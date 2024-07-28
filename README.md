@@ -1,4 +1,4 @@
-# Laravel JWT Authentication Project
+# Inventory System Backend
 
 This project is a Laravel application with JWT (JSON Web Token) authentication for user registration and login.
 
