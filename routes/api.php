@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthAPIController;
+use App\Http\Controllers\API\InventoryAPIController;
+use App\Models\Inventory;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,7 +23,11 @@ Route::post('login', [AuthAPIController::class, 'login']);
 
 Route::middleware('auth:api')->group(function () {
     Route::post('logout', [AuthAPIController::class, 'logout']);
-    Route::get('me', [AuthAPIController::class, 'me']);
     Route::post('refresh', [AuthAPIController::class, 'refresh']);
 });
 
+
+// Inventory
+Route::middleware('auth:api' , 'checkIfAdmin')->group(function () {
+    Route::get('inventories' , [InventoryAPIController::class , 'getInventory']);
+});

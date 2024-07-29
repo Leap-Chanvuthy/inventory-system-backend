@@ -38,27 +38,29 @@ class AuthAPIController extends Controller
 
     public function login(Request $request)
     {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required'
+        ]);
+    
         $credentials = $request->only('email', 'password');
-
-        $token = JWTAuth::attempt($credentials);
-
-        if (!$token) {
+    
+        if (!$token = JWTAuth::attempt($credentials)) {
             return response()->json(['error' => 'Invalid credentials'], 401);
         }
+    
+        $user = Auth::user();
+
+        $userDetails = $user->makeHidden('password');
 
         return response()->json([
-            'user' => $credentials ,
+            'user' => $userDetails,
             'authorisation' => [
                 'token' => $token,
                 'type' => 'Bearer'
             ]
         ], 201);
-    }
-
-    public function me()
-    {
-        return response()->json(auth()->user());
-    }
+    }    
 
     public function logout()
     {
