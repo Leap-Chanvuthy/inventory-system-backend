@@ -1,10 +1,9 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthAPIController;
 use App\Http\Controllers\API\InventoryAPIController;
-use App\Models\Inventory;
+use App\Http\Controllers\API\SupplierAPIController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,7 +16,6 @@ use App\Models\Inventory;
 |
 */
 
-
 Route::post('register', [AuthAPIController::class, 'register']);
 Route::post('login', [AuthAPIController::class, 'login']);
 
@@ -26,8 +24,11 @@ Route::middleware('auth:api')->group(function () {
     Route::post('refresh', [AuthAPIController::class, 'refresh']);
 });
 
-
 // Inventory
-Route::middleware('auth:api' , 'checkIfAdmin')->group(function () {
-    Route::get('inventories' , [InventoryAPIController::class , 'getInventory']);
+Route::middleware(['auth:api', 'checkIfAdmin'])->group(function () {
+    Route::get('inventories', [InventoryAPIController::class, 'getInventory']);
 });
+
+// Supplier
+Route::post('/suppliers/import', [SupplierAPIController::class, 'import'])->name('suppliers.import')->middleware(['auth:api' , 'checkIfAdmin']);
+Route::get('/suppliers/export', [SupplierAPIController::class, 'export'])->name('suppliers.export');
