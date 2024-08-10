@@ -26,6 +26,9 @@ class SupplierExport implements FromCollection, WithHeadings
             'phone_number',
             'location',
             'note',
+            'description',
+            'createdAt',
+            'updatedAt'
         ];
     }
 }

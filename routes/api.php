@@ -22,6 +22,7 @@ Route::post('login', [AuthAPIController::class, 'login']);
 Route::middleware('auth:api')->group(function () {
     Route::post('logout', [AuthAPIController::class, 'logout']);
     Route::post('refresh', [AuthAPIController::class, 'refresh']);
+    Route::post('/change-password' , [AuthAPIController::class , 'changePassword']);
 });
 
 // Inventory
