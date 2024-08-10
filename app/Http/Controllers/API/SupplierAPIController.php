@@ -8,9 +8,65 @@ use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\UploadedFile;
 use App\Http\Controllers\Controller;
+use App\Repositories\Interfaces\SupplierRepositoryInterface;
+
 
 class SupplierAPIController extends Controller
 {
+    protected $supplierRepository;
+
+    public function __construct(SupplierRepositoryInterface $supplierRepository)
+    {
+        $this -> supplierRepository = $supplierRepository;
+    }
+
+    public function index()
+    {
+        try {
+            $suppliers = $this->supplierRepository->all();
+            return response()->json($suppliers);
+        } catch (\Exception $e) {
+            return response()->json(['error' =>  $e->getMessage()], 500);
+        }
+    }
+
+
+    public function show($id){
+        try{
+            $supplier = $this -> supplierRepository->findById($id);
+            return response() ->json($supplier);
+        }catch(\Exception $e){
+            return response() ->json(['error' => $e->getMessage()],500);
+        }
+    }
+
+    public function store (Request $request){
+        try{
+            $supplier = $this -> supplierRepository -> create($request);
+            return response() -> json(['message' => 'Supplier created successfully' , 'supplier' => $supplier],200);
+        }catch(\Exception $e){
+            return response() -> json(['error' => $e -> getMessage()],500);
+        }
+    }
+
+    public function update (Request $request , $id){
+        try{
+            $supplier = $this -> supplierRepository -> update($id , $request);
+            return response() -> json (['message' => 'Supplier updated successfully' , 'supplier' => $supplier],200);
+        } catch (\Exception $e){
+            return response() ->json(['error' => $e -> getMessage()],500);
+        }
+    }
+
+    public function destroy ($id){
+        try{
+            $this -> supplierRepository -> delete($id);
+            return response() -> json(['message' => 'Supplier deleted successfully'] , 200);
+        } catch (\Exception $e){
+            return response() -> json(['error' => $e->getMessage()],500);
+        }
+    }
+
     public function import(Request $request)
     {
         try {

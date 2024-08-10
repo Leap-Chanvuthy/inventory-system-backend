@@ -31,5 +31,10 @@ Route::middleware(['auth:api', 'checkIfAdmin'])->group(function () {
 });
 
 // Supplier
+Route::get('/suppliers' , [SupplierAPIController::class , 'index']);
+Route::get('/supplier/{id}' , [SupplierAPIController::class, 'show']);
+Route::post('/supplier' , [SupplierAPIController::class , 'store']);
+Route::patch('/supplier/{id}', [SupplierAPIController::class , 'update']);
+Route::delete('/supplier/{id}' , [SupplierAPIController::class , 'destroy']);
 Route::post('/suppliers/import', [SupplierAPIController::class, 'import'])->name('suppliers.import')->middleware(['auth:api' , 'checkIfAdmin']);
 Route::get('/suppliers/export', [SupplierAPIController::class, 'export'])->name('suppliers.export');
