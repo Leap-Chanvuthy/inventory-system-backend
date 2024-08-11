@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Inventory;
+use App\Models\Product;
 
 class Supplier extends Model
 {
@@ -18,8 +18,8 @@ class Supplier extends Model
     ];
 
     // Define the relationship with the Inventory model
-    public function inventories()
+    public function products()
     {
-        return $this->hasMany(Inventory::class);
+        return $this->hasMany(Product::class);
     }
 }

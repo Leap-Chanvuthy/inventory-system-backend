@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use app\Models\Supplier;
 
-class Inventory extends Model
+class Product extends Model
 {
     use HasFactory;
 

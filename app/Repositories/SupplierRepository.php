@@ -24,7 +24,7 @@ class SupplierRepository implements SupplierRepositoryInterface
     private function allBuilder(): QueryBuilder
     {
         return QueryBuilder::for(Supplier::class)
-            ->allowedIncludes(['inventories'])
+            ->allowedIncludes(['products'])
             ->allowedFilters([
                 AllowedFilter::exact('id'),
                 AllowedFilter::exact('location'),
@@ -39,12 +39,12 @@ class SupplierRepository implements SupplierRepositoryInterface
 
     public function all(): LengthAwarePaginator
     {
-        return $this->allBuilder()->paginate(10);
+        return $this->allBuilder() ->with('products') ->paginate(10);
     }
 
     public function findById(int $id): Supplier
     {
-        return Supplier::with('inventories')->findOrFail($id);
+        return Supplier::with('products')->findOrFail($id);
     }
 
     public function create(Request $request): Supplier

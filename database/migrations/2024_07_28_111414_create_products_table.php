@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('inventories', function (Blueprint $table) {
+        Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->date('date');
             $table -> string('item_name' , 255);
@@ -36,6 +36,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::disableForeignKeyConstraints();
-        Schema::dropIfExists('inventories');
+        Schema::dropIfExists('products');
     }
 };
