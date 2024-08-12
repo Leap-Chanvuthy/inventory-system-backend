@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum InventoryCategoryEnum: string
+enum ProductCategoryEnum: string
 {
     case RAW_MATERIALS = 'raw_materials';
     case PACKAGING = 'packaging';

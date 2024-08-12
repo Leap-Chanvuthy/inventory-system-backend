@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum InventoryUnitEnum: string
+enum ProductUnitEnum: string
 {
     case PACK = 'pack';
     case BOX = 'box';
