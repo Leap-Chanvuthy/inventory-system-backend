@@ -42,8 +42,8 @@ class SupplierAPIController extends Controller
 
     public function store (Request $request){
         try{
-            $supplier = $this -> supplierRepository -> create($request);
-            return response() -> json(['message' => 'Supplier created successfully' , 'supplier' => $supplier],200);
+            $this -> supplierRepository -> create($request);
+            return response() -> json(['message' => 'Supplier created successfully'],200);
         }catch(\Exception $e){
             return response() -> json(['error' => $e -> getMessage()],500);
         }

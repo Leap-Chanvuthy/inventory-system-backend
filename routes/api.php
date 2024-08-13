@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthAPIController;
 use App\Http\Controllers\API\InventoryAPIController;
 use App\Http\Controllers\API\SupplierAPIController;
+use App\Http\Controllers\API\UserAPIController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,6 +25,16 @@ Route::middleware('auth:api')->group(function () {
     Route::post('refresh', [AuthAPIController::class, 'refresh']);
     Route::post('/change-password' , [AuthAPIController::class , 'changePassword']);
 });
+
+
+Route::get('users' , [UserAPIController::class, 'index']);
+Route::get('users/{id}' , [UserAPIController::class , 'show']);
+Route::post('users' , [UserAPIController::class , 'store']);
+Route::patch('user/{id}', [UserAPIController::class , 'update']);
+Route::delete('user/{id}', [UserAPIController::class , 'destroy']);
+
+
+
 
 // Inventory
 Route::middleware(['auth:api', 'checkIfAdmin'])->group(function () {
