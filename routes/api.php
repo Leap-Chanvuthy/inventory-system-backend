@@ -60,3 +60,5 @@ Route::get('/raw-material/{id}',[RawMaterialAPIController::class, 'show']);
 Route::post('/raw-materials' , [RawMaterialAPIController::class, 'store']);
 Route::patch('/raw-materials/{id}' , [RawMaterialAPIController::class, 'update']);
 Route::delete('/raw-materials/{id}' , [RawMaterialAPIController::class , 'destroy']);
+Route::get('raw-materials/export', [RawMaterialAPIController::class, 'export']);
+Route::post('raw-materials/import', [RawMaterialAPIController::class, 'import']);

@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Illuminate\Support\Facades\Storage;
+use App\Imports\RawMaterialImport;
+use App\Exports\RawMaterialExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class RawMaterialAPIController extends Controller
 {
@@ -119,4 +122,28 @@ class RawMaterialAPIController extends Controller
 
         return response()->json(['message' => 'Raw material deleted successfully'], 200);
     }
+
+    public function export(Request $request)
+    {
+        $filters = $request->all(); // Get all filters from the request
+
+        return Excel::download(new RawMaterialExport($filters), 'raw_materials.xlsx');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'raw_material_file' => 'required|file|mimes:xlsx,csv'
+        ]);
+
+        $file = $request->file('raw_material_file');
+        Excel::import(new RawMaterialImport, $file);
+
+        return response()->json(['message' => 'Raw materials imported successfully'], 200);
+    }
+
+
+
+
+
 }
