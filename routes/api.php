@@ -47,5 +47,5 @@ Route::get('/supplier/{id}' , [SupplierAPIController::class, 'show']);
 Route::post('/supplier' , [SupplierAPIController::class , 'store']);
 Route::patch('/supplier/{id}', [SupplierAPIController::class , 'update']);
 Route::delete('/supplier/{id}' , [SupplierAPIController::class , 'destroy']);
-Route::post('/suppliers/import', [SupplierAPIController::class, 'import'])->name('suppliers.import')->middleware(['auth:api' , 'checkIfAdmin']);
+Route::post('/suppliers/import', [SupplierAPIController::class, 'import'])->name('suppliers.import');
 Route::get('/suppliers/export', [SupplierAPIController::class, 'export'])->name('suppliers.export');

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Product;
+use App\Models\RawMaterial;
 
 class Supplier extends Model
 {
@@ -21,5 +22,9 @@ class Supplier extends Model
     public function products()
     {
         return $this->hasMany(Product::class);
+    }
+
+    public function raw_materials (){
+        return $this -> hasMany(RawMaterial::class);
     }
 }
