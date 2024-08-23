@@ -29,7 +29,7 @@ class RawMaterialAPIController extends Controller
            ->defaultSort('-created_at');
     }
 
-    // Private method for validation and data extraction
+    // Reusable class for validation and data extraction
     private function validateAndExtractData(Request $request, $id = null)
     {
         $rules = [
