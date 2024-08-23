@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthAPIController;
 use App\Http\Controllers\API\InventoryAPIController;
+use App\Http\Controllers\API\RawMaterialAPIController;
 use App\Http\Controllers\API\SupplierAPIController;
 use App\Http\Controllers\API\UserAPIController;
 
@@ -49,3 +50,10 @@ Route::patch('/supplier/{id}', [SupplierAPIController::class , 'update']);
 Route::delete('/supplier/{id}' , [SupplierAPIController::class , 'destroy']);
 Route::post('/suppliers/import', [SupplierAPIController::class, 'import'])->name('suppliers.import');
 Route::get('/suppliers/export', [SupplierAPIController::class, 'export'])->name('suppliers.export');
+
+
+
+
+// raw materials
+
+Route::get('/raw-materials' , [RawMaterialAPIController::class , 'index']);

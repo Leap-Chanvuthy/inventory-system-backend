@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\RawMaterial;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 
@@ -16,6 +17,7 @@ class RawMaterialAPIController extends Controller
            -> allowedIncludes(['suppliers', 'products'])
            -> allowedFilters([
               AllowedFilter::exact('id'),
+              AllowedFilter::exact('name'),
               AllowedFilter::exact('quantity'),
               AllowedFilter::exact('unit_price'),
               AllowedFilter::exact('total_value'),
@@ -28,10 +30,15 @@ class RawMaterialAPIController extends Controller
 
     }
 
-    
 
-    public function index (){
+    public function index () {
+       $raw_materials =  $this -> allBuilder() -> paginate(10);
+       
+       if (!$raw_materials){
+        return response() -> json(['message' => 'No raw materials found'] , 400);
+       }
 
+       return response() -> json(['message' => $raw_materials] , 200);
     }
 
     public function store(Request $request){
