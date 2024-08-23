@@ -15,13 +15,14 @@ return new class extends Migration
             $table->id();
             $table -> string('name' , 50);
             $table -> integer('quantity');
+            $table -> string('image')->nullable();
             $table -> decimal('unit_price' , 10,2);
             $table -> decimal('total_value' , 10, 2);
             $table -> integer('minimum_stock_level');
             $table -> string('unit', 100);
             $table -> string('package_size' , 100);
             $table-> unsignedBigInteger('supplier_id');
-            $table-> unsignedBigInteger('product_id');
+            $table-> unsignedBigInteger('product_id')->nullable();
             
             $table -> foreign('supplier_id')
             ->references('id')
@@ -32,7 +33,7 @@ return new class extends Migration
             $table -> foreign('product_id')
             ->references('id')
             ->on('products')
-            -> onDelete('cascade')
+            -> onDelete('set null')
             ->onUpdate('cascade');
 
             $table->timestamps();

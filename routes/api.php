@@ -55,5 +55,8 @@ Route::get('/suppliers/export', [SupplierAPIController::class, 'export'])->name(
 
 
 // raw materials
-
 Route::get('/raw-materials' , [RawMaterialAPIController::class , 'index']);
+Route::get('/raw-material/{id}',[RawMaterialAPIController::class, 'show']);
+Route::post('/raw-materials' , [RawMaterialAPIController::class, 'store']);
+Route::patch('/raw-materials/{id}' , [RawMaterialAPIController::class, 'update']);
+Route::delete('/raw-materials/{id}' , [RawMaterialAPIController::class , 'destroy']);

@@ -10,16 +10,17 @@ use App\Models\Product;
 class RawMaterial extends Model
 {
     use HasFactory;
-    protected $fillble = [
+    protected $fillable = [
         'name',
         'quantity',
+        'image',
         'unit_price',
         'total_value',
         'minimum_stock_level',
         'unit',
         'package_size',
         'supplier_id',
-        'product_id'
+        'product_id',
     ];
 
 
