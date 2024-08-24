@@ -17,7 +17,7 @@ class RawMaterialAPIController extends Controller
     // Method to build the query for listing raw materials
     private function allBuilder() : QueryBuilder {
         return QueryBuilder::for(RawMaterial::class)
-           ->allowedIncludes(['suppliers', 'products'])
+           ->allowedIncludes(['supplier', 'product'])
            ->allowedFilters([
               AllowedFilter::exact('id'),
               AllowedFilter::exact('name'),
@@ -38,7 +38,7 @@ class RawMaterialAPIController extends Controller
         $rules = [
             'name' => 'required|string|max:50',
             'quantity' => 'required|integer',
-            'image' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'unit_price' => 'required|numeric',
             'total_value' => 'required|numeric',
             'minimum_stock_level' => 'required|integer',
@@ -48,10 +48,6 @@ class RawMaterialAPIController extends Controller
             'product_id' => 'nullable|exists:products,id'
         ];
 
-        if ($id) {
-            $rules['name'] = 'sometimes|required|string|max:50';
-        }
-
         $validatedData = $request->validate($rules);
 
         return $validatedData;
@@ -59,7 +55,8 @@ class RawMaterialAPIController extends Controller
 
     // Index method to list raw materials
     public function index() {
-        $raw_materials = $this->allBuilder()->paginate(10);
+        // $raw_materials = RawMaterial::with('supplier')->paginate(10);
+        $raw_materials = $this->allBuilder() ->with('supplier' , 'product') -> paginate(10);
        
         if (!$raw_materials) {
             return response()->json(['message' => 'No raw materials found'], 400);
@@ -68,68 +65,87 @@ class RawMaterialAPIController extends Controller
         return response()->json(['data' => $raw_materials], 200);
     }
 
-    // Store method to create a new raw material
-    public function store(Request $request) {
-        $data = $this->validateAndExtractData($request);
 
-        if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('images', 'public');
-            $data['image'] = $path;
+    // create a new raw materials
+    public function store(Request $request)
+    {
+        try {
+            $data = $this->validateAndExtractData($request);
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $fileName = time() . '_' . $file->getClientOriginalName();
+                $path = $file->storeAs('raw_materials', $fileName, 'public');  
+                $data['image'] = $path;
+            }
+            $rawMaterial = RawMaterial::create($data);
+            return response()->json(['message' => 'Raw material created successfully', 'data' => $rawMaterial], 201);
+        }catch (\Exception $e){
+            return response() -> json(['error' => $e -> getMessage()],500);
         }
-
-        $rawMaterial = RawMaterial::create($data);
-
-        return response()->json(['message' => 'Raw material created successfully', 'data' => $rawMaterial], 201);
     }
+    
 
     // Update method to modify an existing raw material
-    public function update(Request $request, $id) {
-        $data = $this->validateAndExtractData($request, $id);
+    public function update(Request $request, $id)
+    {
+        try {
+            $validatedData = $this->validateAndExtractData($request, $id);
 
-        $rawMaterial = RawMaterial::find($id);
-
-        if (!$rawMaterial) {
-            return response()->json(['message' => 'Raw material not found'], 404);
-        }
-
-        if ($request->hasFile('image')) {
-            if ($rawMaterial->image && Storage::exists($rawMaterial->image)) {
-                Storage::delete($rawMaterial->image);
+            $rawMaterial = RawMaterial::find($id);
+    
+            if (!$rawMaterial) {
+                return response()->json(['message' => 'Raw material not found'], 404);
             }
+    
+            if ($request->hasFile('image')) {
+                if ($rawMaterial->image && Storage::exists($rawMaterial->image)) {
+                    Storage::delete($rawMaterial->image);
+                }
 
-            $path = $request->file('image')->store('images', 'public');
-            $data['image'] = $path;
+                $image = $request->file('image');
+                $imageName = time() . '_' . $image->getClientOriginalName();
+                $path = $image->storeAs('raw_materials', $imageName, 'public');
+    
+                $validatedData['image'] = $path;
+            }
+    
+            $rawMaterial->update($validatedData);
+    
+            return response()->json(['message' => 'Raw material updated successfully', 'data' => $rawMaterial], 200);
+        
+        }catch (\Exception $e){
+            return response() -> json(['error' => $e -> getMessage()],500);
         }
-
-        $rawMaterial->update($data);
-
-        return response()->json(['message' => 'Raw material updated successfully', 'data' => $rawMaterial], 200);
     }
+
 
     // Destroy method to delete a raw material
     public function destroy($id) {
         $rawMaterial = RawMaterial::find($id);
-
+    
         if (!$rawMaterial) {
             return response()->json(['message' => 'Raw material not found'], 404);
         }
-
-        if ($rawMaterial->image && Storage::exists($rawMaterial->image)) {
-            Storage::delete($rawMaterial->image);
+    
+        if ($rawMaterial->image && Storage::disk('public')->exists($rawMaterial->image)) {
+            Storage::disk('public')->delete($rawMaterial->image);
         }
-
+    
         $rawMaterial->delete();
-
+    
         return response()->json(['message' => 'Raw material deleted successfully'], 200);
     }
+    
 
+    // export record from database 
     public function export(Request $request)
     {
-        $filters = $request->all(); // Get all filters from the request
+        $filters = $request->all();
 
         return Excel::download(new RawMaterialExport($filters), 'raw_materials.xlsx');
     }
 
+    // bulk upload to database
     public function import(Request $request)
     {
         $request->validate([
@@ -141,9 +157,5 @@ class RawMaterialAPIController extends Controller
 
         return response()->json(['message' => 'Raw materials imported successfully'], 200);
     }
-
-
-
-
 
 }
