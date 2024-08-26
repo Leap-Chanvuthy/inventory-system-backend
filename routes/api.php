@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthAPIController;
-use App\Http\Controllers\API\InventoryAPIController;
+use App\Http\Controllers\API\ProductAPIController;
 use App\Http\Controllers\API\RawMaterialAPIController;
 use App\Http\Controllers\API\SupplierAPIController;
 use App\Http\Controllers\API\UserAPIController;
@@ -39,7 +39,7 @@ Route::delete('user/{id}', [UserAPIController::class , 'destroy']);
 
 // Inventory
 Route::middleware(['auth:api', 'checkIfAdmin'])->group(function () {
-    Route::get('inventories', [InventoryAPIController::class, 'getInventory']);
+    Route::get('inventories', [ProductAPIController::class, 'getInventory']);
 });
 
 // Supplier

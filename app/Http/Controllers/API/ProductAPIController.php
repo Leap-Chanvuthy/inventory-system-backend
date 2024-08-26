@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 
-class InventoryAPIController extends Controller
+class ProductAPIController extends Controller
 {
     public function getInventory (){
         $inventories = Supplier::with('inventories')->get();
