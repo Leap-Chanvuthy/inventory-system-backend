@@ -53,19 +53,39 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
     }
 
 
-    public function create(Request $request): RawMaterial
-    {
-        $data = $this->validateAndExtractData($request);
+    // public function create(Request $request): RawMaterial
+    // {
+    //     $data = $this->validateAndExtractData($request);
 
-        if ($request->hasFile('image')) {
-            $file = $request->file('image');
+    //     if ($request->hasFile('image')) {
+    //         $file = $request->file('image');
+    //         $fileName = time() . '_' . $file->getClientOriginalName();
+    //         $path = $file->storeAs('raw_materials', $fileName, 'public');
+    //         $data['image'] = $path;
+    //     }
+
+    //     return RawMaterial::create($data);
+    // }
+
+    public function create(Request $request): array
+{
+    $rawMaterialsData = $this->validateAndExtractData($request);
+
+    $createdMaterials = [];
+
+    foreach ($rawMaterialsData as $data) {
+        if (isset($data['image'])) {
+            $file = $data['image'];
             $fileName = time() . '_' . $file->getClientOriginalName();
             $path = $file->storeAs('raw_materials', $fileName, 'public');
             $data['image'] = $path;
         }
 
-        return RawMaterial::create($data);
+        $createdMaterials[] = RawMaterial::create($data);
     }
+
+    return $createdMaterials;
+}
 
 
     public function update(int $id, Request $request): RawMaterial
@@ -104,23 +124,45 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
     }
 
 
+    // private function validateAndExtractData(Request $request, $id = null): array
+    // {
+    //     $rules = [
+    //         'name' => 'required|string|max:50',
+    //         'quantity' => 'required|integer',
+    //         'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+    //         'unit_price' => 'required|numeric',
+    //         'total_value' => 'required|numeric',
+    //         'minimum_stock_level' => 'required|integer',
+    //         'unit' => 'required|string|max:100',
+    //         'package_size' => 'required|string|max:100',
+    //         'supplier_id' => 'required|exists:suppliers,id',
+    //         'product_id' => 'nullable|exists:products,id'
+    //     ];
+
+    //     $validatedData = $request->validate($rules);
+
+    //     return $validatedData;
+    // }
+
     private function validateAndExtractData(Request $request, $id = null): array
-    {
-        $rules = [
-            'name' => 'required|string|max:50',
-            'quantity' => 'required|integer',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'unit_price' => 'required|numeric',
-            'total_value' => 'required|numeric',
-            'minimum_stock_level' => 'required|integer',
-            'unit' => 'required|string|max:100',
-            'package_size' => 'required|string|max:100',
-            'supplier_id' => 'required|exists:suppliers,id',
-            'product_id' => 'nullable|exists:products,id'
-        ];
+{
+    $rules = [
+        'raw_materials' => 'required|array',
+        'raw_materials.*.name' => 'required|string|max:50',
+        'raw_materials.*.quantity' => 'required|integer',
+        'raw_materials.*.image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        'raw_materials.*.unit_price' => 'required|numeric',
+        'raw_materials.*.total_value' => 'required|numeric',
+        'raw_materials.*.minimum_stock_level' => 'required|integer',
+        'raw_materials.*.unit' => 'required|string|max:100',
+        'raw_materials.*.package_size' => 'required|string|max:100',
+        'raw_materials.*.supplier_id' => 'required|exists:suppliers,id',
+        'raw_materials.*.product_id' => 'nullable|exists:products,id'
+    ];
 
-        $validatedData = $request->validate($rules);
+    $validatedData = $request->validate($rules);
 
-        return $validatedData;
-    }
+    return $validatedData['raw_materials'];
+}
+
 }
