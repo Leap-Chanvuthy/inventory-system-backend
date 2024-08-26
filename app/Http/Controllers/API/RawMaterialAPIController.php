@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException ;
 use App\Imports\RawMaterialImport;
 use App\Exports\RawMaterialExport;
+use App\Repositories\Interfaces\PurchaseInvoiceDetailRepositoryInterface;
+use App\Repositories\Interfaces\PurchaseInvoiceRepositoryInterface;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Repositories\Interfaces\RawMaterialRepositoryInterface;
 
@@ -14,10 +16,14 @@ use App\Repositories\Interfaces\RawMaterialRepositoryInterface;
 class RawMaterialAPIController extends Controller
 {
     protected $rawMaterialRepository;
+    protected $purchaseInvoiceRepository;
+    protected $purchaseInvoiceDetailRepository;
 
-    public function __construct(RawMaterialRepositoryInterface $rawMaterialRepository)
+    public function __construct(RawMaterialRepositoryInterface $rawMaterialRepository , PurchaseInvoiceRepositoryInterface $purchaseInvoiceRepository , PurchaseInvoiceDetailRepositoryInterface $purchaseInvoiceDetailRepository)
     {
         $this->rawMaterialRepository = $rawMaterialRepository;
+        $this -> purchaseInvoiceDetailRepository = $purchaseInvoiceRepository;
+        $this -> purchaseInvoiceDetailRepository = $purchaseInvoiceDetailRepository;
     }
 
     public function index()
