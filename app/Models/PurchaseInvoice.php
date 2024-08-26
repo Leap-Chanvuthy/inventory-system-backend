@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Supplier;
+use App\Models\PurchaseInvoiceDetail;
 
 class PurchaseInvoice extends Model
 {
@@ -32,6 +33,10 @@ class PurchaseInvoice extends Model
     public function supplier()
     {
         return $this->belongsTo(Supplier::class);
+    }
+
+    public function purchaseInvoiceDetails(){
+        return $this -> hasMany(PurchaseInvoiceDetail::class);
     }
 
 }
