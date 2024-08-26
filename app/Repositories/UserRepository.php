@@ -23,8 +23,8 @@ class UserRepository implements UserRepositoryInterface {
         ->allowedFilters([
             AllowedFilter::exact('id'),
             AllowedFilter::exact('role'),
-            AllowedFilter::exact('name'),
-            AllowedFilter::exact('phone_number'),
+            AllowedFilter::partial('name'),
+            AllowedFilter::partial('phone_number'),
         ])
         -> allowedSorts('created_at' , 'updated_at' , 'role')
         -> defaultSort('-created_at');
@@ -32,7 +32,7 @@ class UserRepository implements UserRepositoryInterface {
 
     public function all(): LengthAwarePaginator
     {
-        return $this->allBuilder()->paginate(10);
+        return $this->allBuilder()->paginate(1);
     }
 
     public function findById(int $id): User
