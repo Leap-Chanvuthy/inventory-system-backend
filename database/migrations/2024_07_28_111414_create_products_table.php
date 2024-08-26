@@ -21,7 +21,7 @@ return new class extends Migration
             $table -> double('total_value');
             $table -> string('category' , 255);
             $table -> string('unit' , 255);
-            $table-> unsignedBigInteger('supplier_id');
+            $table-> unsignedBigInteger('supplier_id') -> nullable();
             $table -> foreign('supplier_id')
             ->references('id')
             ->on('suppliers')
