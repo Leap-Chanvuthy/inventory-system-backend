@@ -43,7 +43,7 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
 
     public function all(): LengthAwarePaginator
     {
-        return $this->allBuilder()->with('supplier', 'product')->paginate(10);
+        return $this->allBuilder()->with('supplier', 'purchase_invoices')->paginate(10);
     }
 
 

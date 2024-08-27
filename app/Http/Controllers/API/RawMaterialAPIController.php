@@ -11,19 +11,21 @@ use App\Repositories\Interfaces\PurchaseInvoiceDetailRepositoryInterface;
 use App\Repositories\Interfaces\PurchaseInvoiceRepositoryInterface;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Repositories\Interfaces\RawMaterialRepositoryInterface;
-
+use App\Services\RawMaterialService;
 
 class RawMaterialAPIController extends Controller
 {
     protected $rawMaterialRepository;
     protected $purchaseInvoiceRepository;
     protected $purchaseInvoiceDetailRepository;
+    protected $rawMaterialService;
 
-    public function __construct(RawMaterialRepositoryInterface $rawMaterialRepository , PurchaseInvoiceRepositoryInterface $purchaseInvoiceRepository , PurchaseInvoiceDetailRepositoryInterface $purchaseInvoiceDetailRepository)
+    public function __construct(RawMaterialService $rawMaterialService ,RawMaterialRepositoryInterface $rawMaterialRepository , PurchaseInvoiceRepositoryInterface $purchaseInvoiceRepository , PurchaseInvoiceDetailRepositoryInterface $purchaseInvoiceDetailRepository)
     {
         $this->rawMaterialRepository = $rawMaterialRepository;
         $this -> purchaseInvoiceDetailRepository = $purchaseInvoiceRepository;
         $this -> purchaseInvoiceDetailRepository = $purchaseInvoiceDetailRepository;
+        $this -> rawMaterialService = $rawMaterialService;
     }
 
     public function index()
@@ -36,17 +38,78 @@ class RawMaterialAPIController extends Controller
         return $this->rawMaterialRepository->findById($id);
     }
 
+    // public function store(Request $request)
+    // {
+    //     try {
+    //         $rawMaterial = $this->rawMaterialRepository->create($request);
+    //         return response()->json(['message' => 'Raw material created successfully', 'data' => $rawMaterial], 201);
+    //     } catch (ValidationException $e) {
+    //         return response()->json(['errors' => $e->errors()], 422);
+    //     } catch (\Exception $e) {
+    //         return response()->json(['error' => $e->getMessage()], 500);
+    //     }
+    // }
+
+
+    // public function store(Request $request)
+    // {
+    //     $validatedData = $request->validate([
+    //         'raw_materials.*.name' => 'required|string|max:50',
+    //         'raw_materials.*.quantity' => 'required|integer',
+    //         'raw_materials.*.unit_price' => 'required|numeric',
+    //         'raw_materials.*.total_value' => 'required|numeric',
+    //         'raw_materials.*.minimum_stock_level' => 'required|integer',
+    //         'raw_materials.*.unit' => 'required|string|max:100',
+    //         'raw_materials.*.package_size' => 'required|string|max:100',
+    //         'raw_materials.*.supplier_id' => 'required|exists:suppliers,id',
+    //         'raw_materials.*.product_id' => 'nullable|exists:products,id',
+    //     ]);
+
+    //     // Call the service method to create raw materials and related records
+    //     $result = $this->rawMaterialService->createRawMaterialsWithInvoice($validatedData['raw_materials']);
+
+    //     return response()->json($result, 201);
+    // }
+
+
+
     public function store(Request $request)
     {
-        try {
-            $rawMaterial = $this->rawMaterialRepository->create($request);
-            return response()->json(['message' => 'Raw material created successfully', 'data' => $rawMaterial], 201);
-        } catch (ValidationException $e) {
+        try{
+            $validatedData = $request->validate([
+                'raw_materials.*.name' => 'required|string|max:50',
+                'raw_materials.*.quantity' => 'required|integer',
+                'raw_materials.*.image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                'raw_materials.*.unit_price' => 'required|numeric',
+                'raw_materials.*.total_value' => 'required|numeric',
+                'raw_materials.*.minimum_stock_level' => 'required|integer',
+                'raw_materials.*.unit' => 'required|string|max:100',
+                'raw_materials.*.package_size' => 'required|string|max:100',
+                'raw_materials.*.supplier_id' => 'required|exists:suppliers,id',
+                'raw_materials.*.product_id' => 'nullable|exists:products,id',
+                'discount_percentage' => 'nullable|numeric', 
+                'tax_percentage' => 'nullable|numeric',       
+            ]);
+        
+            $discountPercentage = $request->input('discount_percentage', 0);
+            $taxPercentage = $request->input('tax_percentage', 0);
+        
+            $result = $this->rawMaterialService->createRawMaterialsWithInvoice(
+                $validatedData['raw_materials'],
+                $discountPercentage,
+                0,
+                $taxPercentage,
+                0   
+            );
+        
+            return response()->json($result, 201);
+        }catch (ValidationException $e) {
             return response()->json(['errors' => $e->errors()], 422);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
     
     public function update(Request $request, $id)
     {
