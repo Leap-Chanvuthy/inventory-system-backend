@@ -26,7 +26,7 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
     private function allBuilder(): QueryBuilder
     {
         return QueryBuilder::for(RawMaterial::class)
-            ->allowedIncludes(['supplier', 'product'])
+            ->allowedIncludes(['supplier'])
             ->allowedFilters([
                 AllowedFilter::exact('id'),
                 AllowedFilter::exact('name'),
@@ -43,7 +43,7 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
 
     public function all(): LengthAwarePaginator
     {
-        return $this->allBuilder()->with('supplier', 'purchase_invoices')->paginate(10);
+        return $this->allBuilder()->with('supplier')->paginate(10);
     }
 
 

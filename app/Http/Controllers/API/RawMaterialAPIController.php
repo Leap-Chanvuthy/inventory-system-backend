@@ -73,42 +73,103 @@ class RawMaterialAPIController extends Controller
 
 
 
+    // public function store(Request $request)
+    // {
+    //     try{
+    //         $validatedData = $request->validate([
+    //             'raw_materials.*.name' => 'required|string|max:50',
+    //             'raw_materials.*.quantity' => 'required|integer',
+    //             'raw_materials.*.image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+    //             'raw_materials.*.unit_price' => 'required|numeric',
+    //             'raw_materials.*.total_value' => 'required|numeric',
+    //             'raw_materials.*.minimum_stock_level' => 'required|integer',
+    //             'raw_materials.*.unit' => 'required|string|max:100',
+    //             'raw_materials.*.package_size' => 'required|string|max:100',
+    //             'raw_materials.*.supplier_id' => 'required|exists:suppliers,id',
+    //             'raw_materials.*.product_id' => 'nullable|exists:products,id',
+    //             'discount_percentage' => 'nullable|numeric', 
+    //             'tax_percentage' => 'nullable|numeric',       
+    //         ]);
+        
+    //         $discountPercentage = $request->input('discount_percentage', 0);
+    //         $taxPercentage = $request->input('tax_percentage', 0);
+        
+    //         $result = $this->rawMaterialService->createRawMaterialsWithInvoice(
+    //             $validatedData['raw_materials'],
+    //             $discountPercentage,
+    //             0,
+    //             $taxPercentage,
+    //             0   
+    //         );
+        
+    //         return response()->json($result, 201);
+    //     }catch (ValidationException $e) {
+    //         return response()->json(['errors' => $e->errors()], 422);
+    //     } catch (\Exception $e) {
+    //         return response()->json(['error' => $e->getMessage()], 500);
+    //     }
+    // }
+
+
     public function store(Request $request)
-    {
-        try{
-            $validatedData = $request->validate([
-                'raw_materials.*.name' => 'required|string|max:50',
-                'raw_materials.*.quantity' => 'required|integer',
-                'raw_materials.*.image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-                'raw_materials.*.unit_price' => 'required|numeric',
-                'raw_materials.*.total_value' => 'required|numeric',
-                'raw_materials.*.minimum_stock_level' => 'required|integer',
-                'raw_materials.*.unit' => 'required|string|max:100',
-                'raw_materials.*.package_size' => 'required|string|max:100',
-                'raw_materials.*.supplier_id' => 'required|exists:suppliers,id',
-                'raw_materials.*.product_id' => 'nullable|exists:products,id',
-                'discount_percentage' => 'nullable|numeric', 
-                'tax_percentage' => 'nullable|numeric',       
-            ]);
-        
-            $discountPercentage = $request->input('discount_percentage', 0);
-            $taxPercentage = $request->input('tax_percentage', 0);
-        
-            $result = $this->rawMaterialService->createRawMaterialsWithInvoice(
-                $validatedData['raw_materials'],
-                $discountPercentage,
-                0,
-                $taxPercentage,
-                0   
-            );
-        
-            return response()->json($result, 201);
-        }catch (ValidationException $e) {
-            return response()->json(['errors' => $e->errors()], 422);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+{
+    try {
+        // Validate the request data
+        $validatedData = $request->validate([
+            'raw_materials.*.name' => 'required|string|max:50',
+            'raw_materials.*.quantity' => 'required|integer',
+            'raw_materials.*.image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'raw_materials.*.unit_price' => 'required|numeric',
+            'raw_materials.*.total_value' => 'required|numeric',
+            'raw_materials.*.minimum_stock_level' => 'required|integer',
+            'raw_materials.*.unit' => 'required|string|max:100',
+            'raw_materials.*.package_size' => 'required|string|max:100',
+            'raw_materials.*.supplier_id' => 'required|exists:suppliers,id',
+            'raw_materials.*.product_id' => 'nullable|exists:products,id',
+            'discount_percentage' => 'nullable|numeric',
+            'tax_percentage' => 'nullable|numeric',
+        ]);
+
+        $discountPercentage = $request->input('discount_percentage', 0);
+        $taxPercentage = $request->input('tax_percentage', 0);
+
+        // Extract raw materials data and handle image storage
+        $rawMaterialsData = $validatedData['raw_materials'];
+        $processedRawMaterialsData = [];
+
+        foreach ($rawMaterialsData as $data) {
+            // Check if an image is provided
+            if (isset($data['image'])) {
+                $file = $data['image'];
+                $fileName = time() . '_' . $file->getClientOriginalName();
+                $path = $file->storeAs('raw_materials', $fileName, 'public');
+                $data['image'] = $path; // Save the path of the stored image
+            }
+
+            $processedRawMaterialsData[] = $data; // Add the processed data to the array
         }
+
+        // Call the service method to create raw materials and generate the invoice
+        $result = $this->rawMaterialService->createRawMaterialsWithInvoice(
+            $processedRawMaterialsData,
+            $discountPercentage,
+            0,
+            $taxPercentage,
+            0
+        );
+
+        return response()->json($result, 201);
+    } catch (ValidationException $e) {
+        return response()->json(['errors' => $e->errors()], 422);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
     }
+}
+
+
+
+
+    
 
     
     public function update(Request $request, $id)
