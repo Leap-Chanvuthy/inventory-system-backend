@@ -108,5 +108,219 @@ class RawMaterialService
             throw $e;
         }
     }
+
+
+    // Update service 
+    // public function updateRawMaterialsWithInvoice(
+    //     int $invoiceId,
+    //     array $rawMaterialsData,
+    //     float $discountPercentage = 0,
+    //     float $discountValue = 0,
+    //     float $taxPercentage = 0,
+    //     float $taxValue = 0
+    // ): array {
+    //     DB::beginTransaction();
+    
+    //     try {
+    //         // Fetch the invoice and its details
+    //         $invoice = PurchaseInvoice::findOrFail($invoiceId);
+    //         $existingDetails = $invoice->purchaseInvoiceDetails()->get()->keyBy('raw_material_id');
+    
+    //         $rawMaterials = [];
+    //         $invoiceDetails = [];
+    
+    //         $totalAmount = 0;
+    //         $supplierId = null;
+    
+    //         foreach ($rawMaterialsData as $data) {
+    //             $rawMaterialId = $data['id'] ?? null;
+    
+    //             if ($rawMaterialId) {
+    //                 // Update existing raw material
+    //                 $rawMaterial = RawMaterial::findOrFail($rawMaterialId);
+    //                 $rawMaterial->update($data);
+    //             } else {
+    //                 // Create new raw material
+    //                 $rawMaterial = RawMaterial::create($data);
+    //             }
+    
+    //             $rawMaterials[] = $rawMaterial;
+    //             $totalAmount += $rawMaterial->total_value;
+    
+    //             if ($supplierId === null) {
+    //                 $supplierId = $rawMaterial->supplier_id;
+    //             }
+    
+    //             // Check if this raw material already has an invoice detail
+    //             if (isset($existingDetails[$rawMaterial->id])) {
+    //                 $invoiceDetail = $existingDetails[$rawMaterial->id];
+    //                 $invoiceDetail->update([
+    //                     'quantity' => $rawMaterial->quantity,
+    //                     'total_price' => $rawMaterial->total_value
+    //                 ]);
+    //             } else {
+    //                 $invoiceDetail = [
+    //                     'quantity' => $rawMaterial->quantity,
+    //                     'total_price' => $rawMaterial->total_value,
+    //                     'raw_material_id' => $rawMaterial->id,
+    //                     'purchase_invoice_id' => $invoice->id
+    //                 ];
+    //                 PurchaseInvoiceDetail::create($invoiceDetail);
+    //             }
+    
+    //             $invoiceDetails[] = $invoiceDetail;
+    //         }
+    
+    //         // Delete removed raw materials
+    //         $currentRawMaterialIds = array_column($rawMaterialsData, 'id');
+    //         $deletedDetails = $existingDetails->whereNotIn('id', $currentRawMaterialIds);
+    //         foreach ($deletedDetails as $detail) {
+    //             $detail->delete();
+    //             RawMaterial::findOrFail($detail->raw_material_id)->delete();
+    //         }
+    
+    //         // Apply discount
+    //         $discountAmount = ($totalAmount * $discountPercentage / 100) + $discountValue;
+    
+    //         // Calculate subtotal after discount
+    //         $subTotal = $totalAmount - $discountAmount;
+    
+    //         // Apply tax
+    //         $taxAmount = ($subTotal * $taxPercentage / 100) + $taxValue;
+    
+    //         // Calculate grand total
+    //         $grandTotal = $subTotal + $taxAmount;
+    
+    //         // Update the invoice
+    //         $invoice->update([
+    //             'total_amount' => $grandTotal,
+    //             'payment_method' => 'Default',
+    //             'sub_total' => $subTotal,
+    //             'grand_total' => $grandTotal,
+    //             'discount_percentage' => $discountPercentage,
+    //             'discount_value' => $discountAmount,
+    //             'tax_percentage' => $taxPercentage,
+    //             'tax_value' => $taxAmount,
+    //         ]);
+    
+    //         DB::commit();
+    
+    //         return [
+    //             'message' => 'Raw materials and invoice updated successfully',
+    //             'raw_materials' => $rawMaterials,
+    //             'invoice' => $invoice,
+    //             'invoice_details' => $invoiceDetails
+    //         ];
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         throw $e;
+    //     }
+    // }
+
+    public function updateRawMaterialsWithInvoice(
+        int $invoiceId,
+        array $rawMaterialsData,
+        float $discountPercentage = 0,
+        float $discountValue = 0,
+        float $taxPercentage = 0,
+        float $taxValue = 0
+    ): array {
+        DB::beginTransaction();
+    
+        try {
+            // Fetch the invoice and its details
+            $invoice = PurchaseInvoice::findOrFail($invoiceId);
+            $existingDetails = $invoice->purchaseInvoiceDetails()->get()->keyBy('raw_material_id');
+    
+            $rawMaterials = [];
+            $invoiceDetails = [];
+            $totalAmount = 0;
+            $supplierId = null;
+    
+            // Array to hold IDs of raw materials being processed
+            $currentRawMaterialIds = [];
+    
+            foreach ($rawMaterialsData as $data) {
+                $rawMaterialId = $data['id'] ?? null;
+    
+                if ($rawMaterialId) {
+                    // Update existing raw material
+                    $rawMaterial = RawMaterial::findOrFail($rawMaterialId);
+                    $rawMaterial->update($data);
+                } else {
+                    // Create new raw material
+                    $rawMaterial = RawMaterial::create($data);
+                }
+    
+                // Collect IDs of raw materials being processed
+                $currentRawMaterialIds[] = $rawMaterial->id;
+    
+                $rawMaterials[] = $rawMaterial;
+                $totalAmount += $rawMaterial->total_value;
+    
+                if ($supplierId === null) {
+                    $supplierId = $rawMaterial->supplier_id;
+                }
+    
+                // Update or create invoice detail
+                if (isset($existingDetails[$rawMaterial->id])) {
+                    $invoiceDetail = $existingDetails[$rawMaterial->id];
+                    $invoiceDetail->update([
+                        'quantity' => $rawMaterial->quantity,
+                        'total_price' => $rawMaterial->total_value
+                    ]);
+                } else {
+                    $invoiceDetail = [
+                        'quantity' => $rawMaterial->quantity,
+                        'total_price' => $rawMaterial->total_value,
+                        'raw_material_id' => $rawMaterial->id,
+                        'purchase_invoice_id' => $invoice->id
+                    ];
+                    PurchaseInvoiceDetail::create($invoiceDetail);
+                }
+    
+                $invoiceDetails[] = $invoiceDetail;
+            }
+    
+            // Delete removed raw materials
+            $deletedDetails = $existingDetails->whereNotIn('raw_material_id', $currentRawMaterialIds);
+            foreach ($deletedDetails as $detail) {
+                $detail->delete();
+                RawMaterial::findOrFail($detail->raw_material_id)->delete();
+            }
+    
+            // Apply discount and tax calculations
+            $discountAmount = ($totalAmount * $discountPercentage / 100) + $discountValue;
+            $subTotal = $totalAmount - $discountAmount;
+            $taxAmount = ($subTotal * $taxPercentage / 100) + $taxValue;
+            $grandTotal = $subTotal + $taxAmount;
+    
+            // Update the invoice
+            $invoice->update([
+                'total_amount' => $grandTotal,
+                'payment_method' => 'Default',
+                'sub_total' => $subTotal,
+                'grand_total' => $grandTotal,
+                'discount_percentage' => $discountPercentage,
+                'discount_value' => $discountAmount,
+                'tax_percentage' => $taxPercentage,
+                'tax_value' => $taxAmount,
+            ]);
+    
+            DB::commit();
+    
+            return [
+                'message' => 'Raw materials and invoice updated successfully',
+                'raw_materials' => $rawMaterials,
+                'invoice' => $invoice,
+                'invoice_details' => $invoiceDetails
+            ];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
+    
+    
 }
 
