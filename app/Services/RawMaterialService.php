@@ -34,28 +34,31 @@ class RawMaterialService
         float $discountPercentage = 0,
         float $discountValue = 0,
         float $taxPercentage = 0,
-        float $taxValue = 0
+        float $taxValue = 0,
+        string $paymentMethod = 'Default', 
+        string $status = 'Pending',         
+        float $indebted = 0,               
+        float $clearingPayable = 0         
     ): array {
         DB::beginTransaction();
-
+    
         try {
             $rawMaterials = [];
             $invoiceDetails = [];
-
+    
             $totalAmount = 0;
             $supplierId = null;
-
+    
             foreach ($rawMaterialsData as $data) {
-  
                 $rawMaterial = RawMaterial::create($data);
                 $rawMaterials[] = $rawMaterial;
-
+    
                 $totalAmount += $rawMaterial->total_value;
-
+    
                 if ($supplierId === null) {
                     $supplierId = $rawMaterial->supplier_id;
                 }
-
+    
                 $invoiceDetail = [
                     'quantity' => $rawMaterial->quantity,
                     'total_price' => $rawMaterial->total_value,
@@ -63,42 +66,39 @@ class RawMaterialService
                 ];
                 $invoiceDetails[] = $invoiceDetail;
             }
-
+    
             $discountAmount = ($totalAmount * $discountPercentage / 100) + $discountValue;
-
             $subTotal = $totalAmount - $discountAmount;
-
             $taxAmount = ($subTotal * $taxPercentage / 100) + $taxValue;
-
             $grandTotal = $subTotal + $taxAmount;
-
+    
             $invoiceNumber = $this->generateInvoiceNumber();
-
+    
             $invoice = PurchaseInvoice::create([
                 'total_amount' => $grandTotal,
-                'payment_method' => 'Default',
+                'payment_method' => $paymentMethod, 
                 'invoice_number' => $invoiceNumber,
                 'payment_date' => now(),
                 'supplier_id' => $supplierId,
-                'status' => 'Pending',
+                'status' => $status,                
                 'sub_total' => $subTotal,
                 'grand_total' => $grandTotal,
-                'clearing_payable' => 0, 
+                'clearing_payable' => $clearingPayable, 
+                'indebted' => $indebted,             
                 'discount_percentage' => $discountPercentage,
-                'discount_value' => $discountAmount, 
+                'discount_value' => $discountAmount,
                 'tax_percentage' => $taxPercentage,
                 'tax_value' => $taxAmount,
             ]);
-
+    
             foreach ($invoiceDetails as $detail) {
                 $detail['purchase_invoice_id'] = $invoice->id;
                 PurchaseInvoiceDetail::create($detail);
             }
-
+    
             DB::commit();
-
+    
             return [
-                'message' => 'Raw material and invoice created successfully',
                 'raw_materials' => $rawMaterials,
                 'invoice' => $invoice,
                 'invoice_details' => $invoiceDetails
@@ -108,114 +108,7 @@ class RawMaterialService
             throw $e;
         }
     }
-
-
-    // Update service 
-    // public function updateRawMaterialsWithInvoice(
-    //     int $invoiceId,
-    //     array $rawMaterialsData,
-    //     float $discountPercentage = 0,
-    //     float $discountValue = 0,
-    //     float $taxPercentage = 0,
-    //     float $taxValue = 0
-    // ): array {
-    //     DB::beginTransaction();
     
-    //     try {
-    //         // Fetch the invoice and its details
-    //         $invoice = PurchaseInvoice::findOrFail($invoiceId);
-    //         $existingDetails = $invoice->purchaseInvoiceDetails()->get()->keyBy('raw_material_id');
-    
-    //         $rawMaterials = [];
-    //         $invoiceDetails = [];
-    
-    //         $totalAmount = 0;
-    //         $supplierId = null;
-    
-    //         foreach ($rawMaterialsData as $data) {
-    //             $rawMaterialId = $data['id'] ?? null;
-    
-    //             if ($rawMaterialId) {
-    //                 // Update existing raw material
-    //                 $rawMaterial = RawMaterial::findOrFail($rawMaterialId);
-    //                 $rawMaterial->update($data);
-    //             } else {
-    //                 // Create new raw material
-    //                 $rawMaterial = RawMaterial::create($data);
-    //             }
-    
-    //             $rawMaterials[] = $rawMaterial;
-    //             $totalAmount += $rawMaterial->total_value;
-    
-    //             if ($supplierId === null) {
-    //                 $supplierId = $rawMaterial->supplier_id;
-    //             }
-    
-    //             // Check if this raw material already has an invoice detail
-    //             if (isset($existingDetails[$rawMaterial->id])) {
-    //                 $invoiceDetail = $existingDetails[$rawMaterial->id];
-    //                 $invoiceDetail->update([
-    //                     'quantity' => $rawMaterial->quantity,
-    //                     'total_price' => $rawMaterial->total_value
-    //                 ]);
-    //             } else {
-    //                 $invoiceDetail = [
-    //                     'quantity' => $rawMaterial->quantity,
-    //                     'total_price' => $rawMaterial->total_value,
-    //                     'raw_material_id' => $rawMaterial->id,
-    //                     'purchase_invoice_id' => $invoice->id
-    //                 ];
-    //                 PurchaseInvoiceDetail::create($invoiceDetail);
-    //             }
-    
-    //             $invoiceDetails[] = $invoiceDetail;
-    //         }
-    
-    //         // Delete removed raw materials
-    //         $currentRawMaterialIds = array_column($rawMaterialsData, 'id');
-    //         $deletedDetails = $existingDetails->whereNotIn('id', $currentRawMaterialIds);
-    //         foreach ($deletedDetails as $detail) {
-    //             $detail->delete();
-    //             RawMaterial::findOrFail($detail->raw_material_id)->delete();
-    //         }
-    
-    //         // Apply discount
-    //         $discountAmount = ($totalAmount * $discountPercentage / 100) + $discountValue;
-    
-    //         // Calculate subtotal after discount
-    //         $subTotal = $totalAmount - $discountAmount;
-    
-    //         // Apply tax
-    //         $taxAmount = ($subTotal * $taxPercentage / 100) + $taxValue;
-    
-    //         // Calculate grand total
-    //         $grandTotal = $subTotal + $taxAmount;
-    
-    //         // Update the invoice
-    //         $invoice->update([
-    //             'total_amount' => $grandTotal,
-    //             'payment_method' => 'Default',
-    //             'sub_total' => $subTotal,
-    //             'grand_total' => $grandTotal,
-    //             'discount_percentage' => $discountPercentage,
-    //             'discount_value' => $discountAmount,
-    //             'tax_percentage' => $taxPercentage,
-    //             'tax_value' => $taxAmount,
-    //         ]);
-    
-    //         DB::commit();
-    
-    //         return [
-    //             'message' => 'Raw materials and invoice updated successfully',
-    //             'raw_materials' => $rawMaterials,
-    //             'invoice' => $invoice,
-    //             'invoice_details' => $invoiceDetails
-    //         ];
-    //     } catch (\Exception $e) {
-    //         DB::rollBack();
-    //         throw $e;
-    //     }
-    // }
 
     public function updateRawMaterialsWithInvoice(
         int $invoiceId,
@@ -223,12 +116,15 @@ class RawMaterialService
         float $discountPercentage = 0,
         float $discountValue = 0,
         float $taxPercentage = 0,
-        float $taxValue = 0
+        float $taxValue = 0,
+        string $paymentMethod = 'Default', 
+        string $status = 'Pending',         
+        float $indebted = 0,               
+        float $clearingPayable = 0         
     ): array {
         DB::beginTransaction();
     
         try {
-            // Fetch the invoice and its details
             $invoice = PurchaseInvoice::findOrFail($invoiceId);
             $existingDetails = $invoice->purchaseInvoiceDetails()->get()->keyBy('raw_material_id');
     
@@ -237,22 +133,18 @@ class RawMaterialService
             $totalAmount = 0;
             $supplierId = null;
     
-            // Array to hold IDs of raw materials being processed
             $currentRawMaterialIds = [];
     
             foreach ($rawMaterialsData as $data) {
                 $rawMaterialId = $data['id'] ?? null;
     
                 if ($rawMaterialId) {
-                    // Update existing raw material
-                    $rawMaterial = RawMaterial::findOrFail($rawMaterialId);
+                    $rawMaterial = RawMaterial::withTrashed()->findOrFail($rawMaterialId);
                     $rawMaterial->update($data);
                 } else {
-                    // Create new raw material
                     $rawMaterial = RawMaterial::create($data);
                 }
-    
-                // Collect IDs of raw materials being processed
+
                 $currentRawMaterialIds[] = $rawMaterial->id;
     
                 $rawMaterials[] = $rawMaterial;
@@ -262,7 +154,6 @@ class RawMaterialService
                     $supplierId = $rawMaterial->supplier_id;
                 }
     
-                // Update or create invoice detail
                 if (isset($existingDetails[$rawMaterial->id])) {
                     $invoiceDetail = $existingDetails[$rawMaterial->id];
                     $invoiceDetail->update([
@@ -286,31 +177,31 @@ class RawMaterialService
             $deletedDetails = $existingDetails->whereNotIn('raw_material_id', $currentRawMaterialIds);
             foreach ($deletedDetails as $detail) {
                 $detail->delete();
-                RawMaterial::findOrFail($detail->raw_material_id)->delete();
+                RawMaterial::withTrashed()->findOrFail($detail->raw_material_id)->forceDelete();
             }
     
-            // Apply discount and tax calculations
             $discountAmount = ($totalAmount * $discountPercentage / 100) + $discountValue;
             $subTotal = $totalAmount - $discountAmount;
             $taxAmount = ($subTotal * $taxPercentage / 100) + $taxValue;
             $grandTotal = $subTotal + $taxAmount;
     
-            // Update the invoice
             $invoice->update([
                 'total_amount' => $grandTotal,
-                'payment_method' => 'Default',
+                'payment_method' => $paymentMethod, 
                 'sub_total' => $subTotal,
                 'grand_total' => $grandTotal,
                 'discount_percentage' => $discountPercentage,
                 'discount_value' => $discountAmount,
                 'tax_percentage' => $taxPercentage,
                 'tax_value' => $taxAmount,
+                'status' => $status,                
+                'clearing_payable' => $clearingPayable, 
+                'indebted' => $indebted             
             ]);
     
             DB::commit();
     
             return [
-                'message' => 'Raw materials and invoice updated successfully',
                 'raw_materials' => $rawMaterials,
                 'invoice' => $invoice,
                 'invoice_details' => $invoiceDetails
@@ -320,7 +211,6 @@ class RawMaterialService
             throw $e;
         }
     }
-    
-    
+       
 }
 
