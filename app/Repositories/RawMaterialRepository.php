@@ -29,13 +29,13 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
             ->allowedIncludes(['supplier'])
             ->allowedFilters([
                 AllowedFilter::exact('id'),
-                AllowedFilter::exact('name'),
-                AllowedFilter::exact('quantity'),
-                AllowedFilter::exact('unit_price'),
-                AllowedFilter::exact('total_value'),
-                AllowedFilter::exact('minimum_stock_level'),
-                AllowedFilter::exact('unit'),
-                AllowedFilter::exact('package_size'),
+                AllowedFilter::partial('name'),
+                AllowedFilter::partial('quantity'),
+                AllowedFilter::partial('unit_price'),
+                AllowedFilter::partial('total_value'),
+                AllowedFilter::partial('minimum_stock_level'),
+                AllowedFilter::partial('unit'),
+                AllowedFilter::partial('package_size'),
             ])
             ->allowedSorts('created_at', 'quantity', 'package_size', 'total_value', 'minimum_stock_level')
             ->defaultSort('-created_at');

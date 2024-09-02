@@ -42,6 +42,8 @@ Route::middleware(['auth:api', 'checkIfAdmin'])->group(function () {
     Route::get('inventories', [ProductAPIController::class, 'getInventory']);
 });
 
+Route::get('inventory', [ProductAPIController::class, 'getInventory']);
+
 // Supplier
 Route::get('/suppliers' , [SupplierAPIController::class , 'index']);
 Route::get('/supplier/{id}' , [SupplierAPIController::class, 'show']);
