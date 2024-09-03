@@ -14,7 +14,7 @@ interface SupplierRepositoryInterface
 
     public function create(Request $request): Supplier;
 
-    public function update(int $id, Request $request): Supplier;
+    public function update(Request $request , int $id): Supplier;
 
     public function delete(int $id): void;
 }

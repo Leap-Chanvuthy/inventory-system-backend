@@ -5,6 +5,8 @@ use App\Models\Supplier;
 use App\Repositories\Interfaces\SupplierRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 
@@ -37,6 +39,60 @@ class SupplierRepository implements SupplierRepositoryInterface
             ->defaultSort('-created_at');
     }
 
+    private function validateAndExtractData(Request $request, $id = null){
+        $rule = [
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'name' => 'required|string|max:255',
+            'phone_number' => 'required|string|max:50',
+            'location' => 'required|string|max:255',
+            'longitude' => 'nullable|string|max:100',
+            'latitude' => 'nullable|string|max:100',
+            'address' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:100',
+            'email' => 'required|string|email|max:255|unique:suppliers,email',
+            'contact_person' => 'required|string|max:255',
+            'business_registration_number' => 'nullable|string|max:100',
+            'vat_number' => 'nullable|string|max:100',
+            'bank_account_number' => 'nullable|string|max:50',
+            'bank_account_name' => 'nullable|string|max:50',
+            'bank_name' => 'nullable|string|max:255',
+            'note' => 'required|string',
+        ];
+
+        $validatedData = $request -> validate($rule);
+        return $validatedData;
+    }
+
+    private function validateChange (Request $request , $id){
+        $rule = [
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'name' => 'required|string|max:255',
+            'phone_number' => 'required|string|max:50',
+            'location' => 'required|string|max:255',
+            'longitude' => 'nullable|string|max:100',
+            'latitude' => 'nullable|string|max:100',
+            'address' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:100',
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('suppliers')->ignore($id),
+            ],
+            'contact_person' => 'required|string|max:255',
+            'business_registration_number' => 'nullable|string|max:100',
+            'vat_number' => 'nullable|string|max:100',
+            'bank_account_number' => 'nullable|string|max:50',
+            'bank_account_name' => 'nullable|string|max:50',
+            'bank_name' => 'nullable|string|max:255',
+            'note' => 'required|string',
+        ];
+        $validatedData = $request -> validate($rule);
+        return $validatedData;
+    }
+
+
     public function all(): LengthAwarePaginator
     {
         return $this->allBuilder() ->with('products') ->paginate(10);
@@ -49,13 +105,35 @@ class SupplierRepository implements SupplierRepositoryInterface
 
     public function create(Request $request): Supplier
     {
-        return Supplier::create($request->all());
+        $supplier = $this -> validateAndExtractData($request);
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $path = $file->storeAs('suppliers', $fileName, 'public');
+            $supplier['image'] = $path;
+        }
+
+        return Supplier::create($supplier);
     }
 
-    public function update(int $id, Request $request): Supplier
+    public function update(Request $request, $id): Supplier
     {
+       $supplierData = $this -> validateChange($request , $id);
+        // $supplierData = $request -> all();
         $supplier = Supplier::findOrFail($id);
-        $supplier->update($request->all());
+    
+        if ($request->hasFile('image')) {
+            if ($supplier->image && Storage::disk('public')->exists($supplier->image)) {
+                Storage::disk('public')->delete($supplier->image);
+            }
+
+            $file = $request->file('image');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $path = $file->storeAs('suppliers', $fileName, 'public');
+            $supplierData['image'] = $path;
+        }
+        $supplier->update($supplierData);
+    
         return $supplier;
     }
 

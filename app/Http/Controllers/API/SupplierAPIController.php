@@ -51,7 +51,7 @@ class SupplierAPIController extends Controller
 
     public function update (Request $request , $id){
         try{
-            $supplier = $this -> supplierRepository -> update($id , $request);
+            $supplier = $this -> supplierRepository -> update( $request , $id);
             return response() -> json (['message' => 'Supplier updated successfully' , 'supplier' => $supplier],200);
         } catch (\Exception $e){
             return response() ->json(['error' => $e -> getMessage()],500);
