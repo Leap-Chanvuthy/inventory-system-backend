@@ -6,19 +6,31 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Product;
 use App\Models\RawMaterial;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Supplier extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     protected $fillable = [
         'name',
         'phone_number',
         'location',
+        'longitude',
+        'latitude',
+        'address',
+        'city',
+        'email',
+        'contact_person',
+        'business_registration_number',
+        'vat_number',
+        'bank_account_number',
+        'bank_account_name',
+        'bank_name',
         'note',
     ];
 
-    // Define the relationship with the Inventory model
     public function products()
     {
         return $this->hasMany(Product::class);

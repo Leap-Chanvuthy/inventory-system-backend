@@ -25,10 +25,18 @@ class SupplierExport implements FromCollection, WithHeadings
             'name',
             'phone_number',
             'location',
+            'longitude',
+            'latitude',
+            'address',
+            'city',
+            'email',
+            'contact_person',
+            'business_registration_number',
+            'vat_number',
+            'bank_account_number',
+            'bank_account_name',
+            'bank_name',
             'note',
-            'description',
-            'createdAt',
-            'updatedAt'
         ];
     }
 }
