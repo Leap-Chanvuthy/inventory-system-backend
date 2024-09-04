@@ -81,7 +81,7 @@ class SupplierAPIController extends Controller
 
             return response()->json(['success' => 'Suppliers imported successfully']);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Error importing suppliers: ' . $e->getMessage()], 500);
+            return response()->json(['error' =>  $e->getMessage()], 500);
         }
     }
 
