@@ -110,7 +110,7 @@ class SupplierImport implements ToModel, WithHeadingRow, WithValidation
             'bank_account_name' => $row['bank_account_name'],
             'bank_name' => $row['bank_name'],
             'note' => $row['note'],
-        ]);
+        ]); 
     }
 
     /**
