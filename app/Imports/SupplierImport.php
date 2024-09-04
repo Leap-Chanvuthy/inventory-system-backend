@@ -111,7 +111,7 @@ class SupplierImport implements ToModel, WithHeadingRow, WithValidation
             'bank_name' => $row['bank_name'],
             'note' => $row['note'],
         ]); 
-    } 
+    }  
 
     /**
      * @return array
