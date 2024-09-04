@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
+use Illuminate\Database\Eloquent\Builder;
 
 class SupplierRepository implements SupplierRepositoryInterface
 {
@@ -29,11 +30,20 @@ class SupplierRepository implements SupplierRepositoryInterface
             ->allowedIncludes(['products'])
             ->allowedFilters([
                 AllowedFilter::exact('id'),
-                AllowedFilter::exact('location'),
-                AllowedFilter::partial('name'),
-                AllowedFilter::callback('phone_number', function ($query, $value) {
-                    $query->where('phone_number', 'LIKE', "%{$value}%");
+                AllowedFilter::callback('search', function (Builder $query, $value) {
+                    $query->where(function ($query) use ($value) {
+                        $query->where('location', 'LIKE', "%{$value}%")
+                              ->orWhere('name', 'LIKE', "%{$value}%")
+                              ->orWhere('phone_number', 'LIKE', "%{$value}%")
+                              ->orWhere('location', 'LIKE', "%{$value}%")
+                              ->orWhere('address', 'LIKE', "%{$value}%")
+                              ->orWhere('city', 'LIKE', "%{$value}%")
+                              ->orWhere('contact_person', 'LIKE', "%{$value}%")
+                              ->orWhere('business_registration_number' , 'LIKE' , "%{$value}%")
+                              ->orWhere('bank_name' , 'LIKE' , "%{$value}%");
+                    });
                 }),
+                
             ])
             ->allowedSorts('created_at', 'updated_at', 'name', 'location')
             ->defaultSort('-created_at');

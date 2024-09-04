@@ -28,7 +28,7 @@ return new class extends Migration
             $table->string('bank_account_number', 50)->nullable();
             $table->string('bank_account_name', 50)->nullable();
             $table->string('bank_name', 255)->nullable();
-            $table -> text('note');
+            $table -> text('note') -> nullable();
             $table->timestamps();
             $table -> softDeletes();
         });
