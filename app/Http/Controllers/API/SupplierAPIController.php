@@ -9,7 +9,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\UploadedFile;
 use App\Http\Controllers\Controller;
 use App\Repositories\Interfaces\SupplierRepositoryInterface;
-
+use Illuminate\Validation\ValidationException;
 
 class SupplierAPIController extends Controller
 {
@@ -40,12 +40,23 @@ class SupplierAPIController extends Controller
         }
     }
 
-    public function store (Request $request){
-        try{
-            $this -> supplierRepository -> create($request);
-            return response() -> json(['message' => 'Supplier created successfully'],200);
-        }catch(\Exception $e){
-            return response() -> json(['error' => $e -> getMessage()],500);
+    // public function store (Request $request){
+    //     try{
+    //         $this -> supplierRepository -> create($request);
+    //         return response() -> json(['message' => 'Supplier created successfully'],200);
+    //     }catch(\Exception $e){
+    //         return response() -> json(['error' => $e -> getMessage()],400);
+    //     }
+    // }
+    public function store(Request $request)
+    {
+        try {
+            $this->supplierRepository->create($request);
+            return response()->json(['message' => 'Supplier created successfully'], 200);
+        } catch (ValidationException $e) {
+            return response()->json(['errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
