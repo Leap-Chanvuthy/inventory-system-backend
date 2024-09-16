@@ -40,19 +40,12 @@ class SupplierAPIController extends Controller
         }
     }
 
-    // public function store (Request $request){
-    //     try{
-    //         $this -> supplierRepository -> create($request);
-    //         return response() -> json(['message' => 'Supplier created successfully'],200);
-    //     }catch(\Exception $e){
-    //         return response() -> json(['error' => $e -> getMessage()],400);
-    //     }
-    // }
+
     public function store(Request $request)
     {
         try {
-            $this->supplierRepository->create($request);
-            return response()->json(['message' => 'Supplier created successfully'], 200);
+            $supplier = $this->supplierRepository->create($request);
+            return response()->json(['message' => 'Supplier created successfully', 'supplier' => $supplier], 200);
         } catch (ValidationException $e) {
             return response()->json(['errors' => $e->errors()], 422);
         } catch (\Exception $e) {
@@ -60,12 +53,15 @@ class SupplierAPIController extends Controller
         }
     }
 
-    public function update (Request $request , $id){
-        try{
-            $supplier = $this -> supplierRepository -> update( $request , $id);
-            return response() -> json (['message' => 'Supplier updated successfully' , 'supplier' => $supplier],200);
-        } catch (\Exception $e){
-            return response() ->json(['error' => $e -> getMessage()],500);
+    public function update(Request $request, $id)
+    {
+        try {
+            $supplier = $this->supplierRepository->update($request, $id);
+            return response()->json(['message' => 'Supplier updated successfully', 'supplier' => $supplier], 200);
+        } catch (ValidationException $e) {
+            return response()->json(['errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
@@ -96,10 +92,11 @@ class SupplierAPIController extends Controller
         }
     }
 
-    public function export()
+    public function export(Request $request)
     {
         try {
-            return Excel::download(new SupplierExport, 'suppliers.xlsx');
+            $filters = $request->all();
+            return Excel::download(new SupplierExport($filters), 'suppliers.xlsx');
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error exporting suppliers: ' . $e->getMessage()], 500);
         }

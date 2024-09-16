@@ -78,7 +78,6 @@ use App\Models\Supplier;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
-use Maatwebsite\Excel\Concerns\SkipsOnFailure;
 use Maatwebsite\Excel\Concerns\SkipsFailures;
 use Maatwebsite\Excel\Concerns\Importable;
 use Illuminate\Validation\Rule;
@@ -119,6 +118,7 @@ class SupplierImport implements ToModel, WithHeadingRow, WithValidation
     public function rules(): array
     {
         return [
+            'name' => "required|string|max:50",
             'email' => [
                 'required',
                 'string',
