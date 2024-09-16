@@ -9,6 +9,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Builder;
 
 
 class UserRepository implements UserRepositoryInterface {
@@ -23,8 +24,14 @@ class UserRepository implements UserRepositoryInterface {
         ->allowedFilters([
             AllowedFilter::exact('id'),
             AllowedFilter::exact('role'),
-            AllowedFilter::partial('name'),
-            AllowedFilter::partial('phone_number'),
+            AllowedFilter::callback('search' , function (Builder $query , $value){
+                $query -> where(function ($query) use ($value){
+                    $query -> where ('name' , 'LIKE' , "%{$value}%")
+                           -> orWhere('phone_number' , 'LIKE' , "%{$value}%")
+                           -> orWhere ('email' , 'LIKE' , "%{$value}%")
+                           -> orWhere('role' , 'LIKE' , "%{$value}%");
+                });
+            })
         ])
         -> allowedSorts('created_at' , 'updated_at' , 'role')
         -> defaultSort('-created_at');
@@ -32,7 +39,7 @@ class UserRepository implements UserRepositoryInterface {
 
     public function all(): LengthAwarePaginator
     {
-        return $this->allBuilder()->paginate(1);
+        return $this->allBuilder()->paginate(10);
     }
 
     public function findById(int $id): User
