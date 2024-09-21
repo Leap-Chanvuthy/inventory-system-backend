@@ -33,6 +33,7 @@ Route::get('users/{id}' , [UserAPIController::class , 'show']);
 Route::post('users' , [UserAPIController::class , 'store']);
 Route::patch('user/{id}', [UserAPIController::class , 'update']);
 Route::delete('user/{id}', [UserAPIController::class , 'destroy']);
+Route::get('users/role-counts' ,  [UserAPIController::class , 'getUserRoleCount']);
 
 
 

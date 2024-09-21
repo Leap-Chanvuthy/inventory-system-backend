@@ -49,7 +49,7 @@ class UserRepository implements UserRepositoryInterface {
 
     public function create(Request $request): User
     {
-        $request->validate([
+       $user = $request->validate([
             'name' => 'required|string|max:255',
             'phone_number' => 'nullable|string|max:255',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -57,18 +57,13 @@ class UserRepository implements UserRepositoryInterface {
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        $data = $request->except('profile_picture');
-
         if ($request->hasFile('profile_picture')) {
             $file = $request->file('profile_picture');
             $fileName = time() . '_' . $file->getClientOriginalName();
-            $path = $file->storeAs('profile_pictures', $fileName, 'public');
-            $data['profile_picture'] = $path;
+            $path = $file->storeAs('profile_picture', $fileName, 'public');
+            $user['profile_picture'] = $path;
         }
-        $user = new User($data);
-        $user->save();
-
-        return $user;
+        return User::create($user);
     }
 
     public function update(int $id, Request $request): User

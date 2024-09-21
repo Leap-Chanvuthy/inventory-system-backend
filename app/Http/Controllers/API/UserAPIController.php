@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Repositories\UserRepository;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class UserAPIController extends Controller
 {
@@ -36,7 +39,10 @@ class UserAPIController extends Controller
         try{
             $this -> userRepository -> create($request);
             return response()->json(['message' => 'User created successfully'],200);
-        }catch (\Exception $e){
+        } catch (ValidationException $e){
+            return response()->json(['errors' => $e->errors()], 422);
+        }
+        catch (\Exception $e){
             return response() -> json(['error' => $e -> getMessage()],500);
         }
     }
@@ -57,6 +63,48 @@ class UserAPIController extends Controller
             return response() -> json(['message' => 'User deleted successfully'],200);
         }catch(\Exception $e){
             return response() -> json(['error' => $e -> getMessage()],500);
+        }
+    }
+
+
+    // // Lable for Pie Chart
+    // public function getUserRoleCount()
+    // {
+    //     $roleCounts = User::select('role')
+    //         ->selectRaw('count(*) as count')
+    //         ->groupBy('role')
+    //         ->get();
+
+    //     $labels = [];
+    //     $data = [];
+
+    //     foreach ($roleCounts as $index => $roleData) {
+    //         $labels[] = ucfirst($roleData->role);
+    //         $data[] = $roleData->count;
+    //     }
+
+    //     return response()->json([
+    //         'labels' => $labels,
+    //         'datasets' => [
+    //             [
+    //                 'data' => $data
+    //             ],
+    //         ],
+    //     ]);
+    // }
+
+    public function getUserRoleCount()
+    {
+        try {
+            // Use Eloquent aggregation methods
+            $roleCounts = User::select('role')
+                ->groupBy('role')
+                ->withCount('role as count') // Count the number of users for each role
+                ->get();
+
+            return response()->json($roleCounts);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'An error occurred while processing your request.'], 500);
         }
     }
 
