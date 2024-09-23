@@ -9,6 +9,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Illuminate\Database\Eloquent\Builder;
 
 
@@ -60,7 +61,7 @@ class UserRepository implements UserRepositoryInterface {
         if ($request->hasFile('profile_picture')) {
             $file = $request->file('profile_picture');
             $fileName = time() . '_' . $file->getClientOriginalName();
-            $path = $file->storeAs('profile_picture', $fileName, 'public');
+            $path = $file->storeAs('profile_pictures', $fileName, 'public');
             $user['profile_picture'] = $path;
         }
         return User::create($user);
@@ -69,18 +70,28 @@ class UserRepository implements UserRepositoryInterface {
     public function update(int $id, Request $request): User
     {
         $user = User::findOrFail($id);
-        $data = $request->all();
+        $validation = $request->validate([
+            'name' => 'required|string|max:255',
+            'phone_number' => 'nullable|string|max:255',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('suppliers')->ignore($id),
+            ],
+            'password' => 'required|string|min:8|confirmed',
+        ]);
 
         if ($request->hasFile('profile_picture')) {
             if ($user->profile_picture) {
                 Storage::disk('public')->delete($user->profile_picture);
             }
-            $file = $request->file('profile_picture')->store('profile_pictures', 'public');
-            $data['profile_picture'] = $file;
+            $file = $request->file('profile_picture')->storeAs('profile_pictures', 'public');
+            $validation['profile_picture'] = $file;
         }
-
-        $user->update($data);
-        return $user;
+        return $user->update($validation);
     }
 
 

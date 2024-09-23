@@ -52,7 +52,11 @@ class UserAPIController extends Controller
         try{
             $user = $this -> userRepository -> update($id , $request);
             return response() -> json(['message' => 'User updated successfully' , 'user' => $user],200);
-        }catch (\Exception $e){
+        }
+        catch (ValidationException $e){
+            return response()->json(['errors' => $e->errors()], 422);
+        }
+        catch (\Exception $e){
             return response() -> json(['error' => $e -> getMessage()],500);
         }
     }
@@ -66,32 +70,6 @@ class UserAPIController extends Controller
         }
     }
 
-
-    // // Lable for Pie Chart
-    // public function getUserRoleCount()
-    // {
-    //     $roleCounts = User::select('role')
-    //         ->selectRaw('count(*) as count')
-    //         ->groupBy('role')
-    //         ->get();
-
-    //     $labels = [];
-    //     $data = [];
-
-    //     foreach ($roleCounts as $index => $roleData) {
-    //         $labels[] = ucfirst($roleData->role);
-    //         $data[] = $roleData->count;
-    //     }
-
-    //     return response()->json([
-    //         'labels' => $labels,
-    //         'datasets' => [
-    //             [
-    //                 'data' => $data
-    //             ],
-    //         ],
-    //     ]);
-    // }
 
     public function getUserRoleCount()
     {
