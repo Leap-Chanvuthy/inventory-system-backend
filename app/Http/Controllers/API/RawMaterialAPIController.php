@@ -137,9 +137,9 @@ class RawMaterialAPIController extends Controller
         $result = $this->rawMaterialService->createRawMaterialsWithInvoice(
             $processedRawMaterialsData,
             $discountPercentage,
-            0, // Assuming you are not passing discount value in the request
+            0, 
             $taxPercentage,
-            0, // Assuming you are not passing tax value in the request
+            0, 
             $paymentMethod,
             $status,
             $indebted,
