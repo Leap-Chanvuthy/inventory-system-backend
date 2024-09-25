@@ -13,10 +13,9 @@ return new class extends Migration
     {
         Schema::create('suppliers', function (Blueprint $table) {
             $table->id();
-            $table->id();
             $table->string('image', 255)->nullable();
             $table->string('name', 255);
-            $table->string('supplier_code', 100)->unique(); // New field
+            $table->string('supplier_code', 100)->unique();
             $table->string('phone_number', 50);
             $table->string('location', 255);
             $table->string('longitude', 100)->nullable();

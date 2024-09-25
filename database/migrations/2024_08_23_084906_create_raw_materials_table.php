@@ -21,7 +21,7 @@ return new class extends Migration
             $table -> integer('minimum_stock_level');
             $table -> string('unit', 100);
             $table -> string('package_size' , 100);
-            $table-> unsignedBigInteger('supplier_id');
+            $table-> unsignedBigInteger('supplier_id') -> nullable();
             $table-> unsignedBigInteger('product_id')->nullable();
             
             $table -> foreign('supplier_id')
@@ -46,6 +46,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::disableForeignKeyConstraints();
         Schema::dropIfExists('raw_materials');
     }
 };
