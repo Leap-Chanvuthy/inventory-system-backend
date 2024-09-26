@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Repositories;
 
 use App\Models\RawMaterial;
@@ -31,25 +32,28 @@ class SupplierRepository implements SupplierRepositoryInterface
             ->allowedIncludes(['products'])
             ->allowedFilters([
                 AllowedFilter::exact('id'),
+                AllowedFilter::exact('supplier_status'),
+                AllowedFilter::exact('supplier_category'),
                 AllowedFilter::callback('search', function (Builder $query, $value) {
                     $query->where(function ($query) use ($value) {
                         $query->where('location', 'LIKE', "%{$value}%")
-                              ->orWhere('name', 'LIKE', "%{$value}%")
-                              ->orWhere('phone_number', 'LIKE', "%{$value}%")
-                              ->orWhere('location', 'LIKE', "%{$value}%")
-                              ->orWhere('address', 'LIKE', "%{$value}%")
-                              ->orWhere('contact_person', 'LIKE', "%{$value}%")
-                              ->orWhere('business_registration_number' , 'LIKE' , "%{$value}%")
-                              ->orWhere('bank_name' , 'LIKE' , "%{$value}%");
+                            ->orWhere('name', 'LIKE', "%{$value}%")
+                            ->orWhere('phone_number', 'LIKE', "%{$value}%")
+                            ->orWhere('location', 'LIKE', "%{$value}%")
+                            ->orWhere('address', 'LIKE', "%{$value}%")
+                            ->orWhere('contact_person', 'LIKE', "%{$value}%")
+                            ->orWhere('business_registration_number', 'LIKE', "%{$value}%")
+                            ->orWhere('bank_name', 'LIKE', "%{$value}%");
                     });
                 }),
-                
+
             ])
             ->allowedSorts('created_at', 'updated_at')
             ->defaultSort('-created_at');
     }
 
-    private function validateAndExtractData(Request $request, $id = null){
+    private function validateAndExtractData(Request $request, $id = null)
+    {
         $rule = [
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'name' => 'required|string|max:255',
@@ -76,12 +80,13 @@ class SupplierRepository implements SupplierRepositoryInterface
             'note' => 'nullable|string',
         ];
 
-        $validatedData = $request -> validate($rule);
+        $validatedData = $request->validate($rule);
         return $validatedData;
     }
 
 
-    private function validateChange (Request $request , $id){
+    private function validateChange(Request $request, $id)
+    {
 
         $rule = [
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -115,7 +120,7 @@ class SupplierRepository implements SupplierRepositoryInterface
             'note' => 'nullable|string',
         ];
 
-        $validatedData = $request -> validate($rule);
+        $validatedData = $request->validate($rule);
         return $validatedData;
     }
 
@@ -130,12 +135,12 @@ class SupplierRepository implements SupplierRepositoryInterface
         $newNumber = str_pad($lastCode + 1, 6, '0', STR_PAD_LEFT);
         return 'SUPP-' . $newNumber;
     }
-    
+
 
 
     public function all(): LengthAwarePaginator
     {
-        return $this->allBuilder() ->with('raw_materials') ->paginate(10);
+        return $this->allBuilder()->with('raw_materials')->paginate(10);
     }
 
     public function findById(int $id): Supplier
@@ -145,8 +150,8 @@ class SupplierRepository implements SupplierRepositoryInterface
 
     public function create(Request $request): Supplier
     {
-        $supplier = $this -> validateAndExtractData($request);
-        $supplier['supplier_code'] = $this -> generateSupplierCode();
+        $supplier = $this->validateAndExtractData($request);
+        $supplier['supplier_code'] = $this->generateSupplierCode();
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $fileName = time() . '_' . $file->getClientOriginalName();
@@ -159,10 +164,10 @@ class SupplierRepository implements SupplierRepositoryInterface
 
     public function update(Request $request, $id): Supplier
     {
-       $supplierData = $this -> validateChange($request , $id);
+        $supplierData = $this->validateChange($request, $id);
         // $supplierData = $request -> all();
         $supplier = Supplier::findOrFail($id);
-    
+
         if ($request->hasFile('image')) {
             if ($supplier->image && Storage::disk('public')->exists($supplier->image)) {
                 Storage::disk('public')->delete($supplier->image);
@@ -172,19 +177,21 @@ class SupplierRepository implements SupplierRepositoryInterface
             $fileName = time() . '_' . $file->getClientOriginalName();
             $path = $file->storeAs('suppliers', $fileName, 'public');
             $supplierData['image'] = $path;
+        } else {
+            $supplierData['image'] = $supplier->image;
         }
-        $supplier->update($supplierData);
 
+        $supplier->update($supplierData);
 
         // relationship manager
         if ($request->has('raw_materials')) {
-            $rawMaterialIds = $request->input('raw_materials'); 
+            $rawMaterialIds = $request->input('raw_materials');
 
             $supplier->raw_materials()->whereNotIn('id', $rawMaterialIds)->update(['supplier_id' => null]);
 
             foreach ($rawMaterialIds as $rawMaterialId) {
                 $rawMaterial = RawMaterial::find($rawMaterialId);
-    
+
                 if ($rawMaterial) {
 
                     $rawMaterial->supplier_id = $supplier->id;
@@ -194,6 +201,7 @@ class SupplierRepository implements SupplierRepositoryInterface
         }
         return $supplier;
     }
+
 
     public function delete(int $id): void
     {
