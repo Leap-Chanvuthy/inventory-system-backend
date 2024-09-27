@@ -71,19 +71,21 @@ class UserAPIController extends Controller
     }
 
 
+    // stats
     public function getUserRoleCount()
     {
         try {
-            // Use Eloquent aggregation methods
-            $roleCounts = User::select('role')
+            $userRole = User::selectRaw('role, COUNT(*) as count')
                 ->groupBy('role')
-                ->withCount('role as count') // Count the number of users for each role
                 ->get();
-
-            return response()->json($roleCounts);
+    
+            return response()->json([
+                'user_role' => $userRole,
+            ]);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred while processing your request.'], 500);
+            return response()->json(['error' => $e->getMessage()], 500); // Corrected line
         }
     }
+    
 
 }

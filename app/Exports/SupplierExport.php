@@ -26,21 +26,32 @@ class SupplierExport implements FromQuery, WithHeadings
         return QueryBuilder::for(Supplier::class)
             ->allowedFilters([
                 AllowedFilter::partial('location'),
-                AllowedFilter::partial('city'),
                 AllowedFilter::partial('bank_name'),
+                AllowedFilter::exact('supplier_status'),
+                AllowedFilter::exact('supplier_category'),
+                AllowedFilter::partial('contract_length'),
+                AllowedFilter::partial('discount_term'),
+                AllowedFilter::partial('payment_term'),
             ])
-            ->allowedSorts('name', 'city', 'created_at', 'updated_at')
+            ->allowedSorts('name' ,'created_at', 'updated_at')
             ->defaultSort('-created_at')
             ->select([
                 'name',
+                'supplier_code',
                 'phone_number',
                 'location',
                 'longitude',
                 'latitude',
                 'address',
-                'city',
                 'email',
                 'contact_person',
+                'website', 
+                'social_media', 
+                'supplier_category', 
+                'supplier_status', 
+                'contract_length', 
+                'discount_term', 
+                'payment_term', 
                 'business_registration_number',
                 'vat_number',
                 'bank_account_number',
@@ -59,14 +70,21 @@ class SupplierExport implements FromQuery, WithHeadings
     {
         return [
             'name',
+            'supplier_code',
             'phone_number',
             'location',
             'longitude',
             'latitude',
             'address',
-            'city',
             'email',
             'contact_person',
+            'website', 
+            'social_media', 
+            'supplier_category', 
+            'supplier_status', 
+            'contract_length', 
+            'discount_term', 
+            'payment_term', 
             'business_registration_number',
             'vat_number',
             'bank_account_number',
