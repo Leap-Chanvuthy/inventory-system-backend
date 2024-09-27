@@ -51,6 +51,7 @@ Route::get('/supplier/{id}' , [SupplierAPIController::class, 'show']);
 Route::post('/supplier' , [SupplierAPIController::class , 'store']);
 Route::patch('/supplier/{id}', [SupplierAPIController::class , 'update']);
 Route::delete('/supplier/{id}' , [SupplierAPIController::class , 'destroy']);
+Route::get('/suppliers/stats', [SupplierAPIController::class, 'getSupplierStats']);
 Route::post('/suppliers/import', [SupplierAPIController::class, 'import'])->name('suppliers.import');
 Route::get('/suppliers/export', [SupplierAPIController::class, 'export'])->name('suppliers.export');
 

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\UploadedFile;
 use App\Http\Controllers\Controller;
+use App\Models\Supplier;
 use App\Repositories\Interfaces\SupplierRepositoryInterface;
 use Illuminate\Validation\ValidationException;
 
@@ -73,6 +74,28 @@ class SupplierAPIController extends Controller
             return response() -> json(['error' => $e->getMessage()],500);
         }
     }
+
+    // stats
+    public function getSupplierStats()
+    {
+        try{
+            $statusData = Supplier::selectRaw('supplier_status, COUNT(*) as count')
+            ->groupBy('supplier_status')
+            ->get();
+
+            $categoryData = Supplier::selectRaw('supplier_category, COUNT(*) as count')
+                        ->groupBy('supplier_category')
+                        ->get();
+
+            return response()->json([
+            'supplier_status' => $statusData,
+            'supplier_category' => $categoryData,
+            ]);
+        } catch (\Exception $e){
+            return response() -> json(['error' => $e->getMessage(),500]);
+        }
+    }
+
 
     public function import(Request $request)
     {
