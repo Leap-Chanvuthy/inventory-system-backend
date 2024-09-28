@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Supplier;
-use App\Models\Product;
+use App\Models\RawMaterialImage;
 
 class RawMaterial extends Model
 {
@@ -14,15 +14,19 @@ class RawMaterial extends Model
     use SoftDeletes;
     protected $fillable = [
         'name',
+        'material_code',
         'quantity',
-        'image',
         'unit_price',
         'total_value',
         'minimum_stock_level',
-        'unit',
+        'raw_material_category',
+        'unit_of_measurement',
         'package_size',
+        'status',
+        'location',
+        'description',
+        'expiry_date',
         'supplier_id',
-        'product_id',
     ];
 
 
@@ -30,7 +34,8 @@ class RawMaterial extends Model
         return $this -> belongsTo(Supplier::class);
     }
 
-    public function product(){
-        return $this ->  belongsTo(Product::class);
+    public function raw_material_images (){
+        return $this -> hasMany(RawMaterialImage::class);
     }
+
 }

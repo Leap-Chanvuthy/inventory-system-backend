@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Http\Requests\StoreRawMaterialRequest;
 use App\Models\RawMaterial;
 use App\Repositories\Interfaces\RawMaterialRepositoryInterface;
 use Illuminate\Http\Request;
@@ -34,7 +35,6 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
                 AllowedFilter::partial('unit_price'),
                 AllowedFilter::partial('total_value'),
                 AllowedFilter::partial('minimum_stock_level'),
-                AllowedFilter::partial('unit'),
                 AllowedFilter::partial('package_size'),
             ])
             ->allowedSorts('created_at', 'quantity', 'package_size', 'total_value', 'minimum_stock_level')
@@ -53,60 +53,50 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
     }
 
 
-    // public function create(Request $request): RawMaterial
-    // {
-    //     $data = $this->validateAndExtractData($request);
 
-    //     if ($request->hasFile('image')) {
-    //         $file = $request->file('image');
-    //         $fileName = time() . '_' . $file->getClientOriginalName();
-    //         $path = $file->storeAs('raw_materials', $fileName, 'public');
-    //         $data['image'] = $path;
-    //     }
 
-    //     return RawMaterial::create($data);
-    // }
+    public function create(Request $request): RawMaterial
+    {
 
-    public function create(Request $request): array
-{
-    $rawMaterialsData = $this->validateAndExtractData($request);
+        $data = $this -> validateAndExtractData($request);
 
-    $createdMaterials = [];
-
-    foreach ($rawMaterialsData as $data) {
-        if (isset($data['image'])) {
-            $file = $data['image'];
-            $fileName = time() . '_' . $file->getClientOriginalName();
-            $path = $file->storeAs('raw_materials', $fileName, 'public');
-            $data['image'] = $path;
+        $rawMaterial = RawMaterial::create($data);
+        
+        if ($request->hasFile('image')) {
+            foreach ($request->file('image') as $file) {
+                $fileName = time() . '_' . $file->getClientOriginalName();
+                $path = $file->storeAs('raw_materials', $fileName, 'public');
+                
+                $rawMaterial->raw_material_images()->create(['image' => $path]);
+            }
         }
 
-        $createdMaterials[] = RawMaterial::create($data);
+        return $rawMaterial;
     }
-
-    return $createdMaterials;
-}
 
 
     public function update(int $id, Request $request): RawMaterial
     {
-        $data = $this->validateAndExtractData($request, $id);
+        $data = $this->validateAndExtractData($request);
 
-        $rawMaterial = RawMaterial::findOrFail($id);
-
-        if ($request->hasFile('image')) {
-            if ($rawMaterial->image && Storage::exists($rawMaterial->image)) {
-                Storage::delete($rawMaterial->image);
-            }
-
-            $image = $request->file('image');
-            $imageName = time() . '_' . $image->getClientOriginalName();
-            $path = $image->storeAs('raw_materials', $imageName, 'public');
-
-            $data['image'] = $path;
-        }
+        $rawMaterial = RawMaterial::with('raw_material_images') -> findOrFail($id);
 
         $rawMaterial->update($data);
+
+        if ($request->hasFile('image')) {
+            foreach ($rawMaterial->raw_material_images as $image) {
+                if (Storage::disk('public')->exists($image->image)) {
+                    Storage::disk('public')->delete($image->image);
+                }
+                $image->delete();
+            }
+            foreach ($request->file('image') as $file) {
+                $fileName = time() . '_' . $file->getClientOriginalName();
+                $path = $file->storeAs('raw_materials', $fileName, 'public');
+                
+                $rawMaterial->raw_material_images()->create(['image' => $path]);
+            }
+        }
 
         return $rawMaterial;
     }
@@ -116,53 +106,39 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
     {
         $rawMaterial = RawMaterial::findOrFail($id);
 
-        if ($rawMaterial->image && Storage::disk('public')->exists($rawMaterial->image)) {
-            Storage::disk('public')->delete($rawMaterial->image);
+        foreach ($rawMaterial->raw_material_images as $image) {
+            if ($image->image && Storage::disk('public')->exists($image->image)) {
+                Storage::disk('public')->delete($image->image);
+            }
+            $image->delete();
         }
 
         $rawMaterial->delete();
     }
 
 
-    // private function validateAndExtractData(Request $request, $id = null): array
-    // {
-    //     $rules = [
-    //         'name' => 'required|string|max:50',
-    //         'quantity' => 'required|integer',
-    //         'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-    //         'unit_price' => 'required|numeric',
-    //         'total_value' => 'required|numeric',
-    //         'minimum_stock_level' => 'required|integer',
-    //         'unit' => 'required|string|max:100',
-    //         'package_size' => 'required|string|max:100',
-    //         'supplier_id' => 'required|exists:suppliers,id',
-    //         'product_id' => 'nullable|exists:products,id'
-    //     ];
-
-    //     $validatedData = $request->validate($rules);
-
-    //     return $validatedData;
-    // }
-
     private function validateAndExtractData(Request $request, $id = null): array
-{
-    $rules = [
-        'raw_materials' => 'required|array',
-        'raw_materials.*.name' => 'required|string|max:50',
-        'raw_materials.*.quantity' => 'required|integer',
-        'raw_materials.*.image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-        'raw_materials.*.unit_price' => 'required|numeric',
-        'raw_materials.*.total_value' => 'required|numeric',
-        'raw_materials.*.minimum_stock_level' => 'required|integer',
-        'raw_materials.*.unit' => 'required|string|max:100',
-        'raw_materials.*.package_size' => 'required|string|max:100',
-        'raw_materials.*.supplier_id' => 'required|exists:suppliers,id',
-        'raw_materials.*.product_id' => 'nullable|exists:products,id'
-    ];
+    {
+        $rules = [
+            'name' => 'required|string|max:50',
+            'material_code' => 'required|string|max:255',
+            'quantity' => 'required|integer',
+            'unit_price' => 'required|numeric',
+            'total_value' => 'required|numeric',
+            'minimum_stock_level' => 'required|integer',
+            'raw_material_category' => 'required|string|max:100',
+            'unit_of_measurement' => 'required|string|max:100',
+            'package_size' => 'nullable|string|max:100',
+            'status' => 'nullable|string|max:100',
+            'location' => 'nullable|string|max:100',
+            'description' => 'nullable|string',
+            'expiry_date' => 'nullable|date',
+            'image.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ];
 
-    $validatedData = $request->validate($rules);
+        $validatedData = $request->validate($rules);
 
-    return $validatedData['raw_materials'];
-}
+        return $validatedData;
+    }
 
 }

@@ -14,27 +14,27 @@ return new class extends Migration
         Schema::create('raw_materials', function (Blueprint $table) {
             $table->id();
             $table -> string('name' , 50);
+            // $table -> string('images')->nullable();
+            $table -> string('material_code' , 255);
             $table -> integer('quantity');
-            $table -> string('image')->nullable();
             $table -> decimal('unit_price' , 10,2);
             $table -> decimal('total_value' , 10, 2);
             $table -> integer('minimum_stock_level');
-            $table -> string('unit', 100);
-            $table -> string('package_size' , 100);
+            $table -> string('raw_material_category' ,100);
+            $table -> string('unit_of_measurement', 100);
+            $table -> string('package_size' , 100) -> nullable();
+            $table -> string('status' , 100) -> nullable();
+            $table -> string('location' , 100) -> nullable();
+            $table -> text('description') -> nullable();
+            $table -> date('expiry_date') -> nullable();
             $table-> unsignedBigInteger('supplier_id') -> nullable();
-            $table-> unsignedBigInteger('product_id')->nullable();
             
             $table -> foreign('supplier_id')
             ->references('id')
             ->on('suppliers')
-            -> onDelete('cascade')
+            ->onDelete('cascade')
             ->onUpdate('cascade');
 
-            $table -> foreign('product_id')
-            ->references('id')
-            ->on('products')
-            -> onDelete('set null')
-            ->onUpdate('cascade');
 
             $table->timestamps();
             $table->softDeletes();

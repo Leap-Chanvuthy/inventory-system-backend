@@ -29,7 +29,4 @@ class Product extends Model
         return $this->belongsTo(Supplier::class);
     }
 
-    public function raw_materials (){
-        return $this -> hasMany(RawMaterial::class);
-    }
 }
