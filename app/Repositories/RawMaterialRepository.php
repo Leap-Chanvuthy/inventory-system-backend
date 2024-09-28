@@ -2,7 +2,6 @@
 
 namespace App\Repositories;
 
-use App\Http\Requests\StoreRawMaterialRequest;
 use App\Models\RawMaterial;
 use App\Repositories\Interfaces\RawMaterialRepositoryInterface;
 use Illuminate\Http\Request;
@@ -10,6 +9,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Storage;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
+use Illuminate\Database\Eloquent\Builder;
 
 class RawMaterialRepository implements RawMaterialRepositoryInterface
 {
@@ -30,14 +30,22 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
             ->allowedIncludes(['supplier'])
             ->allowedFilters([
                 AllowedFilter::exact('id'),
-                AllowedFilter::partial('name'),
-                AllowedFilter::partial('quantity'),
-                AllowedFilter::partial('unit_price'),
-                AllowedFilter::partial('total_value'),
-                AllowedFilter::partial('minimum_stock_level'),
-                AllowedFilter::partial('package_size'),
+                AllowedFilter::exact('raw_material_category'),
+                AllowedFilter::exact('status'),
+                AllowedFilter::exact('minimum_stock_level'),
+                AllowedFilter::callback('search', function (Builder $query, $value) {
+                    $query->where(function ($query) use ($value) {
+                        $query->where('name', 'LIKE', "%{$value}%")
+                            ->orWhere('material_code', 'LIKE', "%{$value}%")
+                            ->orWhere('unit_price', 'LIKE', "%{$value}%")
+                            ->orWhere('total_value', 'LIKE', "%{$value}%")
+                            ->orWhere('location', 'LIKE', "%{$value}%")
+                            ->orWhere('status', 'LIKE', "%{$value}%")
+                            ->orWhere('raw_material_category', 'LIKE', "%{$value}%");
+                    });
+                })
             ])
-            ->allowedSorts('created_at', 'quantity', 'package_size', 'total_value', 'minimum_stock_level')
+            ->allowedSorts('created_at', 'updated_at')
             ->defaultSort('-created_at');
     }
 
