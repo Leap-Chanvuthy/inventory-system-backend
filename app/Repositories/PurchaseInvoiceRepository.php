@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
+use Illuminate\Database\Eloquent\Builder;
 use Exception;
 
 class PurchaseInvoiceRepository implements PurchaseInvoiceRepositoryInterface
@@ -27,18 +28,29 @@ class PurchaseInvoiceRepository implements PurchaseInvoiceRepositoryInterface
             ->allowedIncludes(['purchaseInvoiceDetails'])
             ->allowedFilters([
                 AllowedFilter::exact('id'),
-                AllowedFilter::exact('invoice_number'),
-                AllowedFilter::exact('payment_method'),
-                AllowedFilter::exact('status'),
-                AllowedFilter::partial('total_amount'),
-                AllowedFilter::partial('discount_percentage'),
-                AllowedFilter::partial('tax_percentage'),
-                AllowedFilter::partial('sub_total'),
-                AllowedFilter::partial('grand_total'),
+                AllowedFilter::exact('status'),  
+                AllowedFilter::exact('payment_method'), 
+                AllowedFilter::callback('search', function (Builder $query, $value) {
+                    $query->where(function ($query) use ($value) {
+                        $query->where('invoice_number', 'LIKE', "%{$value}%")
+                            ->orWhere('total_amount', 'LIKE', "%{$value}%")
+                            ->orWhere('discount_percentage', 'LIKE', "%{$value}%")
+                            ->orWhere('tax_percentage', 'LIKE', "%{$value}%")
+                            ->orWhere('sub_total', 'LIKE', "%{$value}%")
+                            ->orWhere('grand_total', 'LIKE', "%{$value}%");
+                    });
+                }),
+                AllowedFilter::callback('date_range', function (Builder $query, $value) {
+                    if (isset($value['start_date']) && isset($value['end_date'])) {
+                        $query->whereBetween('created_at', [$value['start_date'], $value['end_date']]);
+                    }
+                }),
             ])
             ->allowedSorts('created_at', 'total_amount', 'status')
             ->defaultSort('-created_at');
     }
+
+
 
     public function all(): LengthAwarePaginator
     {
@@ -47,7 +59,7 @@ class PurchaseInvoiceRepository implements PurchaseInvoiceRepositoryInterface
 
     public function findById(int $id): PurchaseInvoice
     {
-        return $this->purchaseInvoice->with('details')->findOrFail($id);
+        return $this->purchaseInvoice->with('purchaseInvoiceDetails')->findOrFail($id);
     }
 
     public function generateInvoiceNumber(): string

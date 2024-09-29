@@ -71,6 +71,8 @@ Route::post('raw-materials/import', [RawMaterialAPIController::class, 'import'])
 
 
 // Purchase Invoice
+Route::get('/purchase-invoices' , [PurchaseInvoiceAPIController::class , 'index']);
+Route::get('purchase-invoice/{id}' , [PurchaseInvoiceAPIController::class , 'show']);
 Route::post('/purchase-invoice' , [PurchaseInvoiceAPIController::class, 'store']);
 Route::patch('/purchase-invoice/{id}' , [PurchaseInvoiceAPIController::class, 'update']);
 Route::patch('/purchase-invoice/restore/{id}' , [PurchaseInvoiceAPIController::class, 'restore']);

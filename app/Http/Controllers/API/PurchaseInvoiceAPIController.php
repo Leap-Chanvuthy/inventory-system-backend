@@ -16,13 +16,31 @@ class PurchaseInvoiceAPIController extends Controller
         $this->purchaseInvoiceRepository = $purchaseInvoiceRepository;
     }
 
+    public function index (){
+        try{
+            $purchase_invoice = $this -> purchaseInvoiceRepository -> all();
+            return response() -> json([$purchase_invoice],200);
+        }catch (\Exception $e){
+            return response() -> json(['error' => $e -> getMessage()],400);
+        }
+    }
+
+    public function show ($id){
+        try{
+            $purchase_invoice = $this -> purchaseInvoiceRepository -> findById($id);
+            return response() -> json([$purchase_invoice],200);
+        }catch (\Exception $e){
+            return response() -> json(['error' => $e -> getMessage()],400);
+        }
+    }
+
     public function store(Request $request)
     {
         try {
             $validatedData = $request->validate([
                 'supplier_id' => 'required|exists:suppliers,id',
                 'payment_method' => 'required|string',
-                'invoice_number' => 'required|string|unique:purchase_invoices,invoice_number',
+                'invoice_number' => 'string|unique:purchase_invoices,invoice_number',
                 'payment_date' => 'nullable|date',
                 'discount_percentage' => 'nullable|numeric',
                 'tax_percentage' => 'nullable|numeric',
