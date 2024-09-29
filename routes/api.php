@@ -72,3 +72,6 @@ Route::post('raw-materials/import', [RawMaterialAPIController::class, 'import'])
 
 // Purchase Invoice
 Route::post('/purchase-invoice' , [PurchaseInvoiceAPIController::class, 'store']);
+Route::patch('/purchase-invoice/{id}' , [PurchaseInvoiceAPIController::class, 'update']);
+Route::patch('/purchase-invoice/recover/{id}' , [PurchaseInvoiceAPIController::class, 'recover']);
+Route::delete('/purchase-invoice/{id}' , [PurchaseInvoiceAPIController::class, 'delete']);
