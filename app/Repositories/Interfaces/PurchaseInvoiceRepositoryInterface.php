@@ -17,4 +17,8 @@ interface PurchaseInvoiceRepositoryInterface
     public function update(int $id, Request $request): PurchaseInvoice;
 
     public function delete(int $id): void;
+
+    public function restore(int $id): PurchaseInvoice;
+
+    public function generateInvoiceNumber(): string;
 }
