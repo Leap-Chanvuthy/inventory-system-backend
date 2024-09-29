@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('purchase_invoices', function (Blueprint $table) {
             $table->id();
-            $table->double('total_amount');
             $table->string('payment_method' , 50);
             $table-> string('invoice_number' , 100);
             $table->date('payment_date');
@@ -23,10 +22,11 @@ return new class extends Migration
             $table->double('tax_value') -> default(0);
             $table -> string('status');
             $table->double('sub_total');
-            $table->double('grand_total');
+            $table->double('grand_total_with_tax');
+            $table->double('grand_total_without_tax');
             $table-> double('clearing_payable');
             $table -> double('indebted') -> default(0);
-            $table-> unsignedBigInteger('supplier_id');
+            $table-> unsignedBigInteger('supplier_id') -> nullable();
 
             $table -> foreign('supplier_id')
             ->references('id')
@@ -34,6 +34,7 @@ return new class extends Migration
             -> onDelete('cascade')
             ->onUpdate('cascade');
             $table->timestamps();
+            $table -> softDeletes();
         });
     }
 
@@ -42,6 +43,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::disableForeignKeyConstraints();
         Schema::dropIfExists('purchase_invoices');
     }
 };

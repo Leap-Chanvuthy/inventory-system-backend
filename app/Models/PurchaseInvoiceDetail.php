@@ -6,10 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\PurchaseInvoice;
 use App\Models\RawMaterial;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PurchaseInvoiceDetail extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     protected $table = 'purchase_invoice_details';
 

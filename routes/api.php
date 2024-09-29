@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthAPIController;
 use App\Http\Controllers\API\ProductAPIController;
+use App\Http\Controllers\API\PurchaseInvoiceAPIController;
 use App\Http\Controllers\API\RawMaterialAPIController;
 use App\Http\Controllers\API\SupplierAPIController;
 use App\Http\Controllers\API\UserAPIController;
@@ -66,3 +67,8 @@ Route::patch('/raw-materials/{id}' , [RawMaterialAPIController::class, 'update']
 Route::delete('/raw-materials/{id}' , [RawMaterialAPIController::class , 'destroy']);
 Route::get('raw-materials/export', [RawMaterialAPIController::class, 'export']);
 Route::post('raw-materials/import', [RawMaterialAPIController::class, 'import']);
+
+
+
+// Purchase Invoice
+Route::post('/purchase-invoice' , [PurchaseInvoiceAPIController::class, 'store']);

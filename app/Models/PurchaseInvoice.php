@@ -6,15 +6,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Supplier;
 use App\Models\PurchaseInvoiceDetail;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PurchaseInvoice extends Model
 {
     use HasFactory;
+    use SoftDeletes;
     
     protected $table = 'purchase_invoices';
 
     protected $fillable = [
-        'total_amount',
         'payment_method',
         'invoice_number',
         'payment_date',
@@ -24,7 +25,8 @@ class PurchaseInvoice extends Model
         'tax_value',
         'status',
         'sub_total',
-        'grand_total',
+        'grand_total_with_tax',
+        'grand_total_without_tax',
         'clearing_payable',
         'indebted',
         'supplier_id',
