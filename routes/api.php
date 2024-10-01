@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthAPIController;
 use App\Http\Controllers\API\ProductAPIController;
+use App\Http\Controllers\API\ProfileSettingAPIController;
 use App\Http\Controllers\API\PurchaseInvoiceAPIController;
 use App\Http\Controllers\API\RawMaterialAPIController;
 use App\Http\Controllers\API\SupplierAPIController;
@@ -25,7 +26,10 @@ Route::post('login', [AuthAPIController::class, 'login']);
 Route::middleware('auth:api')->group(function () {
     Route::post('logout', [AuthAPIController::class, 'logout']);
     Route::post('refresh', [AuthAPIController::class, 'refresh']);
-    Route::post('/change-password' , [AuthAPIController::class , 'changePassword']);
+
+    Route::post('/change-password' , [ProfileSettingAPIController::class , 'changePassword']);
+    Route::post('/profile-picture/update' , [ProfileSettingAPIController::class , 'uploadProfilePicture']);
+    Route::post('/profile/update' , [ProfileSettingAPIController::class , 'updateProfileInfo']);
 });
 
 

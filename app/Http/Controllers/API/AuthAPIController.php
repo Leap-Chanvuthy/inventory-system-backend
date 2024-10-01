@@ -96,27 +96,7 @@ class AuthAPIController extends Controller
         }
     }    
 
-    public function changePassword (Request $request){
-        $validator = Validator::make($request -> all(),[
-            'current_password' => 'required|string|min:6',
-            'new_password' => 'required|string|min:6|confirmed'
-        ]);
 
-        if ($validator -> fails()){
-            return response()->json(['error' => $validator -> errors()] , 422);
-        }
-
-        $user = Auth::user();
-
-        if (!Hash::check($request -> current_password , $user -> password)){
-            return response() ->json(['error' => 'Current password is not correct'], 401);
-        }
-
-        $user -> password = Hash::make($request -> new_password);
-        $user->save();
-
-        return response() -> json(['message' => 'Password updated successfully'],200);
-    }
 
 
     public function logout()
