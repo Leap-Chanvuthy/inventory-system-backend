@@ -6,7 +6,7 @@ This project is a Laravel application with JWT (JSON Web Token) authentication f
 
 - PHP >= 7.4
 - Composer
-- Laravel 8 or 9
+- Laravel 8 or 9 
 - MySQL / Postgres (or any other supported database)
 
 ## Installation
