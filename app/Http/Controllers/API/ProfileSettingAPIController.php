@@ -77,7 +77,9 @@ class ProfileSettingAPIController extends Controller
     
             if (!Hash::check($request->current_password, $user->password)) {
                 return response()->json([
-                    'message' => 'The provided current password is incorrect.'
+                    'errors' => [
+                        'current_password' => ['Provided current password is not correct.']
+                    ]
                 ], 422);
             }
     
@@ -87,7 +89,10 @@ class ProfileSettingAPIController extends Controller
             return response()->json([
                 'message' => 'Password changed successfully'
             ]);
-        }catch (\Exception $e){
+        } catch (ValidationException $e){
+            return response() -> json(['errors' => $e -> errors()],400);
+        }
+        catch (\Exception $e){
             return response() -> json(['error' => $e -> getMessage()],400);
         }
     }
