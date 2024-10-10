@@ -43,12 +43,15 @@ Route::get('users/role-counts' ,  [UserAPIController::class , 'getUserRoleCount'
 
 
 
-// Inventory
+// Product
 Route::middleware(['auth:api', 'checkIfAdmin'])->group(function () {
     Route::get('inventories', [ProductAPIController::class, 'getInventory']);
 });
 
-Route::get('inventory', [ProductAPIController::class, 'getInventory']);
+Route::post('/product', [ProductAPIController::class, 'store']);
+Route::put('/product/{id}', [ProductAPIController::class, 'update']);
+
+
 
 // Supplier
 Route::get('/suppliers' , [SupplierAPIController::class , 'index']);

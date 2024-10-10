@@ -66,7 +66,7 @@ class AuthAPIController extends Controller
                 ], 404);
             }
     
-            if (!\Hash::check($credentials['password'], $user->password)) {
+            if (!Hash::check($credentials['password'], $user->password)) {
                 return response()->json([
                     'errors' => [
                         'password' => ['The password is incorrect.']
@@ -80,7 +80,7 @@ class AuthAPIController extends Controller
         
             $user = Auth::user();
     
-            $userDetails = $user->makeHidden('password');
+            $userDetails = $user-> makeHidden('password');
     
             return response()->json([
                 'user' => $userDetails,

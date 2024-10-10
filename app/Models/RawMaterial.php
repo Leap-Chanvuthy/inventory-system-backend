@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Supplier;
+use App\Models\ProductRawMaterial;
+use App\Models\Product;
 use App\Models\RawMaterialImage;
 
 class RawMaterial extends Model
@@ -29,6 +31,13 @@ class RawMaterial extends Model
         'supplier_id',
     ];
 
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'product_raw_material')
+                    ->withPivot('quantity_used')
+                    ->using(ProductRawMaterial::class)
+                    ->withTimestamps();
+    }
 
     public function supplier(){
         return $this -> belongsTo(Supplier::class);

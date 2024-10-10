@@ -4,15 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use app\Models\Supplier;
 use App\Models\RawMaterial;
+use App\Models\ProductRawMaterial;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     protected $fillable = [
-        'supplier_id',
         'date',
         'item_name',
         'description',
@@ -23,10 +24,12 @@ class Product extends Model
         'unit',
     ];
 
-    // Define the relationship with the Supplier model
-    public function supplier()
+    public function raw_materials()
     {
-        return $this->belongsTo(Supplier::class);
+        return $this->belongsToMany(RawMaterial::class, 'product_raw_material')
+                    ->withPivot('quantity_used')
+                    ->using(ProductRawMaterial::class) 
+                    ->withTimestamps();
     }
 
 }

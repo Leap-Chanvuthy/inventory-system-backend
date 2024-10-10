@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Product;
 use App\Models\RawMaterial;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -40,10 +39,6 @@ class Supplier extends Model
         'note',
     ];
 
-    public function products()
-    {
-        return $this->hasMany(Product::class);
-    }
 
     public function raw_materials (){
         return $this -> hasMany(RawMaterial::class);
