@@ -90,14 +90,21 @@ class RawMaterialAPIController extends Controller
 
     public function import(Request $request)
     {
-        $request->validate([
-            'raw_material_file' => 'required|file|mimes:xlsx,csv'
-        ]);
+        try {
+            $request->validate([
+                'raw_material_file' => 'required|file|mimes:xlsx,csv'
+            ]);
+    
+            $file = $request->file('raw_material_file');
+            Excel::import(new RawMaterialImport, $file);
+    
+            return response()->json(['message' => 'Raw materials imported successfully'], 200);
 
-        $file = $request->file('raw_material_file');
-        Excel::import(new RawMaterialImport, $file);
-
-        return response()->json(['message' => 'Raw materials imported successfully'], 200);
+        }  catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            return response()->json(['error' => $e->failures()], 422); 
+        }  catch (\Exception $e) {
+            return response()->json(['error' => 'Import failed: ' . $e->getMessage()], 500);
+        }
     }
 
 }
