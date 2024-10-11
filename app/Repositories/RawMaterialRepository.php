@@ -27,7 +27,6 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
     private function allBuilder(): QueryBuilder
     {
         return QueryBuilder::for(RawMaterial::class)
-            ->allowedIncludes(['supplier'])
             ->allowedFilters([
                 AllowedFilter::exact('id'),
                 AllowedFilter::exact('raw_material_category'),
@@ -49,9 +48,23 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
             ->defaultSort('-created_at');
     }
 
+    public function generateRawMaterialCode(): string
+    {
+        $lastMaterialCode = RawMaterial::orderBy('created_at', 'desc')->first();
+
+        if ($lastMaterialCode && preg_match('/MATERIAL-(\d{6})/', $lastMaterialCode->material_code, $matches)) {
+            $lastCode = intval($matches[1]);
+        } else {
+            $lastCode = 0; 
+        }
+
+        $newNumber = str_pad($lastCode + 1, 6, '0', STR_PAD_LEFT);
+        return 'MATERIAL-' . $newNumber;
+    }
+
     public function all(): LengthAwarePaginator
     {
-        return $this->allBuilder()->with('supplier')->paginate(10);
+        return $this->allBuilder()->with('raw_material_images')->paginate(10);
     }
 
 
@@ -67,6 +80,7 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
     {
 
         $data = $this -> validateAndExtractData($request);
+        $data['material_code'] = $this -> generateRawMaterialCode();
 
         $rawMaterial = RawMaterial::create($data);
         
@@ -129,15 +143,15 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
     {
         $rules = [
             'name' => 'required|string|max:50',
-            'material_code' => 'required|string|max:255',
+            // 'material_code' => 'required|string|max:255',
             'quantity' => 'required|integer',
             'unit_price' => 'required|numeric',
             'total_value' => 'required|numeric',
             'minimum_stock_level' => 'required|integer',
             'raw_material_category' => 'required|string|max:100',
+            'status' => 'required|string|max:100',
             'unit_of_measurement' => 'required|string|max:100',
             'package_size' => 'nullable|string|max:100',
-            'status' => 'nullable|string|max:100',
             'location' => 'nullable|string|max:100',
             'description' => 'nullable|string',
             'expiry_date' => 'nullable|date',
