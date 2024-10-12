@@ -34,7 +34,7 @@ class UserRepository implements UserRepositoryInterface {
                 });
             })
         ])
-        -> allowedSorts('created_at' , 'updated_at' , 'role')
+        -> allowedSorts('created_at' , 'updated_at')
         -> defaultSort('-created_at');
     }
 
