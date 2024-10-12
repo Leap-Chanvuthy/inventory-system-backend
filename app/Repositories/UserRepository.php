@@ -56,6 +56,7 @@ class UserRepository implements UserRepositoryInterface {
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
+            'role' => 'required|string'
         ]);
 
         if ($request->hasFile('profile_picture')) {
@@ -82,6 +83,7 @@ class UserRepository implements UserRepositoryInterface {
                 Rule::unique('suppliers')->ignore($id),
             ],
             'password' => 'required|string|min:8|confirmed',
+            'role' => 'required|string'
         ]);
 
         if ($request->hasFile('profile_picture')) {
