@@ -125,7 +125,18 @@ class SupplierImport implements ToModel, WithHeadingRow, WithValidation
     public function rules(): array
     {
         return [
-            'name' => "required|string|max:50",
+            'name' => "required|string|max:255",
+            'supplier_code' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('suppliers'),
+            ],
+            // 'phone_number' => "required|string|max:50",
+            'location' => "required|string|max:255",
+            // 'longitude' => "nullable|string|max:100",
+            // 'latitude' => "nullable|string|max:100",
+            // 'address' => "nullable|string|max:255",
             'email' => [
                 'required',
                 'string',
@@ -133,6 +144,21 @@ class SupplierImport implements ToModel, WithHeadingRow, WithValidation
                 'max:255',
                 Rule::unique('suppliers'),
             ],
+            'contact_person' => "required|string|max:255",
+            // 'website' => "nullable|string|max:255",
+            // 'social_media' => "nullable|string|max:255",
+            // 'supplier_category' => "nullable|string|max:255",
+            // 'supplier_status' => "nullable|string|max:100",
+            // 'contract_length' => "nullable|string|max:100",
+            // 'discount_term' => "nullable|string|max:100",
+            // 'payment_term' => "nullable|string|max:100",
+            // 'business_registration_number' => "nullable|string|max:100",
+            // 'vat_number' => "nullable|string|max:100",
+            // 'bank_account_number' => "nullable|string|max:50",
+            // 'bank_account_name' => "nullable|string|max:50",
+            // 'bank_name' => "nullable|string|max:255",
+            // 'note' => "nullable|string",
         ];
     }
+    
 }

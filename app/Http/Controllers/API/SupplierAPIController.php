@@ -110,9 +110,12 @@ class SupplierAPIController extends Controller
             Excel::import(new SupplierImport, $file);
 
             return response()->json(['success' => 'Suppliers imported successfully']);
-        } catch (\Exception $e) {
-            return response()->json(['error' =>  $e->getMessage()], 500);
+        }catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            return response()->json(['errors' => $e->failures()], 422); 
         }
+        // catch (\Exception $e) {
+        //     return response()->json(['error' =>  $e->getMessage()], 500);
+        // }
     }
 
     public function export(Request $request)
