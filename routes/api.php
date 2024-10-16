@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthAPIController;
+use App\Http\Controllers\API\CurrencyAPIController;
 use App\Http\Controllers\API\ProductAPIController;
 use App\Http\Controllers\API\ProfileSettingAPIController;
 use App\Http\Controllers\API\PurchaseInvoiceAPIController;
@@ -50,6 +51,16 @@ Route::middleware(['auth:api', 'checkIfAdmin'])->group(function () {
 
 Route::post('/product', [ProductAPIController::class, 'store']);
 Route::put('/product/{id}', [ProductAPIController::class, 'update']);
+
+
+
+// currency 
+Route::get('/currencies' , [CurrencyAPIController::class , 'index']);
+Route::get('/currency/{id}' , [CurrencyAPIController::class, 'show']);
+Route::post('/currency' , [CurrencyAPIController::class , 'store']);
+Route::patch('/currency/{id}', [CurrencyAPIController::class , 'update']);
+Route::delete('/currency/{id}' , [CurrencyAPIController::class , 'destroy']);
+
 
 
 

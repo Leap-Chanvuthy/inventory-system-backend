@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('raw_materials', function (Blueprint $table) {
             $table->id();
             $table -> string('name' , 50);
-            // $table -> string('images')->nullable();
+
             $table -> string('material_code' , 255);
             $table -> integer('quantity');
             $table -> decimal('unit_price' , 10,2);
@@ -28,6 +28,13 @@ return new class extends Migration
             $table -> text('description') -> nullable();
             $table -> date('expiry_date') -> nullable();
             $table-> unsignedBigInteger('supplier_id') -> nullable();
+            $table->unsignedBigInteger('currency_id')->nullable();
+
+            $table->foreign('currency_id')
+            ->references('id')
+            ->on('currencies')
+            ->onDelete('cascade')
+            ->onUpdate('cascade');
             
             $table -> foreign('supplier_id')
             ->references('id')

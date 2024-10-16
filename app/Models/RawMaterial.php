@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Supplier;
 use App\Models\ProductRawMaterial;
 use App\Models\Product;
+use App\Models\Currency;
 use App\Models\RawMaterialImage;
 
 class RawMaterial extends Model
@@ -45,6 +46,11 @@ class RawMaterial extends Model
 
     public function raw_material_images (){
         return $this -> hasMany(RawMaterialImage::class);
+    }
+
+    public function currency()
+    {
+        return $this->belongsTo(Currency::class);
     }
 
 }
