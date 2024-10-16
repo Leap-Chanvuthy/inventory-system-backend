@@ -30,6 +30,7 @@ class RawMaterial extends Model
         'description',
         'expiry_date',
         'supplier_id',
+        'currency_id',
     ];
 
     public function products()

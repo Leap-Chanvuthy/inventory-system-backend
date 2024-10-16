@@ -64,13 +64,13 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
 
     public function all(): LengthAwarePaginator
     {
-        return $this->allBuilder()->with('raw_material_images')->paginate(10);
+        return $this->allBuilder()->with('raw_material_images' , 'currency')->paginate(10);
     }
 
 
     public function findById(int $id): RawMaterial
     {
-        return RawMaterial::with('supplier' , 'raw_material_images')->findOrFail($id);
+        return RawMaterial::with('supplier' , 'raw_material_images' , 'currency')->findOrFail($id);
     }
 
 
@@ -101,7 +101,7 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
     {
         $data = $this->validateAndExtractData($request);
 
-        $rawMaterial = RawMaterial::with('raw_material_images') -> findOrFail($id);
+        $rawMaterial = RawMaterial::with('raw_material_images' , 'currency') -> findOrFail($id);
 
         $rawMaterial->update($data);
 
@@ -156,6 +156,7 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
             'description' => 'nullable|string',
             'expiry_date' => 'nullable|date',
             'image.*' => 'nullable|image|mimes:jpeg,png,jpg|max:10000',
+            'currency_id' => 'required|exists:currencies,id'
         ];
 
         $validatedData = $request->validate($rules);

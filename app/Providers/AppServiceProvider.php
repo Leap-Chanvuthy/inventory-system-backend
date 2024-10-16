@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use App\Providers\RepositoryServiceProvider;
+use App\Models\RawMaterial;
+use App\Observers\RawMaterialObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,6 +22,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        RawMaterial::observe(RawMaterialObserver::class);
     }
 }
