@@ -70,7 +70,7 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
 
     public function findById(int $id): RawMaterial
     {
-        return RawMaterial::with('supplier', 'product')->findOrFail($id);
+        return RawMaterial::with('supplier' , 'raw_material_images')->findOrFail($id);
     }
 
 
@@ -155,7 +155,7 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
             'location' => 'nullable|string|max:100',
             'description' => 'nullable|string',
             'expiry_date' => 'nullable|date',
-            'image.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'image.*' => 'nullable|image|mimes:jpeg,png,jpg|max:10000',
         ];
 
         $validatedData = $request->validate($rules);
