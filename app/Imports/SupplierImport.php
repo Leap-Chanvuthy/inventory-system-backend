@@ -1,77 +1,5 @@
 <?php
 
-// namespace App\Imports;
-
-// use App\Models\Supplier;
-// use Maatwebsite\Excel\Concerns\ToModel;
-// use Maatwebsite\Excel\Concerns\WithHeadingRow;
-
-// class SupplierImport implements ToModel, WithHeadingRow
-// {
-//     /**
-//      * @param array $row
-//      *
-//      * @return Supplier|null
-//      */
-//     public function model(array $row)
-//     {
-//         return new Supplier([
-//             'name' => $row['name'],
-//             'phone_number' => $row['phone_number'],
-//             'location' => $row['location'],
-//             'note' => $row['note'],
-//         ]);
-//     }
-// }
-
-
-
-// namespace App\Imports;
-
-// use App\Models\Supplier;
-// use Maatwebsite\Excel\Concerns\ToModel;
-// use Maatwebsite\Excel\Concerns\WithHeadingRow;
-// use Maatwebsite\Excel\Concerns\WithValidation;
-// use Maatwebsite\Excel\Concerns\SkipsOnFailure;
-// use Maatwebsite\Excel\Concerns\SkipsFailures;
-// use Maatwebsite\Excel\Concerns\Importable;
-// use Illuminate\Validation\Rule;
-
-// class SupplierImport implements ToModel, WithHeadingRow
-// {
-//     use Importable, SkipsFailures;
-
-//     /**
-//      * @param array $row
-//      *
-//      * @return Supplier|null
-//      */
-//     public function model(array $row)
-//     {
-//         return new Supplier([
-//             'name' => $row['name'],
-//             'phone_number' => $row['phone_number'],
-//             'location' => $row['location'],
-//             'longitude' => $row['longitude'],
-//             'latitude' => $row['latitude'],
-//             'address' => $row['address'],
-//             'city' => $row['city'],
-//             'email' => $row['email'],
-//             'contact_person' => $row['contact_person'],
-//             'business_registration_number' => $row['business_registration_number'],
-//             'vat_number' => $row['vat_number'],
-//             'bank_account_number' => $row['bank_account_number'],
-//             'bank_account_name' => $row['bank_account_name'],
-//             'bank_name' => $row['bank_name'],
-//             'note' => $row['note'],
-//         ]);
-//     }
-
-
-// }
-
-
-
 namespace App\Imports;
 
 use App\Models\Supplier;
@@ -86,6 +14,8 @@ class SupplierImport implements ToModel, WithHeadingRow, WithValidation
 {
     use Importable, SkipsFailures;
 
+    protected $existingSupplierCodes = [];
+
     /**
      * @param array $row
      *
@@ -93,6 +23,8 @@ class SupplierImport implements ToModel, WithHeadingRow, WithValidation
      */
     public function model(array $row)
     {
+        $supplierCode = $this->generateUniqueSupplierCode();
+
         return new Supplier([
             'name'                        => $row['name'],
             'phone_number'                => $row['phone_number'],
@@ -102,12 +34,12 @@ class SupplierImport implements ToModel, WithHeadingRow, WithValidation
             'address'                     => $row['address'],
             'email'                       => $row['email'],
             'contact_person'              => $row['contact_person'],
-            'business_registration_number'=> $row['business_registration_number'],
+            'business_registration_number' => $row['business_registration_number'],
             'vat_number'                  => $row['vat_number'],
             'bank_account_number'         => $row['bank_account_number'],
             'bank_account_name'           => $row['bank_account_name'],
             'bank_name'                   => $row['bank_name'],
-            'supplier_code'               => $row['supplier_code'],
+            'supplier_code'               => $supplierCode,
             'website'                     => $row['website'],
             'social_media'                => $row['social_media'],
             'supplier_category'           => $row['supplier_category'],
@@ -115,9 +47,30 @@ class SupplierImport implements ToModel, WithHeadingRow, WithValidation
             'contract_length'             => $row['contract_length'],
             'discount_term'               => $row['discount_term'],
             'payment_term'                => $row['payment_term'],
-            'note'                => $row['note'],
+            'note'                        => $row['note'],
         ]); 
     }  
+
+    private function generateUniqueSupplierCode(): string
+    {
+        $lastSupplier = Supplier::orderBy('created_at', 'desc')->first();
+        if ($lastSupplier && preg_match('/SUPP-(\d{6})/', $lastSupplier->supplier_code, $matches)) {
+            $lastCode = intval($matches[1]);
+        } else {
+            $lastCode = 0;
+        }
+
+        $newCode = null;
+        do {
+            $newNumber = str_pad($lastCode + 1, 6, '0', STR_PAD_LEFT);
+            $newCode = 'SUPP-' . $newNumber;
+            $lastCode++;
+        } while (in_array($newCode, $this->existingSupplierCodes) || Supplier::where('supplier_code', $newCode)->exists());
+
+        $this->existingSupplierCodes[] = $newCode;
+
+        return $newCode;
+    }
 
     /**
      * @return array
@@ -127,16 +80,12 @@ class SupplierImport implements ToModel, WithHeadingRow, WithValidation
         return [
             'name' => "required|string|max:255",
             'supplier_code' => [
-                'required',
+                'nullable',
                 'string',
                 'max:100',
                 Rule::unique('suppliers'),
             ],
-            // 'phone_number' => "required|string|max:50",
             'location' => "required|string|max:255",
-            // 'longitude' => "nullable|string|max:100",
-            // 'latitude' => "nullable|string|max:100",
-            // 'address' => "nullable|string|max:255",
             'email' => [
                 'required',
                 'string',
@@ -145,20 +94,6 @@ class SupplierImport implements ToModel, WithHeadingRow, WithValidation
                 Rule::unique('suppliers'),
             ],
             'contact_person' => "required|string|max:255",
-            // 'website' => "nullable|string|max:255",
-            // 'social_media' => "nullable|string|max:255",
-            // 'supplier_category' => "nullable|string|max:255",
-            // 'supplier_status' => "nullable|string|max:100",
-            // 'contract_length' => "nullable|string|max:100",
-            // 'discount_term' => "nullable|string|max:100",
-            // 'payment_term' => "nullable|string|max:100",
-            // 'business_registration_number' => "nullable|string|max:100",
-            // 'vat_number' => "nullable|string|max:100",
-            // 'bank_account_number' => "nullable|string|max:50",
-            // 'bank_account_name' => "nullable|string|max:50",
-            // 'bank_name' => "nullable|string|max:255",
-            // 'note' => "nullable|string",
         ];
     }
-    
 }

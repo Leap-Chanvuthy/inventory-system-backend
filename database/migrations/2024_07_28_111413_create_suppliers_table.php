@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('image', 255)->nullable();
             $table->string('name', 255);
-            $table->string('supplier_code', 100)->unique();
+            $table->string('supplier_code', 100)->unique() -> nullable();
             $table->string('phone_number', 50);
             $table->string('location', 255);
             $table->string('longitude', 100)->nullable();
@@ -37,7 +37,6 @@ return new class extends Migration
             $table->string('bank_name', 255)->nullable();
             $table->text('note')->nullable();
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
