@@ -19,11 +19,15 @@ class RawMaterialObserver
      */
     public function updated(RawMaterial $rawMaterial)
     {
-        if ($rawMaterial->quantity == 0) {
+        if ($rawMaterial->remaining_quantity == 0) {
             $rawMaterial->status = 'OUT_OF_STOCK';
-            $rawMaterial->saveQuietly(); // Use saveQuietly to prevent recursive events
+        } elseif ($rawMaterial->remaining_quantity > 0) {
+            $rawMaterial->status = 'IN_STOCK';
         }
+
+        $rawMaterial->saveQuietly();
     }
+    
 
     /**
      * Handle the RawMaterial "deleted" event.

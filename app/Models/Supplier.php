@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\RawMaterial;
+use App\Models\PurchaseInvoice;
 
 class Supplier extends Model
 {
@@ -40,5 +41,10 @@ class Supplier extends Model
 
     public function raw_materials (){
         return $this -> hasMany(RawMaterial::class);
+    }
+
+    public function purchase_invoices()
+    {
+        return $this->hasMany(PurchaseInvoice::class, 'supplier_id');
     }
 }

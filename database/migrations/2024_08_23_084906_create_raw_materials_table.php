@@ -15,10 +15,13 @@ return new class extends Migration
             $table->id();
             $table -> string('name' , 50);
 
-            $table -> string('material_code' , 255);
+            $table -> string('material_code' , 255) -> unique();
             $table -> integer('quantity');
-            $table -> decimal('unit_price' , 10,2);
-            $table -> decimal('total_value' , 10, 2);
+            $table -> integer('remaining_quantity');
+            $table -> double('unit_price_in_usd');
+            $table -> double('total_value_in_usd');
+            $table -> double('unit_price_in_riel');
+            $table -> double('total_value_in_riel');
             $table -> integer('minimum_stock_level');
             $table -> string('raw_material_category' ,100);
             $table -> string('unit_of_measurement', 100);
@@ -28,14 +31,7 @@ return new class extends Migration
             $table -> text('description') -> nullable();
             $table -> date('expiry_date') -> nullable();
             $table-> unsignedBigInteger('supplier_id') -> nullable();
-            $table->unsignedBigInteger('currency_id')->nullable();
 
-            $table->foreign('currency_id')
-            ->references('id')
-            ->on('currencies')
-            ->onDelete('cascade')
-            ->onUpdate('cascade');
-            
             $table -> foreign('supplier_id')
             ->references('id')
             ->on('suppliers')

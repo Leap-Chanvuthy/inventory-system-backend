@@ -19,8 +19,11 @@ class RawMaterial extends Model
         'name',
         'material_code',
         'quantity',
-        'unit_price',
-        'total_value',
+        'remaining_quantity',
+        'unit_price_in_usd',
+        'total_value_in_usd',
+        'unit_price_in_riel',
+        'total_value_in_riel',
         'minimum_stock_level',
         'raw_material_category',
         'unit_of_measurement',
@@ -30,7 +33,6 @@ class RawMaterial extends Model
         'description',
         'expiry_date',
         'supplier_id',
-        'currency_id',
     ];
 
     public function products()
@@ -47,11 +49,6 @@ class RawMaterial extends Model
 
     public function raw_material_images (){
         return $this -> hasMany(RawMaterialImage::class);
-    }
-
-    public function currency()
-    {
-        return $this->belongsTo(Currency::class);
     }
 
 }

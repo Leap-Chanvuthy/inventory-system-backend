@@ -48,29 +48,42 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
             ->defaultSort('-created_at');
     }
 
+    // public function generateRawMaterialCode(): string
+    // {
+    //     $lastMaterialCode = RawMaterial::orderBy('created_at', 'desc')->first();
+
+    //     if ($lastMaterialCode && preg_match('/MAT-(\d{6})/', $lastMaterialCode->material_code, $matches)) {
+    //         $lastCode = intval($matches[1]);
+    //     } else {
+    //         $lastCode = 0; 
+    //     }
+
+    //     $newNumber = str_pad($lastCode + 1, 6, '0', STR_PAD_LEFT);
+    //     return 'MAT-' . $newNumber;
+    // }
+
     public function generateRawMaterialCode(): string
     {
-        $lastMaterialCode = RawMaterial::orderBy('created_at', 'desc')->first();
+        $lastMaterial = RawMaterial::withTrashed()
+            ->selectRaw('MAX(CAST(SUBSTRING(material_code, 5) AS UNSIGNED)) AS max_code')
+            ->first();
 
-        if ($lastMaterialCode && preg_match('/MATERIAL-(\d{6})/', $lastMaterialCode->material_code, $matches)) {
-            $lastCode = intval($matches[1]);
-        } else {
-            $lastCode = 0; 
-        }
+        $lastCode = $lastMaterial->max_code ?? 0;
 
         $newNumber = str_pad($lastCode + 1, 6, '0', STR_PAD_LEFT);
-        return 'MATERIAL-' . $newNumber;
+        return 'MAT-' . $newNumber;
     }
+
 
     public function all(): LengthAwarePaginator
     {
-        return $this->allBuilder()->with('raw_material_images' , 'currency')->paginate(10);
+        return $this->allBuilder()->with('raw_material_images')->paginate(10);
     }
 
 
     public function findById(int $id): RawMaterial
     {
-        return RawMaterial::with('supplier' , 'raw_material_images' , 'currency')->findOrFail($id);
+        return RawMaterial::with('supplier' , 'raw_material_images')->findOrFail($id);
     }
 
 
@@ -101,7 +114,7 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
     {
         $data = $this->validateAndExtractData($request);
 
-        $rawMaterial = RawMaterial::with('raw_material_images' , 'currency') -> findOrFail($id);
+        $rawMaterial = RawMaterial::with('raw_material_images') -> findOrFail($id);
 
         $rawMaterial->update($data);
 
@@ -145,8 +158,11 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
             'name' => 'required|string|max:50',
             // 'material_code' => 'required|string|max:255',
             'quantity' => 'required|integer',
-            'unit_price' => 'required|numeric',
-            'total_value' => 'required|numeric',
+            'remaining_quantity' => 'required|integer',
+            'unit_price_in_usd' => 'required|numeric',
+            'total_value_in_usd' => 'required|numeric',
+            'unit_price_in_riel' => 'required|numeric',
+            'total_value_in_riel' => 'required|numeric',
             'minimum_stock_level' => 'required|integer',
             'raw_material_category' => 'required|string|max:100',
             'status' => 'required|string|max:100',
@@ -156,7 +172,6 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
             'description' => 'nullable|string',
             'expiry_date' => 'nullable|date',
             'image.*' => 'nullable|image|mimes:jpeg,png,jpg|max:10000',
-            'currency_id' => 'required|exists:currencies,id'
         ];
 
         $validatedData = $request->validate($rules);

@@ -1,70 +1,99 @@
 <?php
 
-// namespace App\Imports;
-
-// use App\Models\RawMaterial;
-// use Maatwebsite\Excel\Concerns\ToModel;
-// use Maatwebsite\Excel\Concerns\WithHeadingRow;
-
-// class RawMaterialImport implements ToModel, WithHeadingRow
-// {
-//     public function model(array $row)
-//     {
-//         return new RawMaterial([
-//             'name' => $row['name'],
-//             'quantity' => $row['quantity'],
-//             'unit_price' => $row['unit_price'],
-//             'total_value' => $row['total_value'],
-//             'minimum_stock_level' => $row['minimum_stock_level'],
-//             'unit' => $row['unit'],
-//             'package_size' => $row['package_size'],
-//             'supplier_id' => $row['supplier_id'],
-//         ]);
-//     }
-// }
-
-
-
 namespace App\Imports;
 
 use App\Models\RawMaterial;
-use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Maatwebsite\Excel\Validators\Failure;
 use Maatwebsite\Excel\Concerns\WithValidation;
+use Maatwebsite\Excel\Concerns\SkipsFailures;
+use Maatwebsite\Excel\Concerns\Importable;
+use Illuminate\Validation\Rule;
 
 class RawMaterialImport implements ToModel, WithHeadingRow, WithValidation
 {
+    use Importable, SkipsFailures;
+
+    protected $existingMaterialCodes = [];
+
+    /**
+     * @param array $row
+     *
+     * @return RawMaterial|null
+     */
     public function model(array $row)
     {
-        // Create and return a new RawMaterial instance
+        $materialCode = $this->generateUniqueMaterialCode();
+
         return new RawMaterial([
-            'name' => $row['name'],
-            'material_code' => $row['material_code'], // Added missing field
-            'quantity' => $row['quantity'],
-            'unit_price' => $row['unit_price'],
-            'total_value' => $row['total_value'],
-            'minimum_stock_level' => $row['minimum_stock_level'],
-            'raw_material_category' => $row['raw_material_category'], // Added missing field
-            'unit_of_measurement' => $row['unit_of_measurement'], // Added missing field
-            'package_size' => $row['package_size'],
-            'status' => $row['status'], // Added missing field
-            'location' => $row['location'], // Added missing field
-            'description' => $row['description'], // Added missing field
-            'expiry_date' => $row['expiry_date'], // Added missing field
-            'supplier_id' => $row['supplier_id'],
+            'name'                  => $row['name'],
+            'material_code'         => $materialCode, // auto-generated material code
+            'quantity'              => $row['quantity'],
+            'remaining_quantity'    => $row['remaining_quantity'],
+            'unit_price_in_usd'     => $row['unit_price_in_usd'],
+            'total_value_in_usd'    => $row['total_value_in_usd'],
+            'unit_price_in_riel'    => $row['unit_price_in_riel'],
+            'total_value_in_riel'   => $row['total_value_in_riel'],
+            'minimum_stock_level'   => $row['minimum_stock_level'],
+            'raw_material_category' => $row['raw_material_category'],
+            'unit_of_measurement'   => $row['unit_of_measurement'],
+            'package_size'          => $row['package_size'],
+            'status'                => $row['status'],
+            'location'              => $row['location'],
+            'description'           => $row['description'],
+            'expiry_date'           => $row['expiry_date'],
+            'supplier_id'           => $row['supplier_id'],
         ]);
     }
 
+    /**
+     * Generate a unique material code.
+     */
+    private function generateUniqueMaterialCode(): string
+    {
+        // Fetch the highest material code from all raw materials, including soft-deleted ones
+        $lastMaterial = RawMaterial::withTrashed()
+            ->selectRaw('MAX(CAST(SUBSTRING(material_code, 5) AS UNSIGNED)) AS max_code')
+            ->first();
+    
+        $lastCode = $lastMaterial->max_code ?? 0;
+    
+        $newNumber = str_pad($lastCode + 1, 6, '0', STR_PAD_LEFT);
+        $newCode = 'MAT-' . $newNumber;
+    
+        while (in_array($newCode, $this->existingMaterialCodes) || RawMaterial::where('material_code', $newCode)->exists()) {
+            $newNumber = str_pad($lastCode + 2, 6, '0', STR_PAD_LEFT);
+            $newCode = 'MAT-' . $newNumber;
+            $lastCode++;
+        }
+    
+        $this->existingMaterialCodes[] = $newCode;
+    
+        return $newCode;
+    }
+    
+
+    /**
+     * Define the validation rules.
+     *
+     * @return array
+     */
     public function rules(): array
     {
         return [
             'name' => 'required|string|max:50',
-            'material_code' => 'required|string|max:255',
+            'material_code' => [
+                'nullable',
+                'string',
+                'max:255',
+                Rule::unique('raw_materials'),
+            ],
             'quantity' => 'required|integer',
-            'unit_price' => 'required|numeric',
-            'total_value' => 'required|numeric',
+            'remaining_quantity' => 'required|integer',
+            'unit_price_in_usd' => 'required|numeric',
+            'total_value_in_usd' => 'required|numeric',
+            'unit_price_in_riel' => 'required|numeric',
+            'total_value_in_riel' => 'required|numeric',
             'minimum_stock_level' => 'required|integer',
             'raw_material_category' => 'required|string|max:100',
             'unit_of_measurement' => 'required|string|max:100',
@@ -76,19 +105,4 @@ class RawMaterialImport implements ToModel, WithHeadingRow, WithValidation
             'supplier_id' => 'nullable|integer|exists:suppliers,id',
         ];
     }
-
-    // public function customValidationMessages()
-    // {
-    //     return [
-    //         'name.required' => 'The name field is required.',
-    //         'material_code.required' => 'The material code field is required.',
-    //         'quantity.required' => 'The quantity field is required.',
-    //         'unit_price.required' => 'The unit price field is required.',
-    //         'total_value.required' => 'The total value field is required.',
-    //         'minimum_stock_level.required' => 'The minimum stock level field is required.',
-    //         'raw_material_category.required' => 'The raw material category field is required.',
-    //         'unit_of_measurement.required' => 'The unit of measurement field is required.',
-    //         // Add more custom messages as needed
-    //     ];
-    // }
 }
