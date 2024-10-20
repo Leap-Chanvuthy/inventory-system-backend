@@ -48,6 +48,31 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
             ->defaultSort('-created_at');
     }
 
+    private function allBuilderWithTrashed(): QueryBuilder
+    {
+        return QueryBuilder::for(RawMaterial::class)
+            ->onlyTrashed() 
+            ->allowedFilters([
+                AllowedFilter::exact('id'),
+                AllowedFilter::exact('raw_material_category'),
+                AllowedFilter::exact('status'),
+                AllowedFilter::exact('minimum_stock_level'),
+                AllowedFilter::callback('search', function (Builder $query, $value) {
+                    $query->where(function ($query) use ($value) {
+                        $query->where('name', 'LIKE', "%{$value}%")
+                            ->orWhere('material_code', 'LIKE', "%{$value}%")
+                            ->orWhere('unit_price', 'LIKE', "%{$value}%")
+                            ->orWhere('total_value', 'LIKE', "%{$value}%")
+                            ->orWhere('location', 'LIKE', "%{$value}%")
+                            ->orWhere('status', 'LIKE', "%{$value}%")
+                            ->orWhere('raw_material_category', 'LIKE', "%{$value}%");
+                    });
+                })
+            ])
+            ->allowedSorts('created_at', 'updated_at' , 'material_code')
+            ->defaultSort('-created_at');
+    }
+
     
     public function generateRawMaterialCode(): string
     {
@@ -65,6 +90,11 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
     public function all(): LengthAwarePaginator
     {
         return $this->allBuilder()->with('raw_material_images')->paginate(10);
+    }
+
+    public function trashed(): LengthAwarePaginator
+    {
+        return $this -> allBuilderWithTrashed() -> paginate (10);
     }
 
 

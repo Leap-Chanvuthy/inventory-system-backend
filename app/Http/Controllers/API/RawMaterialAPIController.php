@@ -34,6 +34,25 @@ class RawMaterialAPIController extends Controller
         return $this->rawMaterialRepository->all();
     }
 
+    public function trashed (){
+        return $this -> rawMaterialRepository -> trashed();
+    }
+
+    public function recover ($id){
+        try {
+            $raw_material = RawMaterial::onlyTrashed() -> findOrFail($id);
+            
+            if ($raw_material){
+                $raw_material -> restore();
+                return response() -> json(['message' => 'Raw material restore successfully' , 'data' => $raw_material],200);
+            }
+
+            return response() -> json(['message' => 'Raw material not found or already active'],400);
+        }catch (\Exception $e){
+            return response() -> json(['error' => $e -> getMessage()],400);
+        }
+    }
+
     public function show($id)
     {
         return $this->rawMaterialRepository->findById($id);
