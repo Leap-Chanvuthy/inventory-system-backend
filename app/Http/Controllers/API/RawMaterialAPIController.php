@@ -101,7 +101,7 @@ class RawMaterialAPIController extends Controller
             return response()->json(['message' => 'Raw materials imported successfully'], 200);
 
         }  catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
-            return response()->json(['error' => $e->failures()], 422); 
+            return response()->json(['errors' => $e->failures()], 422); 
         }  catch (\Exception $e) {
             return response()->json(['error' => 'Import failed: ' . $e->getMessage()], 500);
         }

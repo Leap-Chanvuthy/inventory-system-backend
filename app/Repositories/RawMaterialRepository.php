@@ -44,24 +44,11 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
                     });
                 })
             ])
-            ->allowedSorts('created_at', 'updated_at')
+            ->allowedSorts('created_at', 'updated_at' , 'material_code')
             ->defaultSort('-created_at');
     }
 
-    // public function generateRawMaterialCode(): string
-    // {
-    //     $lastMaterialCode = RawMaterial::orderBy('created_at', 'desc')->first();
-
-    //     if ($lastMaterialCode && preg_match('/MAT-(\d{6})/', $lastMaterialCode->material_code, $matches)) {
-    //         $lastCode = intval($matches[1]);
-    //     } else {
-    //         $lastCode = 0; 
-    //     }
-
-    //     $newNumber = str_pad($lastCode + 1, 6, '0', STR_PAD_LEFT);
-    //     return 'MAT-' . $newNumber;
-    // }
-
+    
     public function generateRawMaterialCode(): string
     {
         $lastMaterial = RawMaterial::withTrashed()
