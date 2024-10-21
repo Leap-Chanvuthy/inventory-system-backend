@@ -80,7 +80,7 @@ Route::get('/suppliers/export', [SupplierAPIController::class, 'export'])->name(
 // raw materials
 Route::get('/raw-materials' , [RawMaterialAPIController::class , 'index']);
 Route::get('/raw-materials/trashed' , [RawMaterialAPIController::class , 'trashed']);
-Route::get('/raw-materials/recover' , [RawMaterialAPIController::class , 'recover']);
+Route::patch('/raw-materials/recover/{id}' , [RawMaterialAPIController::class , 'recover']);
 Route::get('/raw-material/{id}',[RawMaterialAPIController::class, 'show']);
 Route::post('/raw-materials' , [RawMaterialAPIController::class, 'store']);
 Route::patch('/raw-material/{id}' , [RawMaterialAPIController::class, 'update']);

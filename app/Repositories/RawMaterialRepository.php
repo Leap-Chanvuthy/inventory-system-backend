@@ -63,8 +63,6 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
                     $query->where(function ($query) use ($value) {
                         $query->where('name', 'LIKE', "%{$value}%")
                             ->orWhere('material_code', 'LIKE', "%{$value}%")
-                            ->orWhere('unit_price', 'LIKE', "%{$value}%")
-                            ->orWhere('total_value', 'LIKE', "%{$value}%")
                             ->orWhere('location', 'LIKE', "%{$value}%")
                             ->orWhere('status', 'LIKE', "%{$value}%")
                             ->orWhere('raw_material_category', 'LIKE', "%{$value}%");
