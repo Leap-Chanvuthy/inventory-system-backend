@@ -101,9 +101,15 @@ class RawMaterialAPIController extends Controller
     
     public function export(Request $request)
     {
-        $filters = $request->all();
+        try {
+            $filters = $request->all();
 
-        return Excel::download(new RawMaterialExport($filters), 'raw_materials.xlsx');
+            return Excel::download(new RawMaterialExport($request), 'raw_materials.xlsx');
+        }  catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            return response()->json(['errors' => $e->failures()], 422); 
+        }  catch (\Exception $e) {
+            return response()->json(['error' => 'Import failed: ' . $e->getMessage()], 500);
+        }
     }
 
 
