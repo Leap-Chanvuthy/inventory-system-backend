@@ -33,11 +33,11 @@ class PurchaseInvoiceRepository implements PurchaseInvoiceRepositoryInterface
                 AllowedFilter::callback('search', function (Builder $query, $value) {
                     $query->where(function ($query) use ($value) {
                         $query->where('invoice_number', 'LIKE', "%{$value}%")
-                            ->orWhere('total_amount', 'LIKE', "%{$value}%")
+                            ->orWhere('status', 'LIKE', "%{$value}%")
+                            ->orWhere('sub_total_in_usd', 'LIKE', "%{$value}%")
                             ->orWhere('discount_percentage', 'LIKE', "%{$value}%")
                             ->orWhere('tax_percentage', 'LIKE', "%{$value}%")
-                            ->orWhere('sub_total', 'LIKE', "%{$value}%")
-                            ->orWhere('grand_total', 'LIKE', "%{$value}%");
+                            ->orWhere('grand_total_with_tax_in_usd', 'LIKE', "%{$value}%");
                     });
                 }),
                 AllowedFilter::callback('date_range', function (Builder $query, $value) {
@@ -46,11 +46,9 @@ class PurchaseInvoiceRepository implements PurchaseInvoiceRepositoryInterface
                     }
                 }),
             ])
-            ->allowedSorts('created_at', 'total_amount', 'status')
+            ->allowedSorts('created_at', 'grand_total_with_tax_in_usd', 'status')
             ->defaultSort('-created_at');
     }
-
-
 
     public function all(): LengthAwarePaginator
     {
@@ -76,52 +74,73 @@ class PurchaseInvoiceRepository implements PurchaseInvoiceRepositoryInterface
         return 'INV-' . $newNumber;
     }
 
+
     public function create(Request $request): PurchaseInvoice
     {
-        $supplierId = $request->supplier_id;
-
-        $subTotal = 0;
+        $subTotalInRiel = 0;
+        $subTotalInUsd = 0;
         $rawMaterialsData = [];
+        $supplierId = null;
 
         foreach ($request->raw_materials as $rawMaterialId) {
             $rawMaterial = RawMaterial::findOrFail($rawMaterialId);
-
-            if ($rawMaterial->supplier_id !== $supplierId) {
-                throw new Exception("Raw material with ID {$rawMaterialId} does not belong to the selected supplier with ID {$supplierId}.");
+            
+            if (is_null($supplierId)) {
+                $supplierId = $rawMaterial->supplier_id;
             }
 
-            $totalPrice = $rawMaterial->quantity * $rawMaterial->unit_price;
+            $totalPriceInRiel = $rawMaterial-> total_value_in_riel; 
+            $totalPriceInUsd = $rawMaterial-> total_value_in_usd; 
 
             $rawMaterialsData[] = [
-                'quantity' => $rawMaterial->quantity,  
-                'total_price' => $totalPrice,
+                'quantity' => $rawMaterial->quantity,
+                'total_price_in_riel' => $totalPriceInRiel,
+                'total_price_in_usd' => $totalPriceInUsd,
                 'raw_material_id' => $rawMaterial->id,
+                'supplier_id' => $supplierId,
             ];
 
-            $subTotal += $totalPrice;
+            $subTotalInRiel += $totalPriceInRiel;
+            $subTotalInUsd += $totalPriceInUsd;
         }
 
-        $discountValue = ($request->discount_percentage / 100) * $subTotal;
-        $taxValue = ($request->tax_percentage / 100) * ($subTotal - $discountValue);
-        $grandTotalWithoutTax = $subTotal - $discountValue;
-        $grandTotalWithTax = $grandTotalWithoutTax + $taxValue;
+        $discountValueInUsd = ($request->discount_percentage / 100) * $subTotalInUsd;
+        $discountValueInRiel = ($request->discount_percentage / 100) * $subTotalInRiel;
+
+        $grandTotalWithoutTaxInUsd = $subTotalInUsd - $discountValueInUsd;
+        $grandTotalWithoutTaxInRiel = $subTotalInRiel - $discountValueInRiel;
+
+        $taxValueInUsd = ($request->tax_percentage / 100) * $grandTotalWithoutTaxInUsd;
+        $taxValueInRiel = ($request->tax_percentage / 100) * $grandTotalWithoutTaxInRiel;
+
+        $grandTotalWithTaxInUsd = $grandTotalWithoutTaxInUsd + $taxValueInUsd;
+        $grandTotalWithTaxInRiel = $grandTotalWithoutTaxInRiel + $taxValueInRiel;
 
         $purchaseInvoice = $this->purchaseInvoice->create(array_merge($request->all(), [
             'invoice_number' => $this->generateInvoiceNumber(),
-            'sub_total' => $subTotal,
-            'discount_value' => $discountValue,
-            'tax_value' => $taxValue,
-            'grand_total_without_tax' => $grandTotalWithoutTax,
-            'grand_total_with_tax' => $grandTotalWithTax,
+            'payment_method' => $request -> payment_method,
+            'payment_date' => $request -> payment_date,
+            'status' => $request -> status,
+            'sub_total_in_usd' => $subTotalInUsd,
+            'sub_total_in_riel' => $subTotalInRiel,
+            'discount_value_in_usd' => $discountValueInUsd,
+            'discount_value_in_riel' => $discountValueInRiel,
+            'tax_value_in_usd' => $taxValueInUsd,
+            'tax_value_in_riel' => $taxValueInRiel,
+            'grand_total_without_tax_in_usd' => $grandTotalWithoutTaxInUsd,
+            'grand_total_without_tax_in_riel' => $grandTotalWithoutTaxInRiel,
+            'grand_total_with_tax_in_usd' => $grandTotalWithTaxInUsd,
+            'grand_total_with_tax_in_riel' => $grandTotalWithTaxInRiel,
         ]));
 
         foreach ($rawMaterialsData as $material) {
             $material['purchase_invoice_id'] = $purchaseInvoice->id; 
             PurchaseInvoiceDetail::create($material);
         }
-
         return $purchaseInvoice;
     }
+
+
 
     public function update(int $id, Request $request): PurchaseInvoice
     {
@@ -142,8 +161,10 @@ class PurchaseInvoiceRepository implements PurchaseInvoiceRepositoryInterface
 
             $rawMaterialsData[$rawMaterialId] = [
                 'quantity' => $rawMaterial->quantity, 
-                'total_price' => $totalPrice,
+                'total_price_in_riel' => $totalPrice * $request->riel_conversion_rate,
+                'total_price_in_usd' => $totalPrice,
                 'raw_material_id' => $rawMaterial->id,
+                'supplier_id' => $supplierId,
             ];
 
             $subTotal += $totalPrice;
@@ -155,11 +176,16 @@ class PurchaseInvoiceRepository implements PurchaseInvoiceRepositoryInterface
         $grandTotalWithTax = $grandTotalWithoutTax + $taxValue;
 
         $invoice->update(array_merge($request->all(), [
-            'sub_total' => $subTotal,
-            'discount_value' => $discountValue,
-            'tax_value' => $taxValue,
-            'grand_total_without_tax' => $grandTotalWithoutTax,
-            'grand_total_with_tax' => $grandTotalWithTax,
+            'sub_total_in_usd' => $subTotal,
+            'sub_total_in_riel' => $subTotal * $request->riel_conversion_rate,
+            'discount_value_in_usd' => $discountValue,
+            'discount_value_in_riel' => $discountValue * $request->riel_conversion_rate,
+            'tax_value_in_usd' => $taxValue,
+            'tax_value_in_riel' => $taxValue * $request->riel_conversion_rate,
+            'grand_total_without_tax_in_usd' => $grandTotalWithoutTax,
+            'grand_total_without_tax_in_riel' => $grandTotalWithoutTax * $request->riel_conversion_rate,
+            'grand_total_with_tax_in_usd' => $grandTotalWithTax,
+            'grand_total_with_tax_in_riel' => $grandTotalWithTax * $request->riel_conversion_rate,
         ]));
 
         $existingDetails = $invoice->purchaseInvoiceDetails->keyBy('raw_material_id');
@@ -199,6 +225,15 @@ class PurchaseInvoiceRepository implements PurchaseInvoiceRepositoryInterface
         foreach ($invoice->purchaseInvoiceDetails()->withTrashed()->get() as $detail) {
             $detail->restore();
         }
+
+        return $invoice;
+    }
+
+    public function toggleStatus(int $id): PurchaseInvoice
+    {
+        $invoice = $this->purchaseInvoice->findOrFail($id);
+        $invoice->status = !$invoice->status;
+        $invoice->save();
 
         return $invoice;
     }
