@@ -4,14 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Supplier;
-use App\Models\PurchaseInvoiceDetail;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\PurchaseInvoiceDetail;
 
 class PurchaseInvoice extends Model
 {
-    use HasFactory;
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
     
     protected $table = 'purchase_invoices';
 
@@ -20,25 +18,25 @@ class PurchaseInvoice extends Model
         'invoice_number',
         'payment_date',
         'discount_percentage',
-        'discount_value',
+        'discount_value_in_riel',
+        'discount_value_in_usd',
         'tax_percentage',
-        'tax_value',
+        'tax_value_in_riel',
+        'tax_value_in_usd',
         'status',
-        'sub_total',
-        'grand_total_with_tax',
-        'grand_total_without_tax',
-        'clearing_payable',
-        'indebted',
-        'supplier_id',
+        'sub_total_in_riel',
+        'sub_total_in_usd',
+        'grand_total_with_tax_in_riel',
+        'grand_total_with_tax_in_usd',
+        'grand_total_without_tax_in_riel',
+        'grand_total_without_tax_in_usd',
+        'clearing_payable_in_riel',
+        'clearing_payable_in_usd',
+        'indebted_in_riel',
+        'indebted_in_usd',
     ];
 
-    public function supplier()
-    {
-        return $this->belongsTo(Supplier::class);
-    }
-
     public function purchaseInvoiceDetails(){
-        return $this -> hasMany(PurchaseInvoiceDetail::class , 'purchase_invoice_id');
+        return $this->hasMany(PurchaseInvoiceDetail::class, 'purchase_invoice_id');
     }
-
 }

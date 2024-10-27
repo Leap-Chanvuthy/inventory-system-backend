@@ -14,9 +14,11 @@ return new class extends Migration
         Schema::create('purchase_invoice_details', function (Blueprint $table) {
             $table->id();
             $table->integer('quantity');
-            $table->double('total_price');
+            $table->double('total_price_in_riel');
+            $table->double('total_price_in_usd');
             $table->unsignedBigInteger('purchase_invoice_id');
             $table->unsignedBigInteger('raw_material_id');
+            $table-> unsignedBigInteger('supplier_id') -> nullable();
 
             $table->foreign('purchase_invoice_id')
                 ->references('id')
@@ -29,6 +31,13 @@ return new class extends Migration
                 ->on('raw_materials')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
+
+            $table -> foreign('supplier_id')
+                ->references('id')
+                ->on('suppliers')
+                -> onDelete('cascade')
+                ->onUpdate('cascade');
+
             $table->timestamps();
             $table -> softDeletes();
         });

@@ -17,22 +17,23 @@ return new class extends Migration
             $table-> string('invoice_number' , 100);
             $table->date('payment_date');
             $table-> double('discount_percentage')->default(0);
-            $table-> double('discount_value')->default(0);
+            $table-> double('discount_value_in_riel')->default(0);
+            $table-> double('discount_value_in_usd')->default(0);
             $table->double('tax_percentage')->default(0);
-            $table->double('tax_value') -> default(0);
+            $table->double('tax_value_in_riel') -> default(0);
+            $table->double('tax_value_in_usd') -> default(0);
             $table -> string('status');
-            $table->double('sub_total');
-            $table->double('grand_total_with_tax');
-            $table->double('grand_total_without_tax');
-            $table-> double('clearing_payable');
-            $table -> double('indebted') -> default(0);
-            $table-> unsignedBigInteger('supplier_id') -> nullable();
+            $table->double('sub_total_in_riel');
+            $table->double('sub_total_in_usd');
+            $table->double('grand_total_with_tax_in_riel');
+            $table->double('grand_total_with_tax_in_usd');
+            $table->double('grand_total_without_tax_in_riel');
+            $table->double('grand_total_without_tax_in_usd');
+            $table-> double('clearing_payable_in_riel');
+            $table-> double('clearing_payable_in_usd');
+            $table -> double('indebted_in_riel') -> default(0);
+            $table-> double('indebted_in_usd');
 
-            $table -> foreign('supplier_id')
-            ->references('id')
-            ->on('suppliers')
-            -> onDelete('cascade')
-            ->onUpdate('cascade');
             $table->timestamps();
             $table -> softDeletes();
         });

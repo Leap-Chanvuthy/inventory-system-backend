@@ -22,16 +22,16 @@ class AuthAPIController extends Controller
                 'password' => 'required|string|min:6|confirmed',
                 'role' => 'required|string',
             ]);
-    
+
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'role' => $request-> role,
             ]);
-    
+
             $token = JWTAuth::fromUser($user);
-    
+
             return response()->json([
                 'user' => $user ,
                 'authorisation' => [
@@ -53,7 +53,7 @@ class AuthAPIController extends Controller
                 'email' => 'required|email',
                 'password' => 'required'
             ]);
-        
+
             $credentials = $request->only('email', 'password');
 
             $user = User::where('email', $credentials['email'])->first();
@@ -65,7 +65,7 @@ class AuthAPIController extends Controller
                     ]
                 ], 404);
             }
-    
+
             if (!Hash::check($credentials['password'], $user->password)) {
                 return response()->json([
                     'errors' => [
@@ -73,15 +73,15 @@ class AuthAPIController extends Controller
                     ]
                 ], 401);
             }
-        
+
             if (!$token = JWTAuth::attempt($credentials)) {
                 return response()->json(['error' => 'Invalid credentials'], 401);
             }
-        
+
             $user = Auth::user();
-    
+
             $userDetails = $user-> makeHidden('password');
-    
+
             return response()->json([
                 'user' => $userDetails,
                 'authorisation' => [
@@ -94,7 +94,7 @@ class AuthAPIController extends Controller
         } catch (\Exception $e){
             return response () -> json(['error' => $e -> getMessage()],400);
         }
-    }    
+    }
 
 
 

@@ -51,4 +51,9 @@ class RawMaterial extends Model
         return $this -> hasMany(RawMaterialImage::class);
     }
 
+    public function purchase_invoice_details()
+    {
+        return $this->hasMany(PurchaseInvoiceDetail::class, 'raw_material_id');
+    }
+
 }
