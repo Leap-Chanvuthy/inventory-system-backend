@@ -40,19 +40,20 @@ class PurchaseInvoiceAPIController extends Controller
     {
         try {
 
-            $validatedData = $request->validate([
+            $request->validate([
                 'raw_materials' => 'required|array', 
                 'raw_materials*' => 'required|exists:raw_materials,id',
                 'discount_percentage' => 'nullable|numeric',
                 'tax_percentage' => 'nullable|numeric',
                 'payment_method' => "required|string",
-                'status' => 'required|string',
-                'payment_date' => 'required|date'
+                // 'status' => 'required|string',
+                'payment_date' => 'required|date',
+                'clearing_payable_percentage' => 'required|numeric|min:0|max:100',
             ]);
     
             $invoice = $this->purchaseInvoiceRepository->create($request);
     
-            return response()->json(['invoice' => $invoice], 201);
+            return response()->json(['message' => 'Invoice created successfully' , 'invoice' => $invoice], 201);
         } catch (ValidationException $e) {
             return response()->json(['errors' => $e->errors()], 422);
         } catch (\Exception $e) {
@@ -61,32 +62,61 @@ class PurchaseInvoiceAPIController extends Controller
     }
     
 
-    public function update($id, Request $request)
+    // public function update($id, Request $request)
+    // {
+    //     try {
+    //         $validatedData = $request->validate([
+    //             'supplier_id' => 'required|exists:suppliers,id',
+    //             'payment_method' => 'required|string',
+    //             'invoice_number' => 'required|string|unique:purchase_invoices,invoice_number,' . $id,
+    //             'payment_date' => 'nullable|date',
+    //             'discount_percentage' => 'nullable|numeric',
+    //             'tax_percentage' => 'nullable|numeric',
+    //             'status' => 'required|string',
+    //             'clearing_payable' => 'nullable|numeric',
+    //             'indebted' => 'nullable|numeric',
+    //             'riel_conversion_rate' => 'required|numeric',
+    //             'usd_amount' => 'nullable|numeric',
+    //             'riel_amount' => 'nullable|numeric',
+    //             'raw_materials' => 'required|array',
+    //             'raw_materials.*' => 'required|exists:raw_materials,id',
+    //         ]);
+
+    //         $invoice = $this->purchaseInvoiceRepository->update($id, $request);
+    //         return response()->json(['invoice' => $invoice], 200);
+    //     } catch (ValidationException $e) {
+    //         return response()->json(['errors' => $e->errors()], 422);
+    //     }
+    // }
+
+
+    public function update(int $id, Request $request)
     {
         try {
-            $validatedData = $request->validate([
-                'supplier_id' => 'required|exists:suppliers,id',
-                'payment_method' => 'required|string',
-                'invoice_number' => 'required|string|unique:purchase_invoices,invoice_number,' . $id,
-                'payment_date' => 'nullable|date',
-                'discount_percentage' => 'nullable|numeric',
-                'tax_percentage' => 'nullable|numeric',
-                'status' => 'required|string',
-                'clearing_payable' => 'nullable|numeric',
-                'indebted' => 'nullable|numeric',
-                'riel_conversion_rate' => 'required|numeric',
-                'usd_amount' => 'nullable|numeric',
-                'riel_amount' => 'nullable|numeric',
+            // Validate the incoming request
+            $request->validate([
                 'raw_materials' => 'required|array',
                 'raw_materials.*' => 'required|exists:raw_materials,id',
+                'discount_percentage' => 'nullable|numeric',
+                'tax_percentage' => 'nullable|numeric',
+                'payment_method' => 'required|string',
+                // 'status' => 'required|string',
+                'payment_date' => 'required|date',
+                'clearing_payable_percentage' => 'required|numeric|min:0|max:100',
             ]);
-
+    
+            // Update the purchase invoice
             $invoice = $this->purchaseInvoiceRepository->update($id, $request);
-            return response()->json(['invoice' => $invoice], 200);
+    
+            // Return a successful response with the updated invoice
+            return response()->json(['message' => 'Invoice updated successfully', 'invoice' => $invoice], 200);
         } catch (ValidationException $e) {
             return response()->json(['errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+    
 
     public function destroy($id)
     {

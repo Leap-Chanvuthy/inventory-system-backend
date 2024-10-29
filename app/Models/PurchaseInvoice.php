@@ -30,8 +30,9 @@ class PurchaseInvoice extends Model
         'grand_total_with_tax_in_usd',
         'grand_total_without_tax_in_riel',
         'grand_total_without_tax_in_usd',
-        'clearing_payable_in_riel',
-        'clearing_payable_in_usd',
+        // 'clearing_payable_in_riel',
+        // 'clearing_payable_in_usd',
+        'clearing_payable_percentage',
         'indebted_in_riel',
         'indebted_in_usd',
     ];

@@ -31,8 +31,9 @@ return new class extends Migration
             $table->double('grand_total_without_tax_in_usd');
             // $table-> double('clearing_payable_in_riel');
             // $table-> double('clearing_payable_in_usd');
-            // $table -> double('indebted_in_riel') -> default(0);
-            // $table-> double('indebted_in_usd');
+            $table-> double('clearing_payable_percentage');
+            $table -> double('indebted_in_riel') -> default(0);
+            $table-> double('indebted_in_usd');
 
             $table->timestamps();
             $table -> softDeletes();
