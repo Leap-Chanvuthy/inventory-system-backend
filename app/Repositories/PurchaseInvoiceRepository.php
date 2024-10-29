@@ -12,6 +12,8 @@ use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Exception;
+use Carbon\Carbon;
+
 
 class PurchaseInvoiceRepository implements PurchaseInvoiceRepositoryInterface
 {
@@ -42,9 +44,11 @@ class PurchaseInvoiceRepository implements PurchaseInvoiceRepositoryInterface
                 }),
                 AllowedFilter::callback('date_range', function (Builder $query, $value) {
                     if (isset($value['start_date']) && isset($value['end_date'])) {
-                        $query->whereBetween('created_at', [$value['start_date'], $value['end_date']]);
+                        $startDate = Carbon::parse($value['start_date'])->startOfDay();
+                        $endDate = Carbon::parse($value['end_date'])->endOfDay();
+                        $query->whereBetween('created_at', [$startDate, $endDate]);
                     }
-                }),
+                }),               
             ])
             ->allowedSorts('created_at', 'grand_total_with_tax_in_usd', 'status')
             ->defaultSort('-created_at');

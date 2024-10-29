@@ -12,6 +12,7 @@
         "laravel/tinker": "^2.8",
         "laravel/ui": "^4.5",
         "maatwebsite/excel": "^3.1",
+        "nesbot/carbon": "^2.72",
         "spatie/laravel-query-builder": "^6.0",
         "tymon/jwt-auth": "^2.1"
     },
