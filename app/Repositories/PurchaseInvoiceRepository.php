@@ -56,12 +56,12 @@ class PurchaseInvoiceRepository implements PurchaseInvoiceRepositoryInterface
 
     public function all(): LengthAwarePaginator
     {
-        return $this->allBuilder()->with('purchaseInvoiceDetails')->paginate(10);
+        return $this->allBuilder()->with('purchaseInvoiceDetails.rawMaterial.supplier')->paginate(10);
     }
 
     public function findById(int $id): PurchaseInvoice
     {
-        return $this->purchaseInvoice->with('purchaseInvoiceDetails')->findOrFail($id);
+        return $this->purchaseInvoice->with('purchaseInvoiceDetails.rawMaterial.supplier')->findOrFail($id);
     }
 
     public function generateInvoiceNumber(): string
