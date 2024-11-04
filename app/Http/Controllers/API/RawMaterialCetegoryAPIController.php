@@ -36,6 +36,12 @@ class RawMaterialCetegoryAPIController extends Controller
         return response()->json($categories);
     }
 
+    public function getWithoutPagination()
+    {
+        $categories = RawMaterialCategory::all();
+        return response()->json($categories);
+    }
+
     // Store a newly created category
     public function store(Request $request)
     {

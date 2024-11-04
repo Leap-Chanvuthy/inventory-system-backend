@@ -91,6 +91,7 @@ Route::post('raw-materials/import', [RawMaterialAPIController::class, 'import'])
 
 // Raw Material Category
 Route::get('raw-material-categories', [RawMaterialCetegoryAPIController::class , 'index']);
+Route::get('non-paginate/raw-material-categories', [RawMaterialCetegoryAPIController::class , 'getWithoutPagination']);
 
 
 

@@ -29,7 +29,7 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
         return QueryBuilder::for(RawMaterial::class)
             ->allowedFilters([
                 AllowedFilter::exact('id'),
-                AllowedFilter::exact('raw_material_category'),
+                AllowedFilter::exact('raw_material_category_id'),
                 AllowedFilter::exact('status'),
                 AllowedFilter::exact('minimum_stock_level'),
                 AllowedFilter::callback('search', function (Builder $query, $value) {
@@ -87,7 +87,7 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
 
     public function all(): LengthAwarePaginator
     {
-        return $this->allBuilder()->with('raw_material_images')->paginate(10);
+        return $this->allBuilder()->with('raw_material_images' ,'category')->paginate(10);
     }
 
     public function trashed(): LengthAwarePaginator

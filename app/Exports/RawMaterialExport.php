@@ -24,7 +24,7 @@ class RawMaterialExport implements FromQuery, WithHeadings, WithMapping
     public function query()
     {
         return QueryBuilder::for(RawMaterial::with('supplier'))
-        ->allowedIncludes(['supplier'])
+        ->allowedIncludes(['supplier' , 'category'])
         ->allowedFilters([
             AllowedFilter::exact('id'),
             AllowedFilter::exact('name'),
@@ -39,7 +39,7 @@ class RawMaterialExport implements FromQuery, WithHeadings, WithMapping
             AllowedFilter::exact('unit_of_measurement'),
             AllowedFilter::exact('package_size'),
             AllowedFilter::exact('status'),
-            AllowedFilter::exact('raw_material_category'),
+            AllowedFilter::exact('raw_material_category_id'),
             AllowedFilter::callback('start_date', function ($query, $value) {
                 $query->where('created_at', '>=', $value);
             }),
@@ -69,7 +69,7 @@ class RawMaterialExport implements FromQuery, WithHeadings, WithMapping
             $rawMaterial->unit_of_measurement,
             $rawMaterial->package_size,
             $rawMaterial->status,
-            $rawMaterial -> raw_material_category,
+            $rawMaterial -> category -> category_name ?? 'N/A',
             $rawMaterial->location,
             $rawMaterial->expiry_date,
             $rawMaterial->supplier->name ?? 'N/A',         
