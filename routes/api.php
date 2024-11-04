@@ -7,6 +7,7 @@ use App\Http\Controllers\API\ProductAPIController;
 use App\Http\Controllers\API\ProfileSettingAPIController;
 use App\Http\Controllers\API\PurchaseInvoiceAPIController;
 use App\Http\Controllers\API\RawMaterialAPIController;
+use App\Http\Controllers\API\RawMaterialCetegoryAPIController;
 use App\Http\Controllers\API\SupplierAPIController;
 use App\Http\Controllers\API\UserAPIController;
 
@@ -87,6 +88,10 @@ Route::patch('/raw-material/{id}' , [RawMaterialAPIController::class, 'update'])
 Route::delete('/raw-material/{id}' , [RawMaterialAPIController::class , 'destroy']);
 Route::get('raw-materials/export', [RawMaterialAPIController::class, 'export']);
 Route::post('raw-materials/import', [RawMaterialAPIController::class, 'import']);
+
+// Raw Material Category
+Route::get('raw-material-categories', [RawMaterialCetegoryAPIController::class , 'index']);
+
 
 
 

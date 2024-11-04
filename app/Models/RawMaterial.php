@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Supplier;
 use App\Models\ProductRawMaterial;
 use App\Models\Product;
-use App\Models\Currency;
+use App\Models\RawMaterialCategory;
 use App\Models\RawMaterialImage;
 
 class RawMaterial extends Model
@@ -33,6 +33,7 @@ class RawMaterial extends Model
         'description',
         'expiry_date',
         'supplier_id',
+        'raw_material_category_id'
     ];
 
     public function products()
@@ -56,4 +57,8 @@ class RawMaterial extends Model
         return $this->hasMany(PurchaseInvoiceDetail::class, 'raw_material_id');
     }
 
+    public function category()
+    {
+        return $this->belongsTo(RawMaterialCategory::class, 'raw_material_category_id');
+    }    
 }

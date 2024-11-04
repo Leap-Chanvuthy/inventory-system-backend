@@ -23,7 +23,6 @@ return new class extends Migration
             $table -> double('unit_price_in_riel');
             $table -> double('total_value_in_riel');
             $table -> integer('minimum_stock_level');
-            $table -> string('raw_material_category' ,100);
             $table -> string('unit_of_measurement', 100);
             $table -> string('package_size' , 100) -> nullable();
             $table -> string('status' , 100) -> nullable();
@@ -31,12 +30,19 @@ return new class extends Migration
             $table -> text('description') -> nullable();
             $table -> date('expiry_date') -> nullable();
             $table-> unsignedBigInteger('supplier_id') -> nullable();
+            $table -> unsignedBigInteger('raw_material_category_id') -> nullable();
 
             $table -> foreign('supplier_id')
             ->references('id')
             ->on('suppliers')
             ->onDelete('cascade')
             ->onUpdate('cascade');
+
+            $table -> foreign('raw_material_category_id')
+            -> references('id')
+            -> on('raw_material_categories')
+            -> onDelete('cascade')
+            -> onUpdate('cascade');
 
 
             $table->timestamps();

@@ -43,6 +43,7 @@ class RawMaterialImport implements ToModel, WithHeadingRow, WithValidation
             'description'           => $row['description'],
             'expiry_date'           => $row['expiry_date'],
             'supplier_id'           => $row['supplier_id'],
+            'raw_material_category_id' => $row['raw_material_category_id']
         ]);
     }
 
@@ -103,6 +104,7 @@ class RawMaterialImport implements ToModel, WithHeadingRow, WithValidation
             'description' => 'nullable|string',
             'expiry_date' => 'nullable|date',
             'supplier_id' => 'nullable|integer|exists:suppliers,id',
+            'raw_material_category_id' => 'nullable|integer|exists:raw_material_categories,id'
         ];
     }
 }

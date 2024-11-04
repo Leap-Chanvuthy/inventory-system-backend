@@ -41,8 +41,7 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
                             ->orWhere('unit_price_in_usd', 'LIKE', "%{$value}%")
                             ->orWhere('total_value_in_usd', 'LIKE', "%{$value}%")
                             ->orWhere('location', 'LIKE', "%{$value}%")
-                            ->orWhere('status', 'LIKE', "%{$value}%")
-                            ->orWhere('raw_material_category', 'LIKE', "%{$value}%");
+                            ->orWhere('status', 'LIKE', "%{$value}%");
                     });
                 })
             ])
@@ -64,8 +63,7 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
                         $query->where('name', 'LIKE', "%{$value}%")
                             ->orWhere('material_code', 'LIKE', "%{$value}%")
                             ->orWhere('location', 'LIKE', "%{$value}%")
-                            ->orWhere('status', 'LIKE', "%{$value}%")
-                            ->orWhere('raw_material_category', 'LIKE', "%{$value}%");
+                            ->orWhere('status', 'LIKE', "%{$value}%");
                     });
                 })
             ])
@@ -100,7 +98,7 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
 
     public function findById(int $id): RawMaterial
     {
-        return RawMaterial::with('supplier' , 'raw_material_images')->findOrFail($id);
+        return RawMaterial::with('supplier' , 'raw_material_images' , 'category')->findOrFail($id);
     }
 
 
@@ -181,7 +179,6 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
             'unit_price_in_riel' => 'required|numeric',
             'total_value_in_riel' => 'required|numeric',
             'minimum_stock_level' => 'required|integer',
-            'raw_material_category' => 'required|string|max:100',
             'status' => 'required|string|max:100',
             'unit_of_measurement' => 'required|string|max:100',
             'package_size' => 'nullable|string|max:100',
@@ -189,6 +186,7 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
             'description' => 'nullable|string',
             'expiry_date' => 'nullable|date',
             'image.*' => 'nullable|image|mimes:jpeg,png,jpg|max:10000',
+            'raw_material_category_id' => 'required'
         ];
 
         $validatedData = $request->validate($rules);
