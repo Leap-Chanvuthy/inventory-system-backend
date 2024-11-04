@@ -91,8 +91,10 @@ Route::post('raw-materials/import', [RawMaterialAPIController::class, 'import'])
 
 // Raw Material Category
 Route::get('raw-material-categories', [RawMaterialCetegoryAPIController::class , 'index']);
+Route::get('raw-material-category/{id}', [RawMaterialCetegoryAPIController::class , 'show']);
 Route::get('non-paginate/raw-material-categories', [RawMaterialCetegoryAPIController::class , 'getWithoutPagination']);
-
+Route::post('raw-material-category/create', [RawMaterialCetegoryAPIController::class , 'store']);
+Route::patch('raw-material-category/update/{id}', [RawMaterialCetegoryAPIController::class , 'update']);
 
 
 

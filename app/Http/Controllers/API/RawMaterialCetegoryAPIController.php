@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Validation\ValidationException;
 
 class RawMaterialCetegoryAPIController extends Controller
 {
@@ -18,10 +19,10 @@ class RawMaterialCetegoryAPIController extends Controller
         return QueryBuilder::for(RawMaterialCategory::class)
             ->allowedFilters([
                 AllowedFilter::exact('id'),
-                AllowedFilter::exact('catetory_name'),
+                AllowedFilter::exact('category_name'),
                 AllowedFilter::callback('search', function (Builder $query, $value) {
                     $query->where(function ($query) use ($value) {
-                        $query->where('catetory_name', 'LIKE', "%{$value}%");
+                        $query->where('category_name', 'LIKE', "%{$value}%");
                     });
                 })
             ])
@@ -45,14 +46,18 @@ class RawMaterialCetegoryAPIController extends Controller
     // Store a newly created category
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
-            'category_name' => 'required|string|max:255',
-            'description' => 'nullable|string|max:500',
-        ]);
-
-        $category = RawMaterialCategory::create($validatedData);
-
-        return response()->json($category);
+        try {
+            $validatedData = $request->validate([
+                'category_name' => 'required|uppercase|string|max:255',
+                'description' => 'required|string|max:500',
+            ]);
+    
+            $category = RawMaterialCategory::create($validatedData);
+    
+            return response()->json($category);
+        }catch (ValidationException $e){
+            return response() -> json(['errors' => $e -> errors()],400);
+        }
     }
 
     // Display a specific category by ID
@@ -70,20 +75,24 @@ class RawMaterialCetegoryAPIController extends Controller
     // Update a category by ID
     public function update(Request $request, $id)
     {
-        $category = RawMaterialCategory::find($id);
+        try {
+            $category = RawMaterialCategory::find($id);
 
-        if (!$category) {
-            return response()->json(['message' => 'Category not found']);
+            if (!$category) {
+                return response()->json(['message' => 'Category not found']);
+            }
+    
+            $validatedData = $request->validate([
+                'category_name' => 'required|uppercase|string|max:255',
+                'description' => 'required|string|max:500',
+            ]);
+    
+            $category->update($validatedData);
+    
+            return response()->json($category);
+        }catch (ValidationException $e){
+            return response() -> json(['errors' => $e -> errors()],400);
         }
-
-        $validatedData = $request->validate([
-            'category_name' => 'sometimes|required|string|max:255',
-            'description' => 'nullable|string|max:500',
-        ]);
-
-        $category->update($validatedData);
-
-        return response()->json($category);
     }
 
     // Remove a category by ID
