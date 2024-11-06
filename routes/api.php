@@ -95,6 +95,7 @@ Route::get('raw-material-category/{id}', [RawMaterialCetegoryAPIController::clas
 Route::get('non-paginate/raw-material-categories', [RawMaterialCetegoryAPIController::class , 'getWithoutPagination']);
 Route::post('raw-material-category/create', [RawMaterialCetegoryAPIController::class , 'store']);
 Route::patch('raw-material-category/update/{id}', [RawMaterialCetegoryAPIController::class , 'update']);
+Route::delete('raw-material-category/delete/{id}', [RawMaterialCetegoryAPIController::class , 'delete']);
 
 
 

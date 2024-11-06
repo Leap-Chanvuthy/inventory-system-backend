@@ -17,7 +17,7 @@ class RawMaterialCategory extends Model
 
     public function raw_materials()
     {
-        return $this->hasOne(RawMaterial::class, 'raw_material_category_id');
+        return $this->hasMany(RawMaterial::class, 'raw_material_category_id');
     }
     
 }

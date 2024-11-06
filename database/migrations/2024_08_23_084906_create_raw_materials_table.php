@@ -41,7 +41,7 @@ return new class extends Migration
             $table -> foreign('raw_material_category_id')
             -> references('id')
             -> on('raw_material_categories')
-            -> onDelete('cascade')
+            -> onDelete('set null')
             -> onUpdate('cascade');
 
 
