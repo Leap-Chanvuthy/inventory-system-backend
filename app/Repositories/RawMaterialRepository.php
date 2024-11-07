@@ -90,6 +90,11 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
         return $this->allBuilder()->with('raw_material_images' ,'category')->paginate(10);
     }
 
+    public function allWithoutInvoice(): LengthAwarePaginator
+    {
+        return $this->allBuilder()->with('raw_material_images' ,'category') -> whereDoesntHave('purchase_invoice_details')->paginate(10);
+    }
+
     public function trashed(): LengthAwarePaginator
     {
         return $this -> allBuilderWithTrashed() -> paginate (10);

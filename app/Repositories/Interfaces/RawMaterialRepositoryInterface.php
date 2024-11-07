@@ -9,6 +9,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 interface RawMaterialRepositoryInterface
 {
     public function all(): LengthAwarePaginator;
+    public function allWithoutInvoice(): LengthAwarePaginator;
     public function trashed(): LengthAwarePaginator;
     public function findById(int $id): RawMaterial;
     public function create(StoreRawMaterialRequest $request): RawMaterial; 
