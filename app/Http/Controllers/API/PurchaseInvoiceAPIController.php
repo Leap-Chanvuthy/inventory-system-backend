@@ -30,7 +30,7 @@ class PurchaseInvoiceAPIController extends Controller
     {
         try {
             $purchase_invoice = $this->purchaseInvoiceRepository->findById($id);
-            return response()->json(['data' => $purchase_invoice], 200);
+            return response()->json($purchase_invoice, 200);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }

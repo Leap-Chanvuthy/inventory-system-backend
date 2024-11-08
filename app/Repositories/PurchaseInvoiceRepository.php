@@ -61,7 +61,7 @@ class PurchaseInvoiceRepository implements PurchaseInvoiceRepositoryInterface
 
     public function findById(int $id): PurchaseInvoice
     {
-        return $this->purchaseInvoice->with('purchaseInvoiceDetails.rawMaterial.supplier')->findOrFail($id);
+        return $this->purchaseInvoice->with('purchaseInvoiceDetails.rawMaterial.supplier', 'purchaseInvoiceDetails.rawMaterial.category')->findOrFail($id);
     }
 
     public function generateInvoiceNumber(): string
