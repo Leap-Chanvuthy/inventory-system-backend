@@ -79,92 +79,6 @@ class PurchaseInvoiceRepository implements PurchaseInvoiceRepositoryInterface
     }
 
 
-    // public function create(Request $request): PurchaseInvoice
-    // {
-    //     $subTotalInRiel = 0;
-    //     $subTotalInUsd = 0;
-    //     $rawMaterialsData = [];
-    //     $supplierId = null;
-
-    //     foreach ($request->raw_materials as $rawMaterialId) {
-    //         $rawMaterial = RawMaterial::findOrFail($rawMaterialId);
-            
-    //         if (is_null($supplierId)) {
-    //             $supplierId = $rawMaterial->supplier_id;
-    //         }
-
-    //         $totalPriceInRiel = $rawMaterial->total_value_in_riel; 
-    //         $totalPriceInUsd = $rawMaterial->total_value_in_usd; 
-
-    //         $rawMaterialsData[] = [
-    //             'quantity' => $rawMaterial->quantity,
-    //             'total_price_in_riel' => $totalPriceInRiel,
-    //             'total_price_in_usd' => $totalPriceInUsd,
-    //             'raw_material_id' => $rawMaterial->id,
-    //             'supplier_id' => $supplierId,
-    //         ];
-
-    //         $subTotalInRiel += $totalPriceInRiel;
-    //         $subTotalInUsd += $totalPriceInUsd;
-    //     }
-
-    //     $discountValueInUsd = ($request->discount_percentage / 100) * $subTotalInUsd;
-    //     $discountValueInRiel = ($request->discount_percentage / 100) * $subTotalInRiel;
-
-    //     $grandTotalWithoutTaxInUsd = $subTotalInUsd - $discountValueInUsd;
-    //     $grandTotalWithoutTaxInRiel = $subTotalInRiel - $discountValueInRiel;
-
-    //     $taxValueInUsd = ($request->tax_percentage / 100) * $grandTotalWithoutTaxInUsd;
-    //     $taxValueInRiel = ($request->tax_percentage / 100) * $grandTotalWithoutTaxInRiel;
-
-    //     $grandTotalWithTaxInUsd = $grandTotalWithoutTaxInUsd + $taxValueInUsd;
-    //     $grandTotalWithTaxInRiel = $grandTotalWithoutTaxInRiel + $taxValueInRiel;
-
-    //     $clearingPayableInUsd = $request->clearing_payable_in_usd ?? 0;
-    //     $clearingPayableInRiel = $request->clearing_payable_in_riel ?? 0;
-
-    //     $indebtedInUsd = max(0, $grandTotalWithTaxInUsd - $clearingPayableInUsd);
-    //     $indebtedInRiel = max(0, $grandTotalWithTaxInRiel - $clearingPayableInRiel);
-
-    //     // Determine status based on clearing and grand total with tax values
-    //     $status = 'PAID';
-    //     if ($clearingPayableInUsd == 0 && $clearingPayableInRiel == 0) {
-    //         $status = 'UNPAID';
-    //     } elseif ($clearingPayableInUsd < $grandTotalWithTaxInUsd && $clearingPayableInRiel < $grandTotalWithTaxInRiel) {
-    //         $status = 'INDEBTED';
-    //     } elseif ($clearingPayableInUsd > $grandTotalWithTaxInUsd && $clearingPayableInRiel > $grandTotalWithTaxInRiel) {
-    //         $status = 'OVERPAID';
-    //     }
-
-    //     $purchaseInvoice = $this->purchaseInvoice->create(array_merge($request->all(), [
-    //         'invoice_number' => $this->generateInvoiceNumber(),
-    //         'payment_method' => $request->payment_method,
-    //         'payment_date' => $request->payment_date,
-    //         'status' => $status,
-    //         'sub_total_in_usd' => $subTotalInUsd,
-    //         'sub_total_in_riel' => $subTotalInRiel,
-    //         'discount_value_in_usd' => $discountValueInUsd,
-    //         'discount_value_in_riel' => $discountValueInRiel,
-    //         'tax_value_in_usd' => $taxValueInUsd,
-    //         'tax_value_in_riel' => $taxValueInRiel,
-    //         'grand_total_without_tax_in_usd' => $grandTotalWithoutTaxInUsd,
-    //         'grand_total_without_tax_in_riel' => $grandTotalWithoutTaxInRiel,
-    //         'grand_total_with_tax_in_usd' => $grandTotalWithTaxInUsd,
-    //         'grand_total_with_tax_in_riel' => $grandTotalWithTaxInRiel,
-    //         'clearing_payable_in_usd' => $clearingPayableInUsd,
-    //         'clearing_payable_in_riel' => $clearingPayableInRiel,
-    //         'indebted_in_usd' => $indebtedInUsd,
-    //         'indebted_in_riel' => $indebtedInRiel,
-    //     ]));
-
-    //     foreach ($rawMaterialsData as $material) {
-    //         $material['purchase_invoice_id'] = $purchaseInvoice->id; 
-    //         PurchaseInvoiceDetail::create($material);
-    //     }
-        
-    //     return $purchaseInvoice;
-    // }
-
     public function create(Request $request): PurchaseInvoice
 {
     $subTotalInRiel = 0;
@@ -256,97 +170,202 @@ class PurchaseInvoiceRepository implements PurchaseInvoiceRepositoryInterface
 
 
 
+    // public function update(int $id, Request $request): PurchaseInvoice
+    // {
+    //     $purchaseInvoice = $this->purchaseInvoice->findOrFail($id);
+
+    //     $subTotalInRiel = 0;
+    //     $subTotalInUsd = 0;
+    //     $rawMaterialsData = [];
+    //     $supplierId = null;
+
+    //     foreach ($request->raw_materials as $rawMaterialId) {
+    //         $rawMaterial = RawMaterial::findOrFail($rawMaterialId);
+
+    //         if (is_null($supplierId)) {
+    //             $supplierId = $rawMaterial->supplier_id;
+    //         }
+
+    //         $totalPriceInRiel = $rawMaterial->total_value_in_riel; 
+    //         $totalPriceInUsd = $rawMaterial->total_value_in_usd; 
+
+    //         $rawMaterialsData[] = [
+    //             'quantity' => $rawMaterial->quantity,
+    //             'total_price_in_riel' => $totalPriceInRiel,
+    //             'total_price_in_usd' => $totalPriceInUsd,
+    //             'raw_material_id' => $rawMaterial->id,
+    //             'supplier_id' => $supplierId,
+    //         ];
+
+    //         $subTotalInRiel += $totalPriceInRiel;
+    //         $subTotalInUsd += $totalPriceInUsd;
+    //     }
+
+    //     $discountValueInUsd = ($request->discount_percentage / 100) * $subTotalInUsd;
+    //     $discountValueInRiel = ($request->discount_percentage / 100) * $subTotalInRiel;
+
+    //     $grandTotalWithoutTaxInUsd = $subTotalInUsd - $discountValueInUsd;
+    //     $grandTotalWithoutTaxInRiel = $subTotalInRiel - $discountValueInRiel;
+
+    //     $taxValueInUsd = ($request->tax_percentage / 100) * $grandTotalWithoutTaxInUsd;
+    //     $taxValueInRiel = ($request->tax_percentage / 100) * $grandTotalWithoutTaxInRiel;
+
+    //     $grandTotalWithTaxInUsd = $grandTotalWithoutTaxInUsd + $taxValueInUsd;
+    //     $grandTotalWithTaxInRiel = $grandTotalWithoutTaxInRiel + $taxValueInRiel;
+
+    //     $clearingPayablePercentage = $request->clearing_payable_percentage;
+    //     $clearingPayableInUsd = ($clearingPayablePercentage / 100) * $grandTotalWithTaxInUsd;
+    //     $clearingPayableInRiel = ($clearingPayablePercentage / 100) * $grandTotalWithTaxInRiel;
+
+    //     $indebtedInUsd = max(0, $grandTotalWithTaxInUsd - $clearingPayableInUsd);
+    //     $indebtedInRiel = max(0, $grandTotalWithTaxInRiel - $clearingPayableInRiel);
+
+    //     $status = 'PAID';
+    //     if ($clearingPayablePercentage == 0) {
+    //         $status = 'UNPAID';
+    //     } elseif ($clearingPayablePercentage < 100) {
+    //         $status = 'INDEBTED';
+    //     } elseif ($clearingPayablePercentage > 100) {
+    //         $status = 'OVERPAID';
+    //     }
+
+    //     $purchaseInvoice->update(array_merge($request->all(), [
+    //         'payment_method' => $request->payment_method,
+    //         'payment_date' => $request->payment_date,
+    //         'status' => $status,
+    //         'sub_total_in_usd' => $subTotalInUsd,
+    //         'sub_total_in_riel' => $subTotalInRiel,
+    //         'discount_value_in_usd' => $discountValueInUsd,
+    //         'discount_value_in_riel' => $discountValueInRiel,
+    //         'tax_value_in_usd' => $taxValueInUsd,
+    //         'tax_value_in_riel' => $taxValueInRiel,
+    //         'grand_total_without_tax_in_usd' => $grandTotalWithoutTaxInUsd,
+    //         'grand_total_without_tax_in_riel' => $grandTotalWithoutTaxInRiel,
+    //         'grand_total_with_tax_in_usd' => $grandTotalWithTaxInUsd,
+    //         'grand_total_with_tax_in_riel' => $grandTotalWithTaxInRiel,
+    //         'clearing_payable_percentage' => $clearingPayablePercentage,
+    //         'indebted_in_usd' => $indebtedInUsd,
+    //         'indebted_in_riel' => $indebtedInRiel,
+    //     ]));
+
+    //     foreach ($rawMaterialsData as $material) {
+    //         $material['purchase_invoice_id'] = $purchaseInvoice->id; 
+    //         PurchaseInvoiceDetail::updateOrCreate(
+    //             [
+    //                 'purchase_invoice_id' => $purchaseInvoice->id,
+    //                 'raw_material_id' => $material['raw_material_id']
+    //             ],
+    //             $material
+    //         );
+    //     }
+
+    //     return $purchaseInvoice;
+    // }
+
+
     public function update(int $id, Request $request): PurchaseInvoice
-    {
-        $purchaseInvoice = $this->purchaseInvoice->findOrFail($id);
+{
+    // Find the invoice
+    $purchaseInvoice = $this->purchaseInvoice -> with('purchaseInvoiceDetails.rawMaterial.supplier', 'purchaseInvoiceDetails.rawMaterial.category') ->findOrFail($id);
 
-        $subTotalInRiel = 0;
-        $subTotalInUsd = 0;
-        $rawMaterialsData = [];
-        $supplierId = null;
+    $subTotalInRiel = 0;
+    $subTotalInUsd = 0;
+    $rawMaterialsData = [];
+    $supplierId = null;
 
-        foreach ($request->raw_materials as $rawMaterialId) {
-            $rawMaterial = RawMaterial::findOrFail($rawMaterialId);
-
-            if (is_null($supplierId)) {
-                $supplierId = $rawMaterial->supplier_id;
-            }
-
-            $totalPriceInRiel = $rawMaterial->total_value_in_riel; 
-            $totalPriceInUsd = $rawMaterial->total_value_in_usd; 
-
-            $rawMaterialsData[] = [
-                'quantity' => $rawMaterial->quantity,
-                'total_price_in_riel' => $totalPriceInRiel,
-                'total_price_in_usd' => $totalPriceInUsd,
-                'raw_material_id' => $rawMaterial->id,
-                'supplier_id' => $supplierId,
-            ];
-
-            $subTotalInRiel += $totalPriceInRiel;
-            $subTotalInUsd += $totalPriceInUsd;
+    // Process each raw material
+    foreach ($request->raw_materials as $rawMaterialId) {
+        $rawMaterial = RawMaterial::findOrFail($rawMaterialId);
+        
+        if (is_null($supplierId)) {
+            $supplierId = $rawMaterial->supplier_id;
         }
 
-        $discountValueInUsd = ($request->discount_percentage / 100) * $subTotalInUsd;
-        $discountValueInRiel = ($request->discount_percentage / 100) * $subTotalInRiel;
+        $totalPriceInRiel = $rawMaterial->total_value_in_riel;
+        $totalPriceInUsd = $rawMaterial->total_value_in_usd;
 
-        $grandTotalWithoutTaxInUsd = $subTotalInUsd - $discountValueInUsd;
-        $grandTotalWithoutTaxInRiel = $subTotalInRiel - $discountValueInRiel;
+        $rawMaterialsData[] = [
+            'quantity' => $rawMaterial->quantity,
+            'total_price_in_riel' => $totalPriceInRiel,
+            'total_price_in_usd' => $totalPriceInUsd,
+            'raw_material_id' => $rawMaterial->id,
+            'supplier_id' => $supplierId,
+        ];
 
-        $taxValueInUsd = ($request->tax_percentage / 100) * $grandTotalWithoutTaxInUsd;
-        $taxValueInRiel = ($request->tax_percentage / 100) * $grandTotalWithoutTaxInRiel;
-
-        $grandTotalWithTaxInUsd = $grandTotalWithoutTaxInUsd + $taxValueInUsd;
-        $grandTotalWithTaxInRiel = $grandTotalWithoutTaxInRiel + $taxValueInRiel;
-
-        $clearingPayablePercentage = $request->clearing_payable_percentage;
-        $clearingPayableInUsd = ($clearingPayablePercentage / 100) * $grandTotalWithTaxInUsd;
-        $clearingPayableInRiel = ($clearingPayablePercentage / 100) * $grandTotalWithTaxInRiel;
-
-        $indebtedInUsd = max(0, $grandTotalWithTaxInUsd - $clearingPayableInUsd);
-        $indebtedInRiel = max(0, $grandTotalWithTaxInRiel - $clearingPayableInRiel);
-
-        $status = 'PAID';
-        if ($clearingPayablePercentage == 0) {
-            $status = 'UNPAID';
-        } elseif ($clearingPayablePercentage < 100) {
-            $status = 'INDEBTED';
-        } elseif ($clearingPayablePercentage > 100) {
-            $status = 'OVERPAID';
-        }
-
-        $purchaseInvoice->update(array_merge($request->all(), [
-            'payment_method' => $request->payment_method,
-            'payment_date' => $request->payment_date,
-            'status' => $status,
-            'sub_total_in_usd' => $subTotalInUsd,
-            'sub_total_in_riel' => $subTotalInRiel,
-            'discount_value_in_usd' => $discountValueInUsd,
-            'discount_value_in_riel' => $discountValueInRiel,
-            'tax_value_in_usd' => $taxValueInUsd,
-            'tax_value_in_riel' => $taxValueInRiel,
-            'grand_total_without_tax_in_usd' => $grandTotalWithoutTaxInUsd,
-            'grand_total_without_tax_in_riel' => $grandTotalWithoutTaxInRiel,
-            'grand_total_with_tax_in_usd' => $grandTotalWithTaxInUsd,
-            'grand_total_with_tax_in_riel' => $grandTotalWithTaxInRiel,
-            'clearing_payable_percentage' => $clearingPayablePercentage,
-            'indebted_in_usd' => $indebtedInUsd,
-            'indebted_in_riel' => $indebtedInRiel,
-        ]));
-
-        foreach ($rawMaterialsData as $material) {
-            $material['purchase_invoice_id'] = $purchaseInvoice->id; 
-            PurchaseInvoiceDetail::updateOrCreate(
-                [
-                    'purchase_invoice_id' => $purchaseInvoice->id,
-                    'raw_material_id' => $material['raw_material_id']
-                ],
-                $material
-            );
-        }
-
-        return $purchaseInvoice;
+        $subTotalInRiel += $totalPriceInRiel;
+        $subTotalInUsd += $totalPriceInUsd;
     }
+
+    // Calculate discounts, taxes, and clearing payable amounts
+    $discountValueInUsd = ($request->discount_percentage / 100) * $subTotalInUsd;
+    $discountValueInRiel = ($request->discount_percentage / 100) * $subTotalInRiel;
+    $grandTotalWithoutTaxInUsd = $subTotalInUsd - $discountValueInUsd;
+    $grandTotalWithoutTaxInRiel = $subTotalInRiel - $discountValueInRiel;
+    $taxValueInUsd = ($request->tax_percentage / 100) * $grandTotalWithoutTaxInUsd;
+    $taxValueInRiel = ($request->tax_percentage / 100) * $grandTotalWithoutTaxInRiel;
+    $grandTotalWithTaxInUsd = $grandTotalWithoutTaxInUsd + $taxValueInUsd;
+    $grandTotalWithTaxInRiel = $grandTotalWithoutTaxInRiel + $taxValueInRiel;
+    $clearingPayablePercentage = $request->clearing_payable_percentage;
+    $clearingPayableInUsd = ($clearingPayablePercentage / 100) * $grandTotalWithTaxInUsd;
+    $clearingPayableInRiel = ($clearingPayablePercentage / 100) * $grandTotalWithTaxInRiel;
+    $indebtedInUsd = max(0, $grandTotalWithTaxInUsd - $clearingPayableInUsd);
+    $indebtedInRiel = max(0, $grandTotalWithTaxInRiel - $clearingPayableInRiel);
+
+    // Determine status
+    $status = 'PAID';
+    if ($clearingPayablePercentage == 0) {
+        $status = 'UNPAID';
+    } elseif ($clearingPayablePercentage < 100) {
+        $status = 'INDEBTED';
+    } elseif ($clearingPayablePercentage > 100) {
+        $status = 'OVERPAID';
+    }
+
+    // Update the invoice
+    $purchaseInvoice->update(array_merge($request->all(), [
+        'payment_method' => $request->payment_method,
+        'payment_date' => $request->payment_date,
+        'status' => $status,
+        'sub_total_in_usd' => $subTotalInUsd,
+        'sub_total_in_riel' => $subTotalInRiel,
+        'discount_value_in_usd' => $discountValueInUsd,
+        'discount_value_in_riel' => $discountValueInRiel,
+        'tax_value_in_usd' => $taxValueInUsd,
+        'tax_value_in_riel' => $taxValueInRiel,
+        'grand_total_without_tax_in_usd' => $grandTotalWithoutTaxInUsd,
+        'grand_total_without_tax_in_riel' => $grandTotalWithoutTaxInRiel,
+        'grand_total_with_tax_in_usd' => $grandTotalWithTaxInUsd,
+        'grand_total_with_tax_in_riel' => $grandTotalWithTaxInRiel,
+        'clearing_payable_percentage' => $clearingPayablePercentage,
+        'indebted_in_usd' => $indebtedInUsd,
+        'indebted_in_riel' => $indebtedInRiel,
+    ]));
+
+    // Get existing raw material IDs for the invoice
+    $existingRawMaterialIds = $purchaseInvoice->purchaseInvoiceDetails()->pluck('raw_material_id')->toArray();
+
+    // Determine which raw materials to add and which to remove
+    $newRawMaterialIds = array_column($rawMaterialsData, 'raw_material_id');
+    $rawMaterialsToAdd = array_diff($newRawMaterialIds, $existingRawMaterialIds);
+    $rawMaterialsToRemove = array_diff($existingRawMaterialIds, $newRawMaterialIds);
+
+    // Add new raw materials
+    foreach ($rawMaterialsData as $material) {
+        if (in_array($material['raw_material_id'], $rawMaterialsToAdd)) {
+            $material['purchase_invoice_id'] = $purchaseInvoice->id;
+            PurchaseInvoiceDetail::create($material);
+        }
+    }
+
+    // Remove old raw materials not included in the update request
+    if (!empty($rawMaterialsToRemove)) {
+        PurchaseInvoiceDetail::where('purchase_invoice_id', $purchaseInvoice->id)
+            ->whereIn('raw_material_id', $rawMaterialsToRemove)
+            ->delete();
+    }
+
+    return $purchaseInvoice;
+}
 
     
     
