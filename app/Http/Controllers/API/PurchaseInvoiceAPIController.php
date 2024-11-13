@@ -43,8 +43,8 @@ class PurchaseInvoiceAPIController extends Controller
             $request->validate([
                 'raw_materials' => 'required|array', 
                 'raw_materials*' => 'required|exists:raw_materials,id',
-                'discount_percentage' => 'nullable|numeric|min:0|max:100',
-                'tax_percentage' => 'nullable|numeric|min:0|max:100',
+                'discount_percentage' => 'required|numeric|numeric|min:0|max:100',
+                'tax_percentage' => 'required|numeric|numeric|min:0|max:100',
                 'payment_method' => "required|string",
                 // 'status' => 'required|string',
                 'payment_date' => 'required|date',
@@ -97,8 +97,8 @@ class PurchaseInvoiceAPIController extends Controller
             $request->validate([
                 'raw_materials' => 'required|array',
                 'raw_materials.*' => 'required|exists:raw_materials,id',
-                'discount_percentage' => 'nullable|numeric',
-                'tax_percentage' => 'nullable|numeric',
+                'discount_percentage' => 'required|numeric|numeric|min:0|max:100',
+                'tax_percentage' => 'required|numeric|numeric|min:0|max:100',
                 'payment_method' => 'required|string',
                 // 'status' => 'required|string',
                 'payment_date' => 'required|date',
