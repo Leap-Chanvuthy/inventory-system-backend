@@ -10,6 +10,8 @@ use Illuminate\Http\UploadedFile;
 use App\Http\Controllers\Controller;
 use App\Models\Supplier;
 use App\Repositories\Interfaces\SupplierRepositoryInterface;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class SupplierAPIController extends Controller
@@ -95,6 +97,36 @@ class SupplierAPIController extends Controller
             return response() -> json(['error' => $e->getMessage(),500]);
         }
     }
+
+    // get top 10 suppliers that supplier most raw material
+    public function topSuppliers(): JsonResponse
+    {
+        $suppliers = Supplier::with(['raw_materials'])
+            ->get()
+            ->map(function ($supplier) {
+                $rawMaterialSupplied = $supplier->raw_materials->unique('id')->count(); 
+    
+                return [
+                    'supplier_info' => [
+                        'id' => $supplier->id,
+                        'name' => $supplier->name,
+                        'email' => $supplier->email,
+                        'phone_number' => $supplier->phone_number,
+                    ],
+                    'raw_material_supplied' => $rawMaterialSupplied,
+                ];
+            })
+            ->filter(function ($supplier) {
+                return $supplier['raw_material_supplied'] > 0;
+            })
+            ->sortByDesc('raw_material_supplied')
+            ->take(10); 
+    
+        return response()->json([
+            'top_suppliers' => $suppliers,
+        ]);
+    }
+    
 
 
     public function import(Request $request)

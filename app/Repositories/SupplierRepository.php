@@ -126,7 +126,7 @@ class SupplierRepository implements SupplierRepositoryInterface
 
     private function generateSupplierCode(): string
     {
-        $lastSupplier = Supplier::withTrashed() -> orderBy('created_at', 'desc')->first(); // change to withTrashed()
+        $lastSupplier = Supplier::orderBy('created_at', 'desc')->first(); // change to withTrashed()
         if ($lastSupplier && preg_match('/SUPP-(\d{6})/', $lastSupplier->supplier_code, $matches)) {
             $lastCode = intval($matches[1]);
         } else {
