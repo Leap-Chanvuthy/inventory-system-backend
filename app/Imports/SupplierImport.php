@@ -26,30 +26,30 @@ class SupplierImport implements ToModel, WithHeadingRow, WithValidation
         $supplierCode = $this->generateUniqueSupplierCode();
 
         return new Supplier([
-            'name'                        => $row['name'],
-            'phone_number'                => $row['phone_number'],
-            'location'                    => $row['location'],
-            'longitude'                   => $row['longitude'],
-            'latitude'                    => $row['latitude'],
-            'address'                     => $row['address'],
-            'email'                       => $row['email'],
-            'contact_person'              => $row['contact_person'],
-            'business_registration_number' => $row['business_registration_number'],
-            'vat_number'                  => $row['vat_number'],
-            'bank_account_number'         => $row['bank_account_number'],
-            'bank_account_name'           => $row['bank_account_name'],
-            'bank_name'                   => $row['bank_name'],
+            'name'                        => $row['name'] ,
+            'phone_number'                => $row['phone_number'] ,
+            'location'                    => $row['location'] ,
+            'longitude'                   => $row['longitude'] ,
+            'latitude'                    => $row['latitude'] ,
+            'address'                     => $row['address'] ,
+            'email'                       => $row['email'] ,
+            'contact_person'              => $row['contact_person'] ,
+            'business_registration_number' => $row['business_registration_number'] ,
+            'vat_number'                  => $row['vat_number'] ,
+            'bank_account_number'         => $row['bank_account_number'] ,
+            'bank_account_name'           => $row['bank_account_name'] ,
+            'bank_name'                   => $row['bank_name'] ,
             'supplier_code'               => $supplierCode,
-            'website'                     => $row['website'],
-            'social_media'                => $row['social_media'],
-            'supplier_category'           => $row['supplier_category'],
-            'supplier_status'             => $row['supplier_status'],
-            'contract_length'             => $row['contract_length'],
-            'discount_term'               => $row['discount_term'],
-            'payment_term'                => $row['payment_term'],
-            'note'                        => $row['note'],
+            'website'                     => $row['website'] ,
+            'social_media'                => $row['social_media'] ,
+            'supplier_category'           => $row['supplier_category'] ,
+            'supplier_status'             => $row['supplier_status'] ,
+            'contract_length'             => $row['contract_length'] ,
+            'discount_term'               => $row['discount_term'] ,
+            'payment_term'                => $row['payment_term'] ,
+            'note'                        => $row['note'] ,
         ]); 
-    }  
+    }
 
     private function generateUniqueSupplierCode(): string
     {
@@ -93,7 +93,39 @@ class SupplierImport implements ToModel, WithHeadingRow, WithValidation
                 'max:255',
                 Rule::unique('suppliers'),
             ],
-            'contact_person' => "required|string|max:255",
+            'contact_person' => "required",
+            'phone_number' => "nullable",
+            'longitude' => "nullable",
+            'latitude' => "nullable",
+            'address' => "nullable",
+            'website' => "nullable",
+            'social_media' => "nullable",
+            'supplier_category' => [
+                'required',
+                Rule::in(['SERVICE', 'PRODUCT']),
+            ],
+            'supplier_status' => [
+                'required',
+                Rule::in(['ACTIVE', 'INACTIVE', 'SUSPENDED']),
+            ],
+            'contract_length' => "nullable",
+            'discount_term' => "nullable",
+            'payment_term' => "nullable",
+            'business_registration_number' => "nullable",
+            'vat_number' => "nullable",
+            'bank_account_number' => "nullable",
+            'bank_account_name' => "nullable",
+            'bank_name' => "nullable",
+            'note' => "nullable",
         ];
     }
+
+    public function customValidationMessages()
+    {
+        return [
+            'supplier_category.in' => 'Supplier category must be between SERVICE or PRODUCT.',
+            'supplier_status.in' => 'Supplier status must be ACTIVE, INACTIVE, or SUSPENDED.',
+        ];
+    }
+
 }

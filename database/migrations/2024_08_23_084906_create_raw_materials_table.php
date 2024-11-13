@@ -20,8 +20,10 @@ return new class extends Migration
             $table -> integer('remaining_quantity');
             $table -> double('unit_price_in_usd');
             $table -> double('total_value_in_usd');
+            $table -> double('exchange_rate_from_usd_to_riel');
             $table -> double('unit_price_in_riel');
             $table -> double('total_value_in_riel');
+            $table -> double('exchange_rate_from_riel_to_usd');
             $table -> integer('minimum_stock_level');
             $table -> string('unit_of_measurement', 100);
             $table -> string('package_size' , 100) -> nullable();

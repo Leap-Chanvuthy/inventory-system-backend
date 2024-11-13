@@ -181,8 +181,10 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
             'remaining_quantity' => 'required|integer',
             'unit_price_in_usd' => 'required|numeric',
             'total_value_in_usd' => 'required|numeric',
+            'exchange_rate_from_usd_to_riel' => 'required|numeric',
             'unit_price_in_riel' => 'required|numeric',
             'total_value_in_riel' => 'required|numeric',
+            'exchange_rate_from_riel_to_usd' => 'required|numeric',
             'minimum_stock_level' => 'required|integer',
             'status' => 'required|string|max:100',
             'unit_of_measurement' => 'required|string|max:100',
@@ -191,7 +193,7 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
             'description' => 'nullable|string',
             'expiry_date' => 'nullable|date',
             'image.*' => 'nullable|image|mimes:jpeg,png,jpg|max:10000',
-            'raw_material_category_id' => 'required'
+            'raw_material_category_id' => 'required|exists:raw_material_categories,id'
         ];
 
         $validatedData = $request->validate($rules);
