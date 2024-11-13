@@ -73,6 +73,7 @@ Route::patch('/supplier/{id}', [SupplierAPIController::class , 'update']);
 Route::delete('/supplier/{id}' , [SupplierAPIController::class , 'destroy']);
 Route::get('/suppliers/stats', [SupplierAPIController::class, 'getSupplierStats']);
 Route::get('/suppliers/stats/top-suppliers', [SupplierAPIController::class, 'topSuppliers']);
+Route::get('/suppliers/stats/grouped-by-date', [SupplierAPIController::class, 'suppliersGroupedByDay']);
 Route::post('/suppliers/import', [SupplierAPIController::class, 'import'])->name('suppliers.import');
 Route::get('/suppliers/export', [SupplierAPIController::class, 'export'])->name('suppliers.export');
 

@@ -13,6 +13,9 @@ use App\Repositories\Interfaces\SupplierRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Carbon\Carbon;
+use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
 
 class SupplierAPIController extends Controller
 {
@@ -126,6 +129,49 @@ class SupplierAPIController extends Controller
             'top_suppliers' => $suppliers,
         ]);
     }
+
+    // supplier performance 
+public function suppliersGroupedByDay(Request $request)
+{
+    // Define query builder with allowed filters
+    $suppliers = QueryBuilder::for(Supplier::class)
+        // Apply filtering on the created_at column
+        ->allowedFilters([
+            AllowedFilter::callback('start_date', function ($query, $value) {
+                $query->where('created_at', '>=', Carbon::parse($value)->startOfDay());
+            }),
+            AllowedFilter::callback('end_date', function ($query, $value) {
+                $query->where('created_at', '<=', Carbon::parse($value)->endOfDay());
+            }),
+        ])
+        // Load related raw_materials
+        ->with('raw_materials')
+        // Get results
+        ->get()
+        ->map(function ($supplier) {
+            $rawMaterialSupplied = $supplier->raw_materials->unique('id')->count();
+            return [
+                'supplier_info' => [
+                    'id' => $supplier->id,
+                    'name' => $supplier->name,
+                    'email' => $supplier->email,
+                    'phone_number' => $supplier->phone_number,
+                ],
+                'raw_material_supplied' => $rawMaterialSupplied,
+                'created_at' => $supplier->created_at->toDateString(), // Get only the date part
+            ];
+        })
+        // Group by created_at date
+        ->groupBy('created_at')
+        ->map(function ($suppliersPerDay) {
+            return $suppliersPerDay->count(); // Return the count of suppliers per day
+        });
+
+    return response()->json([
+        'grouped_suppliers' => $suppliers,
+    ]);
+}
+
     
 
 
