@@ -43,6 +43,11 @@ class RawMaterialAPIController extends Controller
         return $this->rawMaterialRepository->allWithoutInvoice();
     }
 
+    public function getRawMaterialsWithoutSupplier()
+    {
+        return $this->rawMaterialRepository->allWithoutSupplier();
+    }
+
     public function recover ($id){
         try {
             $raw_material = RawMaterial::onlyTrashed() -> findOrFail($id);

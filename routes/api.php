@@ -86,6 +86,7 @@ Route::get('/raw-materials/trashed' , [RawMaterialAPIController::class , 'trashe
 Route::patch('/raw-materials/recover/{id}' , [RawMaterialAPIController::class , 'recover']);
 Route::get('/raw-material/{id}',[RawMaterialAPIController::class, 'show']);
 Route::get('/raw-materials/no-invoice' , [RawMaterialAPIController::class , 'getRawMaterialsWithoutInvoice']);
+Route::get('/raw-materials/no-supplier' , [RawMaterialAPIController::class , 'getRawMaterialsWithoutSupplier']);
 Route::post('/raw-materials' , [RawMaterialAPIController::class, 'store']);
 Route::patch('/raw-material/{id}' , [RawMaterialAPIController::class, 'update']);
 Route::delete('/raw-material/{id}' , [RawMaterialAPIController::class , 'destroy']);
