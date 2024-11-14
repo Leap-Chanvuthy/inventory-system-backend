@@ -10,6 +10,8 @@ interface PurchaseInvoiceRepositoryInterface
 {
     public function all(): LengthAwarePaginator;
 
+    public function trashed(): LengthAwarePaginator;
+
     public function findById(int $id): PurchaseInvoice;
 
     public function create(Request $request): PurchaseInvoice;

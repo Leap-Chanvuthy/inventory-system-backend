@@ -53,25 +53,73 @@ class PurchaseInvoiceRepository implements PurchaseInvoiceRepositoryInterface
             ->defaultSort('-created_at');
     }
 
+    private function allBuilderWithTrashed (): QueryBuilder
+    {
+        return QueryBuilder::for(PurchaseInvoice::class)
+            ->onlyTrashed() 
+            ->allowedFilters([
+                AllowedFilter::exact('id'),
+                AllowedFilter::exact('status'),  
+                AllowedFilter::exact('payment_method'), 
+                AllowedFilter::callback('search', function (Builder $query, $value) {
+                    $query->where(function ($query) use ($value) {
+                        $query->where('invoice_number', 'LIKE', "%{$value}%")
+                            ->orWhere('status', 'LIKE', "%{$value}%")
+                            ->orWhere('sub_total_in_usd', 'LIKE', "%{$value}%")
+                            ->orWhere('discount_percentage', 'LIKE', "%{$value}%")
+                            ->orWhere('tax_percentage', 'LIKE', "%{$value}%")
+                            ->orWhere('grand_total_with_tax_in_usd', 'LIKE', "%{$value}%");
+                    });
+                }),
+                AllowedFilter::callback('date_range', function (Builder $query, $value) {
+                    if (isset($value['start_date']) && isset($value['end_date'])) {
+                        $startDate = Carbon::parse($value['start_date'])->startOfDay();
+                        $endDate = Carbon::parse($value['end_date'])->endOfDay();
+                        $query->whereBetween('created_at', [$startDate, $endDate]);
+                    }
+                }),               
+            ])
+            ->allowedSorts('created_at', 'grand_total_with_tax_in_usd', 'status')
+            ->defaultSort('-created_at');
+    }
+
     public function all(): LengthAwarePaginator
     {
         return $this->allBuilder()->with('purchaseInvoiceDetails.rawMaterial.supplier')->paginate(10);
     }
+
+    public function trashed(): LengthAwarePaginator
+    {
+        return $this->allBuilderWithTrashed()->with('purchaseInvoiceDetails.rawMaterial.supplier')->paginate(10);
+    }
+
 
     public function findById(int $id): PurchaseInvoice
     {
         return $this->purchaseInvoice->with('purchaseInvoiceDetails.rawMaterial.supplier', 'purchaseInvoiceDetails.rawMaterial.category')->findOrFail($id);
     }
 
+    // public function generateInvoiceNumber(): string
+    // {
+    //     $lastInvoice = PurchaseInvoice::orderBy('created_at', 'desc')->first();
+
+    //     if ($lastInvoice && preg_match('/INV-(\d{6})/', $lastInvoice->invoice_number, $matches)) {
+    //         $lastCode = intval($matches[1]);
+    //     } else {
+    //         $lastCode = 0; 
+    //     }
+
+    //     $newNumber = str_pad($lastCode + 1, 6, '0', STR_PAD_LEFT);
+    //     return 'INV-' . $newNumber;
+    // }
+
     public function generateInvoiceNumber(): string
     {
-        $lastInvoice = PurchaseInvoice::orderBy('created_at', 'desc')->first();
+        $lastInvoice = PurchaseInvoice::withTrashed()
+            ->selectRaw('MAX(CAST(SUBSTRING(invoice_number, 5) AS UNSIGNED)) AS max_code')
+            ->first();
 
-        if ($lastInvoice && preg_match('/INV-(\d{6})/', $lastInvoice->invoice_number, $matches)) {
-            $lastCode = intval($matches[1]);
-        } else {
-            $lastCode = 0; 
-        }
+        $lastCode = $lastInvoice->max_code ?? 0;
 
         $newNumber = str_pad($lastCode + 1, 6, '0', STR_PAD_LEFT);
         return 'INV-' . $newNumber;

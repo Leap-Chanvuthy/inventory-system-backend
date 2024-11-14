@@ -105,8 +105,9 @@ Route::delete('raw-material-category/delete/{id}', [RawMaterialCetegoryAPIContro
 
 // Purchase Invoice
 Route::get('/purchase-invoices' , [PurchaseInvoiceAPIController::class , 'index']);
+Route::get('/purchase-invoices/trashed' , [PurchaseInvoiceAPIController::class , 'trashed']);
 Route::get('purchase-invoice/{id}' , [PurchaseInvoiceAPIController::class , 'show']);
 Route::post('/purchase-invoice' , [PurchaseInvoiceAPIController::class, 'store']);
 Route::patch('/purchase-invoice/{id}' , [PurchaseInvoiceAPIController::class, 'update']);
-Route::patch('/purchase-invoice/restore/{id}' , [PurchaseInvoiceAPIController::class, 'restore']);
+Route::patch('/purchase-invoice/recover/{id}' , [PurchaseInvoiceAPIController::class, 'restore']);
 Route::delete('/purchase-invoice/{id}' , [PurchaseInvoiceAPIController::class, 'destroy']);

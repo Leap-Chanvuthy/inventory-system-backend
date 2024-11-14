@@ -26,6 +26,16 @@ class PurchaseInvoiceAPIController extends Controller
         }
     }
 
+    public function trashed()
+    {
+        try {
+            return $this->purchaseInvoiceRepository->trashed();
+            
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
     public function show($id)
     {
         try {
