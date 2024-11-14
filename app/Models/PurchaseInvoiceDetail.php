@@ -11,7 +11,7 @@ use App\Models\Supplier;
 
 class PurchaseInvoiceDetail extends Model
 {
-
+    use HasFactory, SoftDeletes;
     protected $table = 'purchase_invoice_details';
 
     protected $fillable = [
