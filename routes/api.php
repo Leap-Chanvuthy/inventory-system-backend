@@ -111,3 +111,4 @@ Route::post('/purchase-invoice' , [PurchaseInvoiceAPIController::class, 'store']
 Route::patch('/purchase-invoice/{id}' , [PurchaseInvoiceAPIController::class, 'update']);
 Route::patch('/purchase-invoice/recover/{id}' , [PurchaseInvoiceAPIController::class, 'restore']);
 Route::delete('/purchase-invoice/{id}' , [PurchaseInvoiceAPIController::class, 'destroy']);
+Route::get('/purchase-invoices/export' , [PurchaseInvoiceAPIController::class, 'export']);

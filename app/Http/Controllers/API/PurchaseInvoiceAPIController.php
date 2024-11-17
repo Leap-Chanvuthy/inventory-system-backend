@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Repositories\Interfaces\PurchaseInvoiceRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use App\Exports\PurchaseInvoiceExport;
+use Maatwebsite\Excel\Facades\Excel;
+
 
 class PurchaseInvoiceAPIController extends Controller
 {
@@ -72,53 +75,21 @@ class PurchaseInvoiceAPIController extends Controller
     }
     
 
-    // public function update($id, Request $request)
-    // {
-    //     try {
-    //         $validatedData = $request->validate([
-    //             'supplier_id' => 'required|exists:suppliers,id',
-    //             'payment_method' => 'required|string',
-    //             'invoice_number' => 'required|string|unique:purchase_invoices,invoice_number,' . $id,
-    //             'payment_date' => 'nullable|date',
-    //             'discount_percentage' => 'nullable|numeric',
-    //             'tax_percentage' => 'nullable|numeric',
-    //             'status' => 'required|string',
-    //             'clearing_payable' => 'nullable|numeric',
-    //             'indebted' => 'nullable|numeric',
-    //             'riel_conversion_rate' => 'required|numeric',
-    //             'usd_amount' => 'nullable|numeric',
-    //             'riel_amount' => 'nullable|numeric',
-    //             'raw_materials' => 'required|array',
-    //             'raw_materials.*' => 'required|exists:raw_materials,id',
-    //         ]);
-
-    //         $invoice = $this->purchaseInvoiceRepository->update($id, $request);
-    //         return response()->json(['invoice' => $invoice], 200);
-    //     } catch (ValidationException $e) {
-    //         return response()->json(['errors' => $e->errors()], 422);
-    //     }
-    // }
-
-
     public function update(int $id, Request $request)
     {
         try {
-            // Validate the incoming request
             $request->validate([
                 'raw_materials' => 'required|array',
                 'raw_materials.*' => 'required|exists:raw_materials,id',
                 'discount_percentage' => 'required|numeric|numeric|min:0|max:100',
                 'tax_percentage' => 'required|numeric|numeric|min:0|max:100',
                 'payment_method' => 'required|string',
-                // 'status' => 'required|string',
                 'payment_date' => 'required|date',
                 'clearing_payable_percentage' => 'required|numeric|min:0|max:100',
             ]);
     
-            // Update the purchase invoice
             $invoice = $this->purchaseInvoiceRepository->update($id, $request);
     
-            // Return a successful response with the updated invoice
             return response()->json(['message' => 'Invoice updated successfully', 'invoice' => $invoice], 200);
         } catch (ValidationException $e) {
             return response()->json(['errors' => $e->errors()], 422);
@@ -147,4 +118,19 @@ class PurchaseInvoiceAPIController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
+    public function export(Request $request)
+    {
+        try {
+            $filters = $request->all();
+
+            return Excel::download(new PurchaseInvoiceExport($request), 'purchase_invoices.xlsx');
+        }  catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            return response()->json(['errors' => $e->failures()], 422); 
+        }  catch (\Exception $e) {
+            return response()->json(['error' => 'Import failed: ' . $e->getMessage()], 500);
+        }
+    }
+
+
 }
