@@ -30,6 +30,11 @@ class PurchaseInvoiceExport implements FromQuery, WithHeadings, WithMapping
             ->allowedFilters([
                 AllowedFilter::exact('id'),
                 AllowedFilter::exact('status'),
+                AllowedFilter::exact('payment_method'),
+                AllowedFilter::exact('discount_percentage'),
+                AllowedFilter::exact('tax_percentage'),
+                AllowedFilter::exact('clearing_payable_percentage'),
+                AllowedFilter::exact('invoice_number'),
                 AllowedFilter::callback('start_date', function ($query, $value) {
                     $query->where('created_at', '>=', $value);
                 }),
@@ -37,7 +42,7 @@ class PurchaseInvoiceExport implements FromQuery, WithHeadings, WithMapping
                     $query->where('created_at', '<=', $value);
                 }),
             ])
-            ->allowedSorts('created_at', 'status')
+            ->allowedSorts('created_at', 'tax_percentage' , 'discount_percentage' , 'clearing_payable_percentage')
             ->defaultSort('-created_at');
     }
 
