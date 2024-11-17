@@ -85,7 +85,7 @@ class PurchaseInvoiceRepository implements PurchaseInvoiceRepositoryInterface
 
     public function all(): LengthAwarePaginator
     {
-        return $this->allBuilder()->with('purchaseInvoiceDetails.rawMaterial.supplier')->paginate(10);
+        return $this->allBuilder()->with(['purchaseInvoiceDetails.rawMaterial' => function ($query) {$query->withTrashed();}, 'purchaseInvoiceDetails.rawMaterial.supplier' ])->paginate(10);
     }
 
     public function trashed(): LengthAwarePaginator
@@ -96,7 +96,7 @@ class PurchaseInvoiceRepository implements PurchaseInvoiceRepositoryInterface
 
     public function findById(int $id): PurchaseInvoice
     {
-        return $this->purchaseInvoice->with('purchaseInvoiceDetails.rawMaterial.supplier', 'purchaseInvoiceDetails.rawMaterial.category')->findOrFail($id);
+        return $this->purchaseInvoice-> with(['purchaseInvoiceDetails.rawMaterial' => function ($query) {$query->withTrashed();} , 'purchaseInvoiceDetails.rawMaterial.category'])->withTrashed()->findOrFail($id);
     }
 
     // public function generateInvoiceNumber(): string
@@ -134,7 +134,7 @@ class PurchaseInvoiceRepository implements PurchaseInvoiceRepositoryInterface
         $supplierId = null;
 
         foreach ($request->raw_materials as $rawMaterialId) {
-            $rawMaterial = RawMaterial::findOrFail($rawMaterialId);
+            $rawMaterial = RawMaterial::withTrashed() ->findOrFail($rawMaterialId);
             
             if (is_null($supplierId)) {
                 $supplierId = $rawMaterial->supplier_id;
@@ -223,7 +223,7 @@ class PurchaseInvoiceRepository implements PurchaseInvoiceRepositoryInterface
         $supplierId = null;
 
         foreach ($request->raw_materials as $rawMaterialId) {
-            $rawMaterial = RawMaterial::findOrFail($rawMaterialId);
+            $rawMaterial = RawMaterial::withTrashed() -> findOrFail($rawMaterialId);
             
             if (is_null($supplierId)) {
                 $supplierId = $rawMaterial->supplier_id;
