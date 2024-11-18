@@ -24,6 +24,11 @@ use App\Http\Controllers\API\UserAPIController;
 
 Route::post('register', [AuthAPIController::class, 'register']);
 Route::post('login', [AuthAPIController::class, 'login']);
+Route::post('password/send-otp', [AuthAPIController::class, 'sendOtp']);
+Route::post('password/reset', [AuthAPIController::class, 'reset']);
+Route::get('/password/reset/{token}', function ($token) {
+    return response()->json(['token' => $token]);
+})->name('password.reset');
 
 Route::middleware('auth:api')->group(function () {
     Route::post('logout', [AuthAPIController::class, 'logout']);
