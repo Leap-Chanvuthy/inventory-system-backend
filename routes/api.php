@@ -40,23 +40,21 @@ Route::middleware('auth:api')->group(function () {
 });
 
 
-Route::get('users' , [UserAPIController::class, 'index']);
-Route::get('user/{id}' , [UserAPIController::class , 'show']);
-Route::post('users' , [UserAPIController::class , 'store']);
-Route::patch('user/{id}', [UserAPIController::class , 'update']);
-Route::delete('user/{id}', [UserAPIController::class , 'destroy']);
-Route::get('users/role-counts' ,  [UserAPIController::class , 'getUserRoleCount']);
+// Users
+Route::middleware(['auth:api' , 'Admin'  ])->group(function () {
+    Route::get('users' , [UserAPIController::class, 'index']);
+    Route::get('user/{id}' , [UserAPIController::class , 'show']);
+    Route::post('users' , [UserAPIController::class , 'store']);
+    Route::patch('user/{id}', [UserAPIController::class , 'update']);
+    Route::delete('user/{id}', [UserAPIController::class , 'destroy']);
+    Route::get('users/role-counts' ,  [UserAPIController::class , 'getUserRoleCount']);
+});
 
 
 
 
 // Product
-Route::middleware(['auth:api', 'checkIfAdmin'])->group(function () {
-    Route::get('inventories', [ProductAPIController::class, 'getInventory']);
-});
 
-Route::post('/product', [ProductAPIController::class, 'store']);
-Route::put('/product/{id}', [ProductAPIController::class, 'update']);
 
 
 
