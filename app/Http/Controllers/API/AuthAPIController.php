@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Mail\OtpMail;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -107,31 +108,55 @@ class AuthAPIController extends Controller
     }
 
 
+    // public function sendOtp(Request $request)
+    // {
+    //     try {
+    //         $request->validate([
+    //             'email' => 'required|email|exists:users,email',
+    //         ]);
+    
+    //         $otp = rand(100000, 999999);
+    
+    //         $user = User::where('email', $request->email)->first();
+    //         $user->update([
+    //             'otp' => $otp,
+    //             'otp_expires_at' => Carbon::now()->addMinutes(10),
+    //         ]);
+    
+    //         Mail::raw("Your password reset OTP is: $otp", function ($message) use ($user) {
+    //             $message->to($user->email)
+    //                 ->subject('Password Reset OTP');
+    //         });
+    
+    //         return response()->json(['message' => 'OTP sent to your email.'], 200);
+    //     }catch (ValidationException $e){
+    //         return response() -> json(['errors' => $e -> errors()],400);
+    //     }
+    // }
+
+
     public function sendOtp(Request $request)
-    {
-        try {
-            $request->validate([
-                'email' => 'required|email|exists:users,email',
-            ]);
-    
-            $otp = rand(100000, 999999);
-    
-            $user = User::where('email', $request->email)->first();
-            $user->update([
-                'otp' => $otp,
-                'otp_expires_at' => Carbon::now()->addMinutes(10),
-            ]);
-    
-            Mail::raw("Your password reset OTP is: $otp", function ($message) use ($user) {
-                $message->to($user->email)
-                    ->subject('Password Reset OTP');
-            });
-    
-            return response()->json(['message' => 'OTP sent to your email.'], 200);
-        }catch (ValidationException $e){
-            return response() -> json(['errors' => $e -> errors()],400);
-        }
+{
+    try {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+        ]);
+
+        $otp = rand(100000, 999999);
+
+        $user = User::where('email', $request->email)->first();
+        $user->update([
+            'otp' => $otp,
+            'otp_expires_at' => Carbon::now()->addMinutes(10),
+        ]);
+
+        Mail::to($user->email)->send(new OtpMail($otp));
+
+        return response()->json(['message' => 'OTP sent to your email.'], 200);
+    } catch (ValidationException $e) {
+        return response()->json(['errors' => $e->errors()], 400);
     }
+}
 
 
     public function reset(Request $request)
