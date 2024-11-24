@@ -145,7 +145,7 @@ class SupplierRepository implements SupplierRepositoryInterface
 
     public function findById(int $id): Supplier
     {
-        return Supplier::with('raw_materials')->findOrFail($id);
+        return Supplier::with('raw_materials.category')->findOrFail($id);
     }
 
     public function create(Request $request): Supplier
