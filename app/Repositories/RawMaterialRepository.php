@@ -183,6 +183,7 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
         $rules = [
             'name' => 'required|string|max:50',
             // 'material_code' => 'required|string|max:255',
+            'supplier_id' => 'required|exists:suppliers,id',
             'quantity' => 'required|integer',
             'remaining_quantity' => 'required|integer',
             'unit_price_in_usd' => 'required|numeric',
