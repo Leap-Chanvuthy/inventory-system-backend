@@ -103,7 +103,7 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
 
     public function trashed(): LengthAwarePaginator
     {
-        return $this -> allBuilderWithTrashed() -> paginate (10);
+        return $this -> allBuilderWithTrashed() ->with('category') -> paginate (10);
     }
 
 
