@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthAPIController;
 use App\Http\Controllers\API\CurrencyAPIController;
-use App\Http\Controllers\API\ProductAPIController;
+use App\Http\Controllers\API\ProductCategoryAPIController;
 use App\Http\Controllers\API\ProfileSettingAPIController;
 use App\Http\Controllers\API\PurchaseInvoiceAPIController;
 use App\Http\Controllers\API\RawMaterialAPIController;
@@ -54,6 +54,7 @@ Route::middleware(['auth:api' , 'Admin'  ])->group(function () {
 
 
 // Product
+Route::post('/currency' , [CurrencyAPIController::class , 'store']);
 
 
 
@@ -103,6 +104,15 @@ Route::get('non-paginate/raw-material-categories', [RawMaterialCetegoryAPIContro
 Route::post('raw-material-category/create', [RawMaterialCetegoryAPIController::class , 'store']);
 Route::patch('raw-material-category/update/{id}', [RawMaterialCetegoryAPIController::class , 'update']);
 Route::delete('raw-material-category/delete/{id}', [RawMaterialCetegoryAPIController::class , 'delete']);
+
+
+// Raw Material Category
+Route::get('product-categories', [ProductCategoryAPIController::class , 'index']);
+Route::get('product-category/{id}', [ProductCategoryAPIController::class , 'show']);
+Route::get('product-categories/all', [ProductCategoryAPIController::class , 'getWithoutPagination']);
+Route::post('product-category/create', [ProductCategoryAPIController::class , 'store']);
+Route::patch('product-category/update/{id}', [ProductCategoryAPIController::class , 'update']);
+Route::delete('product-category/delete/{id}', [ProductCategoryAPIController::class , 'delete']);
 
 
 
