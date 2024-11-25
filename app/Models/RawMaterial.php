@@ -40,10 +40,10 @@ class RawMaterial extends Model
 
     public function products()
     {
-        return $this->belongsToMany(Product::class, 'product_raw_material')
-                    ->withPivot('quantity_used')
-                    ->using(ProductRawMaterial::class)
-                    ->withTimestamps();
+        return $this->belongsToMany(Product::class, 'product_raw_material');
+                    // ->withPivot('quantity_used')
+                    // ->using(ProductRawMaterial::class)
+                    // ->withTimestamps();
     }
 
     public function supplier(){

@@ -125,3 +125,5 @@ Route::get('/purchase-invoices/export' , [PurchaseInvoiceAPIController::class, '
 
 // Product
 Route::get('/products' , [ProductAPIController::class , 'index']);
+Route::post('/product' , [ProductAPIController::class , 'store']);
+Route::patch('/product/{id}' , [ProductAPIController::class , 'update']);
