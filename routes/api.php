@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthAPIController;
 use App\Http\Controllers\API\CurrencyAPIController;
+use App\Http\Controllers\API\ProductAPIController;
 use App\Http\Controllers\API\ProductCategoryAPIController;
 use App\Http\Controllers\API\ProfileSettingAPIController;
 use App\Http\Controllers\API\PurchaseInvoiceAPIController;
@@ -49,12 +50,6 @@ Route::middleware(['auth:api' , 'Admin'  ])->group(function () {
     Route::delete('user/{id}', [UserAPIController::class , 'destroy']);
     Route::get('users/role-counts' ,  [UserAPIController::class , 'getUserRoleCount']);
 });
-
-
-
-
-// Product
-Route::post('/currency' , [CurrencyAPIController::class , 'store']);
 
 
 
@@ -106,7 +101,7 @@ Route::patch('raw-material-category/update/{id}', [RawMaterialCetegoryAPIControl
 Route::delete('raw-material-category/delete/{id}', [RawMaterialCetegoryAPIController::class , 'delete']);
 
 
-// Raw Material Category
+// Product Category
 Route::get('product-categories', [ProductCategoryAPIController::class , 'index']);
 Route::get('product-category/{id}', [ProductCategoryAPIController::class , 'show']);
 Route::get('product-categories/all', [ProductCategoryAPIController::class , 'getWithoutPagination']);
@@ -125,3 +120,8 @@ Route::patch('/purchase-invoice/{id}' , [PurchaseInvoiceAPIController::class, 'u
 Route::patch('/purchase-invoice/recover/{id}' , [PurchaseInvoiceAPIController::class, 'restore']);
 Route::delete('/purchase-invoice/{id}' , [PurchaseInvoiceAPIController::class, 'destroy']);
 Route::get('/purchase-invoices/export' , [PurchaseInvoiceAPIController::class, 'export']);
+
+
+
+// Product
+Route::get('/products' , [ProductAPIController::class , 'index']);

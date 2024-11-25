@@ -33,6 +33,7 @@ class Product extends Model
         'description',
         'status',
         'product_category_id',
+        'barcode'
     ];
 
     public function raw_materials()

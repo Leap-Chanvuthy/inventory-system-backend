@@ -30,6 +30,7 @@ return new class extends Migration
             $table -> double('exchange_rate_from_riel_to_usd');
             $table -> text('description')->nullable();
             $table -> string('status' , 255);
+            $table -> string('barcode' ,255);
             $table -> unsignedBigInteger('product_category_id') -> nullable();
 
 

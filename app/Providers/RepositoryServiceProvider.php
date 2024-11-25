@@ -11,6 +11,8 @@ use App\Repositories\SupplierRepository;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\RawMaterialRepository;
 use App\Repositories\Interfaces\RawMaterialRepositoryInterface;
+use App\Repositories\Interfaces\ProductRepositoryInterface;
+use App\Repositories\ProductRepository;
 use App\Repositories\PurchaseInvoiceRepository;
 use App\Repositories\UserRepository;
 
@@ -26,6 +28,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this -> app -> bind(RawMaterialRepositoryInterface::class , RawMaterialRepository::class);
         $this -> app -> bind(PurchaseInvoiceRepositoryInterface::class , PurchaseInvoiceRepository::class);
         $this -> app -> bind(PurchaseInvoiceDetailRepositoryInterface::class , PurchaseInvoiceDetailRepository::class);
+        $this -> app -> bind(ProductRepositoryInterface::class , ProductRepository::class);
     }
 
     /**
