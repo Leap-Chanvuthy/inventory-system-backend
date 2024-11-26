@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\RawMaterial;
 use App\Models\ProductRawMaterial;
+use App\Models\ProductCategory;
 use App\Models\ProductImage;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -47,5 +48,10 @@ class Product extends Model
     public function product_images (){
         return $this -> hasMany(ProductImage::class);
     }
+
+    public function category()
+    {
+        return $this->belongsTo(ProductCategory::class, 'product_category_id');
+    }    
 
 }

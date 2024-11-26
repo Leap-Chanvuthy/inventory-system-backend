@@ -121,7 +121,7 @@ class ProductRepository implements ProductRepositoryInterface
 
     public function all(): LengthAwarePaginator
     {
-        return $this->allBuilder()->with('product_images')->paginate(10);
+        return $this->allBuilder()->with('product_images' , 'category')->paginate(10);
     }
 
 
