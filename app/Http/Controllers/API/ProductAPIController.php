@@ -32,6 +32,8 @@ class ProductAPIController extends Controller
             ], 201);    
         }catch (ValidationException $e){
             return response() -> json(['errors' => $e -> errors()],400);
+        }        catch (\Exception $e){
+            return response()->json(["errors" => $e->getMessage()], 400);
         }
     }
 
