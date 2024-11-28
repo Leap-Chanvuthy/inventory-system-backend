@@ -33,7 +33,7 @@ class ProductAPIController extends Controller
         }catch (ValidationException $e){
             return response() -> json(['errors' => $e -> errors()],400);
         }        catch (\Exception $e){
-            return response()->json(["errors" => $e->getMessage()], 400);
+            return response()->json(["error" => $e->getMessage()], 400);
         }
     }
 
@@ -50,7 +50,7 @@ class ProductAPIController extends Controller
             return response() -> json(['errors' => $e -> errors()],400);
         }
         catch (\Exception $e){
-            return response() -> json(['errors' => $e -> getMessage()],500);
+            return response() -> json(['error' => $e -> getMessage()],500);
         }
     }
 
