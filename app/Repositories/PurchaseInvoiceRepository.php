@@ -96,22 +96,8 @@ class PurchaseInvoiceRepository implements PurchaseInvoiceRepositoryInterface
 
     public function findById(int $id): PurchaseInvoice
     {
-        return $this->purchaseInvoice-> with(['purchaseInvoiceDetails.rawMaterial' => function ($query) {$query->withTrashed();} , 'purchaseInvoiceDetails.rawMaterial.category'])->withTrashed()->findOrFail($id);
+        return $this->purchaseInvoice-> with(['purchaseInvoiceDetails.rawMaterial.supplier' , 'purchaseInvoiceDetails.rawMaterial' => function ($query) {$query->withTrashed();} , 'purchaseInvoiceDetails.rawMaterial.category'])->withTrashed()->findOrFail($id);
     }
-
-    // public function generateInvoiceNumber(): string
-    // {
-    //     $lastInvoice = PurchaseInvoice::orderBy('created_at', 'desc')->first();
-
-    //     if ($lastInvoice && preg_match('/INV-(\d{6})/', $lastInvoice->invoice_number, $matches)) {
-    //         $lastCode = intval($matches[1]);
-    //     } else {
-    //         $lastCode = 0; 
-    //     }
-
-    //     $newNumber = str_pad($lastCode + 1, 6, '0', STR_PAD_LEFT);
-    //     return 'INV-' . $newNumber;
-    // }
 
     public function generateInvoiceNumber(): string
     {
@@ -138,6 +124,8 @@ class PurchaseInvoiceRepository implements PurchaseInvoiceRepositoryInterface
             
             if (is_null($supplierId)) {
                 $supplierId = $rawMaterial->supplier_id;
+            }elseif ($rawMaterial->supplier_id !== $supplierId) {
+                throw new \Exception("Raw material ID {$rawMaterial->id} belongs to a different supplier. All raw materials must belong to the same supplier.");
             }
 
             $totalPriceInRiel = $rawMaterial->total_value_in_riel; 
@@ -227,6 +215,8 @@ class PurchaseInvoiceRepository implements PurchaseInvoiceRepositoryInterface
             
             if (is_null($supplierId)) {
                 $supplierId = $rawMaterial->supplier_id;
+            }elseif ($rawMaterial->supplier_id !== $supplierId) {
+                throw new \Exception("Raw material ID {$rawMaterial->id} belongs to a different supplier. All raw materials must belong to the same supplier.");
             }
 
             $totalPriceInRiel = $rawMaterial->total_value_in_riel;
