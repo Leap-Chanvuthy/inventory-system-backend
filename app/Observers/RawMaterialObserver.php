@@ -21,7 +21,9 @@ class RawMaterialObserver
     {
         if ($rawMaterial->remaining_quantity == 0) {
             $rawMaterial->status = 'OUT_OF_STOCK';
-        } elseif ($rawMaterial->remaining_quantity > 0) {
+        } elseif ($rawMaterial->remaining_quantity > 0 && $rawMaterial->remaining_quantity == $rawMaterial->minimum_stock_level) {
+            $rawMaterial->status = 'LOW_STOCK';
+        } else {
             $rawMaterial->status = 'IN_STOCK';
         }
 

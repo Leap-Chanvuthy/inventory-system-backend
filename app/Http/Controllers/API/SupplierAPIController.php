@@ -123,7 +123,7 @@ class SupplierAPIController extends Controller
                 return $supplier['raw_material_supplied'] > 0;
             })
             ->sortByDesc('raw_material_supplied')
-            ->take(10); 
+            ->take(5); 
     
         return response()->json([
             'top_suppliers' => $suppliers,
