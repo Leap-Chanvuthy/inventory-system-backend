@@ -118,6 +118,24 @@ class ProductRepository implements ProductRepositoryInterface
         return 'PRODUCT-' . $newNumber;
     }
 
+    // public function generateProductCode(): string
+    // {
+    //     // Use DB transaction to ensure consistency
+    //     return DB::transaction(function () {
+    //         // Lock the table to prevent race conditions
+    //         $lastProduct = Product::withTrashed()
+    //             ->selectRaw('MAX(CAST(SUBSTRING(product_code, 9) AS UNSIGNED)) AS max_code') // Adjusted index to match "PRODUCT-"
+    //             ->lockForUpdate() // Locks the row until the transaction completes
+    //             ->first();
+    //
+    //         $lastCode = $lastProduct->max_code ?? 0;
+    //
+    //         $newNumber = str_pad($lastCode + 1, 6, '0', STR_PAD_LEFT);
+    //         return 'PRODUCT-' . $newNumber;
+    //     });
+    // }
+
+
 
     public function all(): LengthAwarePaginator
     {
