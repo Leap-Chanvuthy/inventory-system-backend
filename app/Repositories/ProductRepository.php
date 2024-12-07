@@ -147,7 +147,7 @@ class ProductRepository implements ProductRepositoryInterface
 
 
     public function findById(int $id): Product {
-        return $this -> product -> with('product_images' , 'category' , 'raw_materials') -> findOrFail($id) ;
+        return $this -> product -> with('product_images' , 'category' , 'raw_materials.category') -> findOrFail($id) ;
     }
 
 
@@ -179,17 +179,7 @@ class ProductRepository implements ProductRepositoryInterface
                 }
 
                 if ($rawMaterial['quantity_used'] > $rawMaterialModel->remaining_quantity) {
-                    // return response()->json([
-                    //     'error' => 'The quantity used exceeds the remaining quantity of the raw material.',
-                    // ]);
-                    // throw new Exception('The quantity used exceeds the remaining quantity of the raw material.');
                     throw new Exception("Raw material id {$rawMaterial['id']} with inputed quantity ({$rawMaterial['quantity_used']}) cannot be greater the remaining quantity ({$rawMaterialModel->remaining_quantity}).");
-
-                    // return response()->json([
-                    //     'errors' => [
-                    //         'password' => ['The password is incorrect.']
-                    //     ]
-                    // ], 401);
                 }
 
                 $productRawMaterial = new ProductRawMaterial();
@@ -206,59 +196,6 @@ class ProductRepository implements ProductRepositoryInterface
 
         return $product;
     }
-
-
-//     public function create(Request $request): Product
-// {
-//     $data = $this->validateAndExtractData($request);
-//     $data['product_code'] = $this->generateProductCode();
-
-//     $product = Product::create($data);
-
-//     if ($request->hasFile('image')) {
-//         foreach ($request->file('image') as $file) {
-//             $fileName = time() . '_' . $file->getClientOriginalName();
-//             $path = $file->storeAs('products', $fileName, 'public');
-            
-//             $product->product_images()->create(['image' => $path]);
-//         }
-//     }
-
-//     if (!empty($data['raw_materials'])) {
-//         $errors = [];
-//         foreach ($data['raw_materials'] as $rawMaterial) {
-//             $rawMaterialModel = RawMaterial::find($rawMaterial['id']);
-
-//             if (!$rawMaterialModel) {
-//                 $errors["raw_material_id_{$rawMaterial['id']}"][] = "Raw material with ID {$rawMaterial['id']} not found.";
-//                 continue;
-//             }
-
-//             if ($rawMaterial['quantity_used'] > $rawMaterialModel->remaining_quantity) {
-//                 $errors["raw_material_id_{$rawMaterial['id']}"][] = 
-//                     "The quantity used ({$rawMaterial['quantity_used']}) exceeds the remaining quantity ({$rawMaterialModel->remaining_quantity}).";
-//                 continue;
-//             }
-
-//             $productRawMaterial = new ProductRawMaterial();
-//             $productRawMaterial->product_id = $product->id;
-//             $productRawMaterial->raw_material_id = $rawMaterial['id'];
-//             $productRawMaterial->quantity_used = $rawMaterial['quantity_used'];
-//             $productRawMaterial->save();
-
-//             $rawMaterialModel->remaining_quantity -= $rawMaterial['quantity_used'];
-//             $rawMaterialModel->save();
-//         }
-
-//         if (!empty($errors)) {
-//             throw new \Exception(json_encode(['errors' => $errors]));
-//         }
-//     }
-
-//     return $product;
-// }
-
-
 
 
 
@@ -315,7 +252,7 @@ class ProductRepository implements ProductRepositoryInterface
                 }
 
                 if ($rawMaterial['quantity_used'] > $rawMaterialModel->remaining_quantity) {
-                    throw new Exception('The quantity used exceeds the remaining quantity of the raw material.');
+                    throw new Exception("Raw material id {$rawMaterial['id']} with inputed quantity ({$rawMaterial['quantity_used']}) cannot be greater the remaining quantity ({$rawMaterialModel->remaining_quantity}).");
                 }
 
                 if ($productRawMaterial) {
