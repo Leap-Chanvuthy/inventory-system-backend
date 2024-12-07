@@ -146,7 +146,9 @@ class ProductRepository implements ProductRepositoryInterface
     public function trashed(): LengthAwarePaginator {}
 
 
-    public function findById(int $id): Product {}
+    public function findById(int $id): Product {
+        return $this -> product -> with('product_images' , 'category' , 'raw_materials') -> findOrFail($id) ;
+    }
 
 
     public function create(Request $request): Product

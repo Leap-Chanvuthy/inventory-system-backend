@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Repositories\Interfaces\ProductRepositoryInterface;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -20,6 +21,14 @@ class ProductAPIController extends Controller
     public function index()
     {
         return $this-> productRepository->all();
+    }
+
+    public function show ($id) {
+        try {
+            return $this -> productRepository -> findById($id);
+        } catch (Exception $e){
+            return response() -> json(["error" => $e -> getMessage()],400);
+        }
     }
 
     public function store(Request $request)
