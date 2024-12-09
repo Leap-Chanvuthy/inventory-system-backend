@@ -125,6 +125,9 @@ Route::get('/purchase-invoices/export' , [PurchaseInvoiceAPIController::class, '
 
 // Product
 Route::get('/products' , [ProductAPIController::class , 'index']);
+Route::get('/products/trashed' , [ProductAPIController::class , 'trashed']);
 Route::post('/product' , [ProductAPIController::class , 'store']);
 Route::get('/product/{id}' , [ProductAPIController::class , 'show'] );
 Route::patch('/product/{id}' , [ProductAPIController::class , 'update']);
+Route::delete('/product/{id}' , [ProductAPIController::class , 'destroy']);
+Route::patch('/proudct/recover/{id}' , [ProductAPIController::class , 'recover']);

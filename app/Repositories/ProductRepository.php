@@ -143,7 +143,9 @@ class ProductRepository implements ProductRepositoryInterface
     }
 
 
-    public function trashed(): LengthAwarePaginator {}
+    public function trashed(): LengthAwarePaginator {
+        return $this -> allBuilderWithTrashed() ->with('product_images' , 'category') -> paginate (10);
+    }
 
 
     public function findById(int $id): Product {
@@ -311,5 +313,16 @@ class ProductRepository implements ProductRepositoryInterface
 
 
 
-    public function delete(int $id): void {}
+    public function delete(int $id): void {
+        $product = Product::findOrFail($id);
+
+        foreach ($product->raw_materials as $rawMaterial) {
+            $rawMaterial->remaining_quantity += $rawMaterial->pivot->quantity_used;
+            $rawMaterial->save();
+        }
+
+        $product->raw_materials()->detach();
+        $product->delete();
+
+    }
 }
