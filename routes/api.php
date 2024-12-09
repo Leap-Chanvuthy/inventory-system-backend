@@ -130,4 +130,4 @@ Route::post('/product' , [ProductAPIController::class , 'store']);
 Route::get('/product/{id}' , [ProductAPIController::class , 'show'] );
 Route::patch('/product/{id}' , [ProductAPIController::class , 'update']);
 Route::delete('/product/{id}' , [ProductAPIController::class , 'destroy']);
-Route::patch('/proudct/recover/{id}' , [ProductAPIController::class , 'recover']);
+Route::patch('/product/recover/{id}' , [ProductAPIController::class , 'recover']);
