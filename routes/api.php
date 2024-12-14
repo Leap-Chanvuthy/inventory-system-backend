@@ -154,6 +154,6 @@ Route::get('/customer/{id}' , [CustomerAPIController::class, 'show']);
 Route::post('/customer' , [CustomerAPIController::class , 'store']);
 Route::patch('/customer/{id}' , [CustomerAPIController::class , 'update']);
 Route::patch('/customer/recover/{id}' , [CustomerAPIController::class , 'recover']);
-Route::delete('/customer/{id}' , [CustomerAPIController::class , 'delete']);
+Route::delete('/customer/{id}' , [CustomerAPIController::class , 'destroy']);
 Route::get('/customers/export' , [CustomerAPIController::class , 'export']);
 

@@ -25,13 +25,13 @@ class CustomerAPIController extends Controller
                 AllowedFilter::exact('customer_status'),
                 AllowedFilter::callback('search', function (Builder $query, $value) {
                     $query->where(function ($query) use ($value) {
-                        $query->where('customer_category', 'LIKE', "%{$value}%");
-                        $query->where('customer_status', 'LIKE', "%{$value}%"); 
+                        // $query->where('customer_category', 'LIKE', "%{$value}%");
+                        // $query->orWhere('customer_status', 'LIKE', "%{$value}%"); 
                         $query->where('fullname', 'LIKE', "%{$value}%");
-                        $query->where('email_address', 'LIKE', "%{$value}%");  
-                        $query->where('shipping_address', 'LIKE', "%{$value}%");
-                        $query->where('phone_number', 'LIKE', "%{$value}%");
-                        $query->where('social_media', 'LIKE', "%{$value}%");                         
+                        $query->orWhere('email_address', 'LIKE', "%{$value}%");  
+                        $query->orWhere('shipping_address', 'LIKE', "%{$value}%");
+                        $query->orWhere('phone_number', 'LIKE', "%{$value}%");
+                        $query->orWhere('social_medial', 'LIKE', "%{$value}%");                         
                     });
                 })
             ])
@@ -52,11 +52,11 @@ class CustomerAPIController extends Controller
                     $query->where(function ($query) use ($value) {
                         $query->where('customer_category', 'LIKE', "%{$value}%");
                         $query->where('customer_status', 'LIKE', "%{$value}%"); 
-                        $query->where('fullname', 'LIKE', "%{$value}%");
-                        $query->where('email_address', 'LIKE', "%{$value}%");  
-                        $query->where('shipping_address', 'LIKE', "%{$value}%");
-                        $query->where('phone_number', 'LIKE', "%{$value}%");
-                        $query->where('social_media', 'LIKE', "%{$value}%");                         
+                        $query->orWhere('fullname', 'LIKE', "%{$value}%");
+                        $query->orWhere('email_address', 'LIKE', "%{$value}%");  
+                        $query->orWhere('shipping_address', 'LIKE', "%{$value}%");
+                        $query->orWhere('phone_number', 'LIKE', "%{$value}%");
+                        $query->orWhere('social_media', 'LIKE', "%{$value}%");                         
                     });
                 })
             ])
