@@ -132,3 +132,14 @@ Route::patch('/product/{id}' , [ProductAPIController::class , 'update']);
 Route::delete('/product/{id}' , [ProductAPIController::class , 'destroy']);
 Route::patch('/product/recover/{id}' , [ProductAPIController::class , 'recover']);
 Route::get('/products/export', [ProductAPIController::class, 'export']);
+
+
+
+
+// Customer Category
+Route::get('customer-categories', [ProductCategoryAPIController::class , 'index']);
+Route::get('customer-category/{id}', [ProductCategoryAPIController::class , 'show']);
+Route::get('customer-categories/all', [ProductCategoryAPIController::class , 'getWithoutPagination']);
+Route::post('customer-category/create', [ProductCategoryAPIController::class , 'store']);
+Route::patch('customer-category/update/{id}', [ProductCategoryAPIController::class , 'update']);
+Route::delete('customer-category/delete/{id}', [ProductCategoryAPIController::class , 'delete']);
