@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Storage;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 use PhpParser\Node\Expr\Throw_;
 
 class ProductRepository implements ProductRepositoryInterface
@@ -106,34 +107,32 @@ class ProductRepository implements ProductRepositoryInterface
     }
 
 
-    public function generateProductCode(): string
-    {
-        $lastProduct = Product::withTrashed()
-            ->selectRaw('MAX(CAST(SUBSTRING(product_code, 5) AS UNSIGNED)) AS max_code')
-            ->first();
-
-        $lastCode = $lastProduct->max_code ?? 0;
-
-        $newNumber = str_pad($lastCode + 1, 6, '0', STR_PAD_LEFT);
-        return 'PRODUCT-' . $newNumber;
-    }
-
     // public function generateProductCode(): string
     // {
-    //     // Use DB transaction to ensure consistency
-    //     return DB::transaction(function () {
-    //         // Lock the table to prevent race conditions
-    //         $lastProduct = Product::withTrashed()
-    //             ->selectRaw('MAX(CAST(SUBSTRING(product_code, 9) AS UNSIGNED)) AS max_code') // Adjusted index to match "PRODUCT-"
-    //             ->lockForUpdate() // Locks the row until the transaction completes
-    //             ->first();
-    //
-    //         $lastCode = $lastProduct->max_code ?? 0;
-    //
-    //         $newNumber = str_pad($lastCode + 1, 6, '0', STR_PAD_LEFT);
-    //         return 'PRODUCT-' . $newNumber;
-    //     });
+    //     $lastProduct = Product::withTrashed()
+    //         ->selectRaw('MAX(CAST(SUBSTRING(product_code, 5) AS UNSIGNED)) AS max_code')
+    //         ->first();
+
+    //     $lastCode = $lastProduct->max_code ?? 0;
+
+    //     $newNumber = str_pad($lastCode + 1, 6, '0', STR_PAD_LEFT);
+    //     return 'PRODUCT-' . $newNumber;
     // }
+
+    public function generateProductCode(): string
+    {
+        return DB::transaction(function () {
+            $lastProduct = Product::withTrashed()
+                ->selectRaw('MAX(CAST(SUBSTRING(product_code, 9) AS UNSIGNED)) AS max_code')
+                ->lockForUpdate()
+                ->first();
+    
+            $lastCode = $lastProduct->max_code ?? 0;
+    
+            $newNumber = str_pad($lastCode + 1, 6, '0', STR_PAD_LEFT);
+            return 'PRODUCT-' . $newNumber;
+        });
+    }
 
 
 
