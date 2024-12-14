@@ -2,10 +2,12 @@
 
 namespace App\Providers;
 
+use App\Models\Product;
 use App\Models\PurchaseInvoice;
 use Illuminate\Support\ServiceProvider;
 use App\Providers\RepositoryServiceProvider;
 use App\Models\RawMaterial;
+use App\Observers\ProductObserver;
 use App\Observers\PurchaseInvoiceObserver;
 use App\Observers\RawMaterialObserver;
 
@@ -26,5 +28,6 @@ class AppServiceProvider extends ServiceProvider
     {
         RawMaterial::observe(RawMaterialObserver::class);
         PurchaseInvoice::observe(PurchaseInvoiceObserver::class);
+        Product::observe(ProductObserver::class);
     }
 }

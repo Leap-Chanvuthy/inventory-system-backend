@@ -148,7 +148,7 @@ class ProductRepository implements ProductRepositoryInterface
     }
 
 
-    public function findById(int $id): Product {
+    public function findById($id): Product {
         return $this -> product -> with('product_images' , 'category' , 'raw_materials.category') -> findOrFail($id) ;
     }
 

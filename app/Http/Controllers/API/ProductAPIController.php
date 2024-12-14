@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Exports\ProductExport;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Repositories\Interfaces\ProductRepositoryInterface;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProductAPIController extends Controller
 {
@@ -97,6 +99,18 @@ class ProductAPIController extends Controller
 
 
 
+    public function export(Request $request)
+    {
+        try {
+            $filters = $request->all();
+
+            return Excel::download(new ProductExport($request), 'products.xlsx');
+        }  catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            return response()->json(['errors' => $e->failures()], 422); 
+        }  catch (\Exception $e) {
+            return response()->json(['error' => 'Import failed: ' . $e->getMessage()], 500);
+        }
+    }
 
 
 }
