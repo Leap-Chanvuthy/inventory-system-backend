@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthAPIController;
 use App\Http\Controllers\API\CurrencyAPIController;
+use App\Http\Controllers\API\CustomerAPIController;
+use App\Http\Controllers\API\CustomerCategoryAPIController;
 use App\Http\Controllers\API\ProductAPIController;
 use App\Http\Controllers\API\ProductCategoryAPIController;
 use App\Http\Controllers\API\ProfileSettingAPIController;
@@ -137,9 +139,20 @@ Route::get('/products/export', [ProductAPIController::class, 'export']);
 
 
 // Customer Category
-Route::get('customer-categories', [ProductCategoryAPIController::class , 'index']);
-Route::get('customer-category/{id}', [ProductCategoryAPIController::class , 'show']);
-Route::get('customer-categories/all', [ProductCategoryAPIController::class , 'getWithoutPagination']);
-Route::post('customer-category/create', [ProductCategoryAPIController::class , 'store']);
-Route::patch('customer-category/update/{id}', [ProductCategoryAPIController::class , 'update']);
-Route::delete('customer-category/delete/{id}', [ProductCategoryAPIController::class , 'delete']);
+Route::get('customer-categories', [CustomerCategoryAPIController::class , 'index']);
+Route::get('customer-category/{id}', [CustomerCategoryAPIController::class , 'show']);
+Route::get('customer-categories/all', [CustomerCategoryAPIController::class , 'getWithoutPagination']);
+Route::post('customer-category/create', [CustomerCategoryAPIController::class , 'store']);
+Route::patch('customer-category/update/{id}', [CustomerCategoryAPIController::class , 'update']);
+Route::delete('customer-category/delete/{id}', [CustomerCategoryAPIController::class , 'delete']);
+
+
+// Customer
+Route::get('/customers', [CustomerAPIController::class , 'index']);
+Route::get('/customers/trashed', [CustomerAPIController::class , 'trashed']);
+Route::get('/customer/{id}' , [CustomerAPIController::class, 'show']);
+Route::post('/customer' , [CustomerAPIController::class , 'store']);
+Route::patch('/customer/{id}' , [CustomerAPIController::class , 'update']);
+Route::patch('/customer/recover/{id}' , [CustomerAPIController::class , 'recover']);
+Route::delete('/customer/{id}' , [CustomerAPIController::class , 'delete']);
+
