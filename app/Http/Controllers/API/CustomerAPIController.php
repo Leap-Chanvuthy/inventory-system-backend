@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Exports\CustomerExport;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use Exception;
@@ -11,6 +12,7 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use Maatwebsite\Excel\Facades\Excel;
 
 class CustomerAPIController extends Controller
 {
@@ -182,6 +184,21 @@ class CustomerAPIController extends Controller
     public function destroy ($id){
         $customer = Customer::findOrFail($id);
         $customer -> delete();
+    }
+
+
+
+    public function export(Request $request)
+    {
+        try {
+            $filters = $request->all();
+
+            return Excel::download(new CustomerExport($request), 'customers.xlsx');
+        }  catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            return response()->json(['errors' => $e->failures()], 422); 
+        }  catch (\Exception $e) {
+            return response()->json(['error' => 'Import failed: ' . $e->getMessage()], 500);
+        }
     }
 
 
