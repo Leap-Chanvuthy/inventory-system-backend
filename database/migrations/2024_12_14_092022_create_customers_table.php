@@ -17,7 +17,7 @@ return new class extends Migration
             $table -> string('fullname', 50);
             $table -> string('email_address' , 50) -> nullable();
             $table -> string('phone_number' , 50);
-            $table -> string('social_medial' , 100)-> nullable();
+            $table -> string('social_media' , 100)-> nullable();
             $table -> string('shipping_address' , 255);
             $table->string('longitude', 100)->nullable();
             $table->string('latitude', 100)->nullable();

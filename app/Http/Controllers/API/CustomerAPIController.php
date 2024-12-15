@@ -70,14 +70,14 @@ class CustomerAPIController extends Controller
         $rules = [
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:10000',
             'fullname' => 'required|string|max:50',
-            'email_address' => 'nullable|email|max:50',
+            'email_address' => 'required|email|max:50',
             'phone_number' => 'required|string|max:50',
-            'social_medial' => 'nullable|string|max:100',
+            'social_media' => 'nullable|string|max:100',
             'shipping_address' => 'required|string|max:255',
             'longitude' => 'nullable|string|max:100',
             'latitude' => 'nullable|string|max:100',
             'customer_status' => 'required|string|max:255',
-            'customer_category_id' => 'nullable|exists:customer_categories,id',
+            'customer_category_id' => 'required|exists:customer_categories,id',
             'customer_note' => 'nullable|string',
         ];
 

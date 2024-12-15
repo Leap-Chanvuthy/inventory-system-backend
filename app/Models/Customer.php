@@ -16,7 +16,7 @@ class Customer extends Model
         'fullname',
         'email_address',
         'phone_number',
-        'social_medial',
+        'social_media',
         'shipping_address',
         'longitude',
         'latitude',
