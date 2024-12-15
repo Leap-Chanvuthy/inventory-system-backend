@@ -74,6 +74,8 @@ class CustomerAPIController extends Controller
             'phone_number' => 'required|string|max:50',
             'social_medial' => 'nullable|string|max:100',
             'shipping_address' => 'required|string|max:255',
+            'longitude' => 'nullable|string|max:100',
+            'latitude' => 'nullable|string|max:100',
             'customer_status' => 'required|string|max:255',
             'customer_category_id' => 'nullable|exists:customer_categories,id',
             'customer_note' => 'nullable|string',

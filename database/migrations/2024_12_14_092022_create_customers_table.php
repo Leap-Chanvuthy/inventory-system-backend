@@ -19,6 +19,8 @@ return new class extends Migration
             $table -> string('phone_number' , 50);
             $table -> string('social_medial' , 100)-> nullable();
             $table -> string('shipping_address' , 255);
+            $table->string('longitude', 100)->nullable();
+            $table->string('latitude', 100)->nullable();
             $table -> string('customer_status' , 255);
             $table -> unsignedBigInteger('customer_category_id') -> nullable();
             $table -> text('customer_note');

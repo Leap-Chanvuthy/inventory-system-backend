@@ -18,6 +18,8 @@ class Customer extends Model
         'phone_number',
         'social_medial',
         'shipping_address',
+        'longitude',
+        'latitude',
         'customer_status',
         'customer_category_id',
         'customer_note',
