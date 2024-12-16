@@ -31,7 +31,7 @@ class CustomerAPIController extends Controller
                         $query->orWhere('email_address', 'LIKE', "%{$value}%");  
                         $query->orWhere('shipping_address', 'LIKE', "%{$value}%");
                         $query->orWhere('phone_number', 'LIKE', "%{$value}%");
-                        $query->orWhere('social_medial', 'LIKE', "%{$value}%");                         
+                        $query->orWhere('social_media', 'LIKE', "%{$value}%");                         
                     });
                 })
             ])
