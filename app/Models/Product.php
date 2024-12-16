@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\RawMaterial;
 use App\Models\ProductRawMaterial;
+use App\Models\SaleOrder;
 use App\Models\ProductCategory;
 use App\Models\ProductImage;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -43,6 +44,12 @@ class Product extends Model
                     ->withPivot('quantity_used');
                     // ->using(ProductRawMaterial::class) 
                     // ->withTimestamps();
+    }
+
+    public function sale_orders()
+    {
+        return $this->belongsToMany(SaleOrder::class, 'product_sale_orders')
+                    ->withPivot('quantity_sold');
     }
 
     public function product_images (){
