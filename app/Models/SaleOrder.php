@@ -12,7 +12,8 @@ class SaleOrder extends Model
     protected $fillable = [
         'payment_method',
         'order_date',
-        'status',
+        'payment_status',
+        'order_status',
         'discount_percentage',
         'discount_value_in_riel',
         'discount_value_in_usd',

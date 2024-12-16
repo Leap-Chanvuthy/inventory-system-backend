@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table -> string('payment_method' , 50);
             $table -> date('order_date');
-            $table -> string('status');
+            $table -> string('order_status');
+            $table -> string('payment_status');
             $table-> double('discount_percentage')->default(0);
             $table-> double('discount_value_in_riel')->default(0);
             $table-> double('discount_value_in_usd')->default(0);
@@ -41,6 +42,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::disableForeignKeyConstraints();
         Schema::dropIfExists('sale_orders');
     }
 };
