@@ -22,7 +22,7 @@ class CustomerAPIController extends Controller
         return QueryBuilder::for(Customer::class)
             ->allowedFilters([
                 AllowedFilter::exact('id'),
-                AllowedFilter::exact('customer_category'),
+                AllowedFilter::exact('customer_category_id'),
                 AllowedFilter::exact('customer_status'),
                 AllowedFilter::callback('search', function (Builder $query, $value) {
                     $query->where(function ($query) use ($value) {
