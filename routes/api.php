@@ -11,6 +11,7 @@ use App\Http\Controllers\API\ProfileSettingAPIController;
 use App\Http\Controllers\API\PurchaseInvoiceAPIController;
 use App\Http\Controllers\API\RawMaterialAPIController;
 use App\Http\Controllers\API\RawMaterialCetegoryAPIController;
+use App\Http\Controllers\API\SaleOrderAPIController;
 use App\Http\Controllers\API\SupplierAPIController;
 use App\Http\Controllers\API\UserAPIController;
 
@@ -157,3 +158,8 @@ Route::patch('/customer/recover/{id}' , [CustomerAPIController::class , 'recover
 Route::delete('/customer/{id}' , [CustomerAPIController::class , 'destroy']);
 Route::get('/customers/export' , [CustomerAPIController::class , 'export']);
 
+
+// Sale Order
+Route::get('/sale-orders' , [SaleOrderAPIController::class , 'index'] );
+Route::post('/sale-order' , [SaleOrderAPIController::class , 'store']);
+Route::patch('/sale-order/{id}' , [SaleOrderAPIController::class , 'update']);

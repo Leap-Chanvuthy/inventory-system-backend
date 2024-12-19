@@ -10,6 +10,7 @@ use App\Models\SaleOrder;
 class ProductSaleOrder extends Model
 {
     use HasFactory;
+    // protected $table = 'product_sale_orders';
     protected $fillable = [
         'product_id',
         'sale_order_id',
