@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Product;
+use App\Models\Customer;
+
 
 class SaleOrder extends Model
 {
@@ -52,6 +54,7 @@ class SaleOrder extends Model
         'clearing_payable_percentage',
         'indebted_in_usd',
         'indebted_in_riel',
+        'customer_id',
     ];
     
 
@@ -61,4 +64,10 @@ class SaleOrder extends Model
         return $this->belongsToMany(Product::class, 'product_sale_orders')
                     ->withPivot('quantity_sold');
     }
+
+
+    public function customer (){
+        return $this -> belongsTo(Customer::class);
+    }
+
 }

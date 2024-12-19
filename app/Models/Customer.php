@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\CustomerCategory;
+use App\Models\SaleOrder;
 
 class Customer extends Model
 {
@@ -30,5 +31,9 @@ class Customer extends Model
     {
         return $this->belongsTo(CustomerCategory::class, 'customer_category_id');
     }    
+
+    public function sale_orders (){
+        return $this -> hasMany(SaleOrder::class);
+    }
 
 }
