@@ -61,6 +61,7 @@ class SaleOrderAPIController extends Controller
             'tax_percentage' => 'nullable|numeric|min:0|max:100',
             'clearing_payable_percentage' => 'required|numeric|min:0|max:100',
             'products' => 'required|array|min:1',
+            'customer_id' => 'required|exists:customers,id',
             'products.*.product_id' => 'required|exists:products,id',
             'products.*.quantity_sold' => 'required|integer|min:1',
         ];
@@ -74,7 +75,7 @@ class SaleOrderAPIController extends Controller
 
     public function index () {
         try {
-            $saleOrder = $this -> allBuilder() -> with('products') -> paginate(10);
+            $saleOrder = $this -> allBuilder() -> with( 'customer' , 'products') -> paginate(10);
             return response() -> json([$saleOrder]);
         }catch (Exception $e){
             return response() -> json(['error' => $e -> getMessage()],400);
@@ -152,6 +153,7 @@ class SaleOrderAPIController extends Controller
                 'clearing_payable_percentage' => $validated['clearing_payable_percentage'],
                 'indebted_in_usd' => $indebtedUSD,
                 'indebted_in_riel' => $indebtedRiel,
+                'customer_id' => $validated['customer_id'],
             ]);
 
             // Step 4: Create ProductSaleOrder records for each product
@@ -264,6 +266,7 @@ class SaleOrderAPIController extends Controller
                 'clearing_payable_percentage' => $validated['clearing_payable_percentage'],
                 'indebted_in_usd' => $indebtedUSD,
                 'indebted_in_riel' => $indebtedRiel,
+                'customer_id' => $validated['customer_id'],
             ]);
 
             return response()->json([
