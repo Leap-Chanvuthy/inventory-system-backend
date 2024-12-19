@@ -11,7 +11,7 @@ use Maatwebsite\Excel\Concerns\SkipsFailures;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Illuminate\Validation\Rule;
 
-class CustomersImport implements ToModel, WithValidation, WithHeadingRow
+class CustomerImport implements ToModel, WithValidation, WithHeadingRow
 {
     use Importable, SkipsFailures;
 
@@ -24,7 +24,6 @@ class CustomersImport implements ToModel, WithValidation, WithHeadingRow
     public function model(array $row)
     {
         return new Customer([
-            'image' => $row['image'],
             'fullname' => $row['fullname'],
             'email_address' => $row['email_address'],
             'phone_number' => $row['phone_number'],
@@ -44,14 +43,13 @@ class CustomersImport implements ToModel, WithValidation, WithHeadingRow
     public function rules(): array
     {
         return [
-            'image' => 'nullable|string|max:255',
             'fullname' => 'required|string|max:50',
             'email_address' => 'nullable|email|max:50',
             'phone_number' => 'required|string|max:50',
             'social_media' => 'nullable|string|max:100',
             'shipping_address' => 'required|string|max:255',
-            'longitude' => 'nullable|string|max:100',
-            'latitude' => 'nullable|string|max:100',
+            'longitude' => 'nullable',
+            'latitude' => 'nullable',
             'customer_status' => [
                 'required',
                 Rule::in(['ACTIVE', 'INACTIVE', 'SUSPENDED']),
@@ -60,4 +58,13 @@ class CustomersImport implements ToModel, WithValidation, WithHeadingRow
             'customer_note' => 'nullable|string',
         ];
     }
+
+    public function customValidationMessages()
+    {
+        return [
+            'customer_status.in' => 'Supplier status must be ACTIVE, INACTIVE, or SUSPENDED.',
+        ];
+    }
+
+
 }

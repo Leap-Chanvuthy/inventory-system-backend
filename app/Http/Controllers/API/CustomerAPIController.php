@@ -4,7 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Exports\CustomerExport;
 use App\Http\Controllers\Controller;
-use App\Imports\CustomersImport;
+use App\Imports\CustomerImport;
 use App\Models\Customer;
 use Exception;
 use Illuminate\Http\Request;
@@ -213,7 +213,7 @@ class CustomerAPIController extends Controller
             ]);
     
             $file = $request->file('customer_file');
-            Excel::import(new CustomersImport, $file);
+            Excel::import(new CustomerImport, $file);
     
             return response()->json(['message' => 'Customers imported successfully'], 200);
 

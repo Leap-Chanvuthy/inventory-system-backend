@@ -31,11 +31,13 @@ class CustomerExport implements FromQuery , WithHeadings
             ->allowedIncludes(['category'])
             ->allowedFilters([
                 AllowedFilter::exact('id'),
-                AllowedFilter::exact('customer_category'),
+                AllowedFilter::exact('customer_category_id'),
                 AllowedFilter::exact('customer_status'),
+                AllowedFilter::partial('phone_number'),
+                AllowedFilter::partial('email_address'),
                 AllowedFilter::callback('search', function (Builder $query, $value) {
                     $query->where(function ($query) use ($value) {
-                        $query->where('customer_category', 'LIKE', "%{$value}%");
+                        $query->where('customer_category_id', 'LIKE', "%{$value}%");
                         $query->where('customer_status', 'LIKE', "%{$value}%"); 
                         $query->where('fullname', 'LIKE', "%{$value}%");
                         $query->where('email_address', 'LIKE', "%{$value}%");  
