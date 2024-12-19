@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Exports\CustomerExport;
 use App\Http\Controllers\Controller;
+use App\Imports\CustomersImport;
 use App\Models\Customer;
 use Exception;
 use Illuminate\Http\Request;
@@ -199,10 +200,29 @@ class CustomerAPIController extends Controller
         }  catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
             return response()->json(['errors' => $e->failures()], 422); 
         }  catch (\Exception $e) {
-            return response()->json(['error' => 'Import failed: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Export failed: ' . $e->getMessage()], 500);
         }
     }
 
+
+    public function import(Request $request)
+    {
+        try {
+            $request->validate([
+                'customer_file' => 'required|file|mimes:xlsx,csv'
+            ]);
+    
+            $file = $request->file('customer_file');
+            Excel::import(new CustomersImport, $file);
+    
+            return response()->json(['message' => 'Customers imported successfully'], 200);
+
+        }  catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            return response()->json(['errors' => $e->failures()], 422); 
+        }  catch (\Exception $e) {
+            return response()->json(['error' => 'Import failed: ' . $e->getMessage()], 500);
+        }
+    }
 
     
 

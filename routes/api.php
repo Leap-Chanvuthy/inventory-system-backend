@@ -157,6 +157,7 @@ Route::patch('/customer/{id}' , [CustomerAPIController::class , 'update']);
 Route::patch('/customer/recover/{id}' , [CustomerAPIController::class , 'recover']);
 Route::delete('/customer/{id}' , [CustomerAPIController::class , 'destroy']);
 Route::get('/customers/export' , [CustomerAPIController::class , 'export']);
+Route::post('customers/import' , [CustomerAPIController::class , 'import']);
 
 
 // Sale Order
