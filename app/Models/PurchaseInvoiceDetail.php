@@ -33,8 +33,8 @@ class PurchaseInvoiceDetail extends Model
         return $this->belongsTo(RawMaterial::class);
     }
 
-    public function supplier()
-    {
-        return $this->belongsTo(Supplier::class);
-    }
+    // public function supplier()
+    // {
+    //     return $this->belongsTo(Supplier::class);
+    // }
 }

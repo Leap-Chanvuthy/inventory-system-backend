@@ -18,7 +18,7 @@ return new class extends Migration
             $table->double('total_price_in_usd');
             $table->unsignedBigInteger('purchase_invoice_id');
             $table->unsignedBigInteger('raw_material_id');
-            $table-> unsignedBigInteger('supplier_id') -> nullable();
+            // $table-> unsignedBigInteger('supplier_id') -> nullable();
 
             $table->foreign('purchase_invoice_id')
                 ->references('id')
@@ -32,11 +32,11 @@ return new class extends Migration
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
 
-            $table -> foreign('supplier_id')
-                ->references('id')
-                ->on('suppliers')
-                -> onDelete('cascade')
-                ->onUpdate('cascade');
+            // $table -> foreign('supplier_id')
+            //     ->references('id')
+            //     ->on('suppliers')
+            //     -> onDelete('cascade')
+            //     ->onUpdate('cascade');
 
             $table->timestamps();
             $table -> softDeletes();
@@ -48,6 +48,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::disableForeignKeyConstraints();
         Schema::dropIfExists('purchase_invoice_details');
     }
 };

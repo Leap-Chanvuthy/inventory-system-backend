@@ -34,6 +34,13 @@ return new class extends Migration
             $table-> double('clearing_payable_percentage');
             $table -> double('indebted_in_riel') -> default(0);
             $table-> double('indebted_in_usd');
+            $table-> unsignedBigInteger('supplier_id');
+
+            $table->foreign('supplier_id')
+                ->references('id')
+                ->on('suppliers')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
 
             $table->timestamps();
             $table -> softDeletes();

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\RawMaterial;
-use App\Models\PurchaseInvoiceDetail;
+use App\Models\PurchaseInvoice;
 
 class Supplier extends Model
 {
@@ -45,6 +45,6 @@ class Supplier extends Model
 
     public function purchase_invoices()
     {
-        return $this->hasMany(PurchaseInvoiceDetail::class);
+        return $this->hasMany(PurchaseInvoice::class);
     }
 }

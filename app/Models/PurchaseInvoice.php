@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\PurchaseInvoiceDetail;
+use App\Models\Supplier;
 
 class PurchaseInvoice extends Model
 {
@@ -35,9 +36,16 @@ class PurchaseInvoice extends Model
         'clearing_payable_percentage',
         'indebted_in_riel',
         'indebted_in_usd',
+        'supplier_id',
     ];
 
     public function purchaseInvoiceDetails(){
         return $this->hasMany(PurchaseInvoiceDetail::class, 'purchase_invoice_id');
     }
+
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
+    }
+
 }

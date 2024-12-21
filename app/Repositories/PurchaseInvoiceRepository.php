@@ -85,18 +85,18 @@ class PurchaseInvoiceRepository implements PurchaseInvoiceRepositoryInterface
 
     public function all(): LengthAwarePaginator
     {
-        return $this->allBuilder()->with(['purchaseInvoiceDetails.rawMaterial' => function ($query) {$query->withTrashed();}, 'purchaseInvoiceDetails.rawMaterial.supplier' ])->paginate(10);
+        return $this->allBuilder()->with(['purchaseInvoiceDetails.rawMaterial' => function ($query) {$query->withTrashed();}, 'purchaseInvoiceDetails.rawMaterial' , 'supplier' ])->paginate(10);
     }
 
     public function trashed(): LengthAwarePaginator
     {
-        return $this->allBuilderWithTrashed()->with('purchaseInvoiceDetails.rawMaterial.supplier')->paginate(10);
+        return $this->allBuilderWithTrashed()->with('purchaseInvoiceDetails.rawMaterial' , 'supplier')->paginate(10);
     }
 
 
     public function findById(int $id): PurchaseInvoice
     {
-        return $this->purchaseInvoice-> with(['purchaseInvoiceDetails.rawMaterial.supplier' , 'purchaseInvoiceDetails.rawMaterial' => function ($query) {$query->withTrashed();} , 'purchaseInvoiceDetails.rawMaterial.category'])->withTrashed()->findOrFail($id);
+        return $this->purchaseInvoice-> with(['purchaseInvoiceDetails.rawMaterial' , 'purchaseInvoiceDetails.rawMaterial' => function ($query) {$query->withTrashed();} , 'purchaseInvoiceDetails.rawMaterial.category' , 'supplier'])->withTrashed()->findOrFail($id);
     }
 
     public function generateInvoiceNumber(): string
@@ -136,7 +136,7 @@ class PurchaseInvoiceRepository implements PurchaseInvoiceRepositoryInterface
                 'total_price_in_riel' => $totalPriceInRiel,
                 'total_price_in_usd' => $totalPriceInUsd,
                 'raw_material_id' => $rawMaterial->id,
-                'supplier_id' => $supplierId,
+                // 'supplier_id' => $supplierId,
             ];
 
             $subTotalInRiel += $totalPriceInRiel;
@@ -190,6 +190,7 @@ class PurchaseInvoiceRepository implements PurchaseInvoiceRepositoryInterface
             'clearing_payable_percentage' => $clearingPayablePercentage,
             'indebted_in_usd' => $indebtedInUsd,
             'indebted_in_riel' => $indebtedInRiel,
+            'supplier_id' => $supplierId,
         ]));
 
         foreach ($rawMaterialsData as $material) {
@@ -227,7 +228,7 @@ class PurchaseInvoiceRepository implements PurchaseInvoiceRepositoryInterface
                 'total_price_in_riel' => $totalPriceInRiel,
                 'total_price_in_usd' => $totalPriceInUsd,
                 'raw_material_id' => $rawMaterial->id,
-                'supplier_id' => $supplierId,
+                // 'supplier_id' => $supplierId,
             ];
 
             $subTotalInRiel += $totalPriceInRiel;
@@ -274,6 +275,7 @@ class PurchaseInvoiceRepository implements PurchaseInvoiceRepositoryInterface
             'clearing_payable_percentage' => $clearingPayablePercentage,
             'indebted_in_usd' => $indebtedInUsd,
             'indebted_in_riel' => $indebtedInRiel,
+            'supplier_id' => $supplierId,
         ]));
 
         $existingRawMaterialIds = $purchaseInvoice->purchaseInvoiceDetails()->pluck('raw_material_id')->toArray();

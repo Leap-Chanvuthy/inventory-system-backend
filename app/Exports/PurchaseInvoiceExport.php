@@ -25,7 +25,8 @@ class PurchaseInvoiceExport implements FromQuery, WithHeadings, WithMapping
     {
         return QueryBuilder::for(PurchaseInvoice::with([
             'purchaseInvoiceDetails.rawMaterial',
-            'purchaseInvoiceDetails.supplier',
+            'purchaseInvoiceDetails.rawMaterial.category',
+            'supplier',
         ]))
             ->allowedFilters([
                 AllowedFilter::exact('id'),
@@ -57,6 +58,9 @@ class PurchaseInvoiceExport implements FromQuery, WithHeadings, WithMapping
                 $purchaseInvoice->payment_method,
                 $purchaseInvoice->payment_date,
                 $purchaseInvoice->status,
+                $purchaseInvoice->supplier->name ?? 'N/A',
+                $purchaseInvoice->supplier->supplier_code ?? 'N/A',
+                $purchaseInvoice->supplier-> email ?? 'N/A',
                 $purchaseInvoice->discount_percentage ?? 0,
                 $purchaseInvoice->tax_percentage ?? 0,
                 $purchaseInvoice->clearing_payable_percentage ?? 0,
@@ -78,7 +82,6 @@ class PurchaseInvoiceExport implements FromQuery, WithHeadings, WithMapping
                 $detail->total_price_in_usd ?: 0,
                 $detail->rawMaterial->name ?? 'N/A',
                 $detail->rawMaterial->material_code ?? 'N/A',
-                $detail->supplier->name ?? 'N/A',
                 $purchaseInvoice->created_at->format('Y-m-d'),
             ];
         }
@@ -95,6 +98,9 @@ class PurchaseInvoiceExport implements FromQuery, WithHeadings, WithMapping
             'Payment Method',
             'Payment Date',
             'Status',
+            'Supplier Name',
+            'Supplier Code',
+            'Supplier Email',
             'Discount (%)',
             'Tax (%)',
             'Payable Rate (%)',
@@ -116,7 +122,6 @@ class PurchaseInvoiceExport implements FromQuery, WithHeadings, WithMapping
             'Total Price ($)',
             'Raw Material Name',
             'Material Code',
-            'Supplier Name',
             'Created At',
         ];
     }
