@@ -92,6 +92,7 @@ Route::get('/raw-materials/no-supplier' , [RawMaterialAPIController::class , 'ge
 Route::post('/raw-materials' , [RawMaterialAPIController::class, 'store']);
 Route::patch('/raw-material/{id}' , [RawMaterialAPIController::class, 'update']);
 Route::delete('/raw-material/{id}' , [RawMaterialAPIController::class , 'destroy']);
+Route::delete('/raw-material/{materialId}/images/{imageId}', [RawMaterialAPIController::class, 'removeImage']);
 Route::get('raw-materials/export', [RawMaterialAPIController::class, 'export']);
 Route::post('raw-materials/import', [RawMaterialAPIController::class, 'import']);
 

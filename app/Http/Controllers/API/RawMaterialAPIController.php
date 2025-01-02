@@ -14,6 +14,7 @@ use App\Repositories\Interfaces\PurchaseInvoiceRepositoryInterface;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Repositories\Interfaces\RawMaterialRepositoryInterface;
 use App\Services\RawMaterialService;
+use Illuminate\Support\Facades\Storage;
 
 class RawMaterialAPIController extends Controller
 {
@@ -108,12 +109,29 @@ class RawMaterialAPIController extends Controller
         return response()->json(['message' => 'Raw material deleted successfully'], 200);
     }
 
+
+
+    public function removeImage ($materialId , $imageId) {
+        try {
+            $rawMaterial = RawMaterial::findOrFail($materialId);
+            $image = $rawMaterial -> raw_material_images() -> findOrFail($imageId);
+
+            if (Storage::disk('public')->exists($image->image)) {
+                Storage::disk('public')->delete($image->image);
+            }
+            $image->delete();
+            return response() -> json(['message' => 'Image deleted successfully'],200);
+
+        }catch (ValidationException $e){
+            return response() -> json(['errors' => $e -> errors()],400);
+        }
+    }
+
     
     public function export(Request $request)
     {
         try {
             $filters = $request->all();
-
             return Excel::download(new RawMaterialExport($request), 'raw_materials.xlsx');
         }  catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
             return response()->json(['errors' => $e->failures()], 422); 
