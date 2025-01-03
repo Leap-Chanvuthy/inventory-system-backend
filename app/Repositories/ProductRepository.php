@@ -47,7 +47,7 @@ class ProductRepository implements ProductRepositoryInterface
                     });
                 }),
             ])
-            ->allowedSorts('created_at', 'updated_at', 'product_name')
+            ->allowedSorts('created_at', 'updated_at', 'product_code')
             ->defaultSort('-created_at');
     }
 
@@ -81,19 +81,19 @@ class ProductRepository implements ProductRepositoryInterface
             'product_name' => 'required|string|max:255',
             'image.*' => 'nullable|image|mimes:jpeg,png,jpg|max:10000',
             'quantity' => 'required|integer|min:0',
-            'remaining_quantity' => 'required|integer|min:0',
+            'remaining_quantity' => 'nullable|integer|min:0',
             'minimum_stock_level' => 'required|integer|min:0',
             'unit_of_measurement' => 'required|string|max:255',
             'package_size' => 'nullable|string|max:255',
             'warehouse_location' => 'nullable|string|max:255',
             'unit_price_in_usd' => 'required|numeric|min:0',
-            'total_value_in_usd' => 'required|numeric|min:0',
+            'total_value_in_usd' => 'nullable|numeric|min:0',
             'exchange_rate_from_usd_to_riel' => 'required|numeric|min:0',
-            'unit_price_in_riel' => 'required|numeric|min:0',
-            'total_value_in_riel' => 'required|numeric|min:0',
-            'exchange_rate_from_riel_to_usd' => 'required|numeric|min:0',
+            'unit_price_in_riel' => 'nullable|numeric|min:0',
+            'total_value_in_riel' => 'nullable|numeric|min:0',
+            'exchange_rate_from_riel_to_usd' => 'nullable|numeric|min:0',
             'description' => 'nullable|string',
-            'status' => 'required|string|max:255',
+            'status' => 'nullable|string|max:255',
             'barcode' => 'nullable|string|max:255',
             'product_category_id' => 'required|exists:product_categories,id',
             'raw_materials' => 'required|array',
@@ -102,6 +102,17 @@ class ProductRepository implements ProductRepositoryInterface
         ];
 
         $validatedData = $request->validate($rules);
+
+        $validatedData['total_value_in_usd'] = $validatedData['total_value_in_usd'] ?? null;
+        $validatedData['unit_price_in_riel'] = $validatedData['unit_price_in_riel'] ?? null;
+        $validatedData['total_value_in_riel'] = $validatedData['total_value_in_riel'] ?? null;
+        $validatedData['exchange_rate_from_riel_to_usd'] = $validatedData['exchange_rate_from_riel_to_usd'] ?? null;
+        $validatedData['package_size'] = $validatedData['package_size'] ?? null;
+        $validatedData['warehouse_location'] = $validatedData['warehouse_location'] ?? null;
+        $validatedData['description'] = $validatedData['description'] ?? null;
+        $validatedData['staging_date'] = $validatedData['staging_date'] ?? null;
+        $validatedData['status'] = $validatedData['status'] ?? null;
+        $validatedData['remaining_quantity'] = $validatedData['remaining_quantity'] ?? null;
 
         return $validatedData;
     }
@@ -157,6 +168,16 @@ class ProductRepository implements ProductRepositoryInterface
         $data = $this->validateAndExtractData($request);
         $data['product_code'] = $this->generateProductCode();
 
+        if (!isset($data['total_value_in_usd'])) {
+            $data['total_value_in_usd'] = $data['unit_price_in_usd'] * $data['quantity'];
+        }
+
+        $data['status'] = "IN_STOCK";
+        $data['remaining_quantity'] = $data['quantity'];
+        $data['unit_price_in_riel'] = $data['unit_price_in_usd'] * $data['exchange_rate_from_usd_to_riel'];
+        $data['total_value_in_riel'] = $data['total_value_in_usd'] * $data['exchange_rate_from_usd_to_riel'];
+        $data['exchange_rate_from_riel_to_usd'] = number_format(1 / $data['exchange_rate_from_usd_to_riel'], 6);
+
         $product = Product::create($data);
 
         if ($request->hasFile('image')) {
@@ -203,6 +224,14 @@ class ProductRepository implements ProductRepositoryInterface
     public function update($id, Request $request): Product
     {
         $data = $this->validateAndExtractData($request);
+
+        if (!isset($data['total_value_in_usd'])) {
+            $data['total_value_in_usd'] = $data['unit_price_in_usd'] * $data['quantity'];
+        }
+
+        $data['unit_price_in_riel'] = $data['unit_price_in_usd'] * $data['exchange_rate_from_usd_to_riel'];
+        $data['total_value_in_riel'] = $data['total_value_in_usd'] * $data['exchange_rate_from_usd_to_riel'];
+        $data['exchange_rate_from_riel_to_usd'] = number_format(1 / $data['exchange_rate_from_usd_to_riel'], 6);
 
         $product = Product::find($id);
 

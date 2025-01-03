@@ -12,10 +12,12 @@ use Illuminate\Validation\Rule;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 
 class SupplierRepository implements SupplierRepositoryInterface
 {
     protected $supplier;
+    protected $existingSupplierCodes = [];
 
     public function __construct(Supplier $supplier)
     {
@@ -126,14 +128,23 @@ class SupplierRepository implements SupplierRepositoryInterface
 
     private function generateSupplierCode(): string
     {
-        $lastSupplier = Supplier::orderBy('created_at', 'desc')->first(); // change to withTrashed()
+        $lastSupplier = Supplier::orderBy('created_at', 'desc')->first();
         if ($lastSupplier && preg_match('/SUPP-(\d{6})/', $lastSupplier->supplier_code, $matches)) {
             $lastCode = intval($matches[1]);
         } else {
             $lastCode = 0;
         }
-        $newNumber = str_pad($lastCode + 1, 6, '0', STR_PAD_LEFT);
-        return 'SUPP-' . $newNumber;
+
+        $newCode = null;
+        do {
+            $newNumber = str_pad($lastCode + 1, 6, '0', STR_PAD_LEFT);
+            $newCode = 'SUPP-' . $newNumber;
+            $lastCode++;
+        } while (in_array($newCode, $this->existingSupplierCodes) || Supplier::where('supplier_code', $newCode)->exists());
+
+        $this->existingSupplierCodes[] = $newCode;
+
+        return $newCode;
     }
 
 
@@ -165,7 +176,6 @@ class SupplierRepository implements SupplierRepositoryInterface
     public function update(Request $request, $id): Supplier
     {
         $supplierData = $this->validateChange($request, $id);
-        // $supplierData = $request -> all();
         $supplier = Supplier::findOrFail($id);
 
         if ($request->hasFile('image')) {
