@@ -105,8 +105,8 @@ class RawMaterialImport implements ToModel, WithHeadingRow, WithValidation
             'location' => 'nullable|string|max:100',
             'description' => 'nullable|string',
             'expiry_date' => 'nullable|date',
-            'supplier_id' => 'nullable|integer|exists:suppliers,id',
-            'raw_material_category_id' => 'nullable|integer|exists:raw_material_categories,id'
+            'supplier_id' => 'required|integer|exists:suppliers,id',
+            'raw_material_category_id' => 'required|integer|exists:raw_material_categories,id'
         ];
     }
 }

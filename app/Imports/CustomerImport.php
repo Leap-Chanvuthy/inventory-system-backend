@@ -54,7 +54,7 @@ class CustomerImport implements ToModel, WithValidation, WithHeadingRow
                 'required',
                 Rule::in(['ACTIVE', 'INACTIVE', 'SUSPENDED']),
             ],
-            'customer_category_id' => 'nullable|exists:customer_categories,id',
+            'customer_category_id' => 'required|exists:customer_categories,id',
             'customer_note' => 'nullable|string',
         ];
     }
