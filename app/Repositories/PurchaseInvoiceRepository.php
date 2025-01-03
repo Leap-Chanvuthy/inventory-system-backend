@@ -121,6 +121,10 @@ class PurchaseInvoiceRepository implements PurchaseInvoiceRepositoryInterface
 
         foreach ($request->raw_materials as $rawMaterialId) {
             $rawMaterial = RawMaterial::withTrashed() ->findOrFail($rawMaterialId);
+
+            if (is_null($rawMaterial->supplier_id)) {
+                throw new \Exception("Raw material ID {$rawMaterial->id} does not belong to any supplier. All raw materials must belong to a supplier to create invoice.");
+            }
             
             if (is_null($supplierId)) {
                 $supplierId = $rawMaterial->supplier_id;
