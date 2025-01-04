@@ -27,6 +27,8 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
     private function allBuilder(): QueryBuilder
     {
         return QueryBuilder::for(RawMaterial::class)
+        ->join('suppliers', 'raw_materials.supplier_id', '=', 'suppliers.id')
+        ->select('raw_materials.*', 'suppliers.name as supplier_name')
             ->allowedFilters([
                 AllowedFilter::exact('id'),
                 AllowedFilter::exact('raw_material_category_id'),
@@ -45,7 +47,7 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
                     });
                 })
             ])
-            ->allowedSorts('created_at', 'updated_at', 'material_code')
+            ->allowedSorts('created_at', 'updated_at', 'material_code' , 'supplier_name')
             ->defaultSort('-created_at');
     }
 
