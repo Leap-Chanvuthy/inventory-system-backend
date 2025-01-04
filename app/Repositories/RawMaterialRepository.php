@@ -27,7 +27,7 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
     private function allBuilder(): QueryBuilder
     {
         return QueryBuilder::for(RawMaterial::class)
-        ->join('suppliers', 'raw_materials.supplier_id', '=', 'suppliers.id')
+        ->leftJoin('suppliers', 'raw_materials.supplier_id', '=', 'suppliers.id')
         ->select('raw_materials.*', 'suppliers.name as supplier_name')
             ->allowedFilters([
                 AllowedFilter::exact('id'),
