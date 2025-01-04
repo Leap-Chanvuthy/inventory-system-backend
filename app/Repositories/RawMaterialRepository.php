@@ -92,9 +92,20 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
         return $this->allBuilder()->with('raw_material_images', 'category', 'supplier')->paginate(10);
     }
 
+    // public function allWithoutInvoice(): LengthAwarePaginator
+    // {
+    //     return $this->allBuilder()->withTrashed()->with('raw_material_images', 'category', 'supplier')->whereDoesntHave('purchase_invoice_details')->paginate(10);
+    // }
+
     public function allWithoutInvoice(): LengthAwarePaginator
     {
-        return $this->allBuilder()->withTrashed()->with('raw_material_images', 'category', 'supplier')->whereDoesntHave('purchase_invoice_details')->paginate(10);
+        return $this->allBuilder()
+            ->withTrashed()
+            ->with('raw_material_images', 'category', 'supplier')
+            ->whereDoesntHave('purchase_invoice_details', function ($query) {
+                $query->withTrashed();
+            })
+            ->paginate(10);
     }
 
     public function allWithoutSupplier(): LengthAwarePaginator
