@@ -36,14 +36,14 @@ class RawMaterialRepository implements RawMaterialRepositoryInterface
                 AllowedFilter::exact('minimum_stock_level'),
                 AllowedFilter::callback('search', function (Builder $query, $value) {
                     $query->where(function ($query) use ($value) {
-                        $query->where('name', 'LIKE', "%{$value}%")
-                            ->orWhere('material_code', 'LIKE', "%{$value}%")
-                            ->orWhere('unit_price_in_riel', 'LIKE', "%{$value}%")
-                            ->orWhere('total_value_in_riel', 'LIKE', "%{$value}%")
-                            ->orWhere('unit_price_in_usd', 'LIKE', "%{$value}%")
-                            ->orWhere('total_value_in_usd', 'LIKE', "%{$value}%")
-                            ->orWhere('location', 'LIKE', "%{$value}%")
-                            ->orWhere('status', 'LIKE', "%{$value}%");
+                        $query->where('raw_materials.name', 'LIKE', "%{$value}%")
+                            ->orWhere('raw_materials.material_code', 'LIKE', "%{$value}%")
+                            ->orWhere('raw_materials.unit_price_in_riel', 'LIKE', "%{$value}%")
+                            ->orWhere('raw_materials.total_value_in_riel', 'LIKE', "%{$value}%")
+                            ->orWhere('raw_materials.unit_price_in_usd', 'LIKE', "%{$value}%")
+                            ->orWhere('raw_materials.total_value_in_usd', 'LIKE', "%{$value}%")
+                            ->orWhere('raw_materials.location', 'LIKE', "%{$value}%")
+                            ->orWhere('raw_materials.status', 'LIKE', "%{$value}%");
                     });
                 })
             ])
