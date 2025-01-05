@@ -13,6 +13,7 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Validation\Rule;
 
 class SaleOrderAPIController extends Controller
 {
@@ -56,7 +57,7 @@ class SaleOrderAPIController extends Controller
             'payment_method' => 'required|string|max:50',
             'order_date' => 'required|date',
             // 'payment_status' => 'required|string',
-            'order_status' => 'required|string',
+            'order_status' => 'required|string',Rule::in(['PENDING', 'PROCESSING', 'DELIVERING' ,'COMPLETED']),
             'discount_percentage' => 'nullable|numeric|min:0|max:100',
             'tax_percentage' => 'nullable|numeric|min:0|max:100',
             'clearing_payable_percentage' => 'required|numeric|min:0|max:100',
