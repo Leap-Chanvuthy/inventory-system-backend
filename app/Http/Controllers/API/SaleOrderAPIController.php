@@ -63,7 +63,7 @@ class SaleOrderAPIController extends Controller
             'clearing_payable_percentage' => 'required|numeric|min:0|max:100',
             'products' => 'required|array|min:1',
             'customer_id' => 'required|exists:customers,id',
-            'products.*.product_id' => 'required|exists:products,id',
+            'products.*.id' => 'required|exists:products,id',
             'products.*.quantity_sold' => 'required|integer|min:1',
         ];
 
@@ -95,7 +95,7 @@ class SaleOrderAPIController extends Controller
             $subTotalRiel = 0;
 
             foreach ($validated['products'] as $productInput) {
-                $product = Product::findOrFail($productInput['product_id']);
+                $product = Product::findOrFail($productInput['id']);
 
                 // Check if remaining quantity is sufficient
                 if ($product->remaining_quantity < $productInput['quantity_sold']) {
@@ -161,7 +161,7 @@ class SaleOrderAPIController extends Controller
             foreach ($validated['products'] as $productInput) {
                 ProductSaleOrder::create([
                     'sale_order_id' => $saleOrder->id,
-                    'product_id' => $productInput['product_id'],
+                    'product_id' => $productInput['id'],
                     'quantity_sold' => $productInput['quantity_sold'],
                 ]);
             }
@@ -205,7 +205,7 @@ class SaleOrderAPIController extends Controller
             $subTotalRiel = 0;
 
             foreach ($validated['products'] as $productInput) {
-                $product = Product::findOrFail($productInput['product_id']);
+                $product = Product::findOrFail($productInput['id']);
 
                 // Check if remaining quantity is sufficient
                 if ($product->remaining_quantity < $productInput['quantity_sold']) {
