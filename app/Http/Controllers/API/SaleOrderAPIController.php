@@ -21,21 +21,23 @@ class SaleOrderAPIController extends Controller
     private function allBuilder(): QueryBuilder
     {
         return QueryBuilder::for(SaleOrder::class)
+            -> leftJoin ('customers' , 'sale_orders.customer_id', '=' , 'customers.id')
+            ->select('sale_orders.*', 'customers.fullname as customer_name')
             ->allowedFilters([
                 AllowedFilter::exact('id'),
                 AllowedFilter::exact('payment_method'),
                 AllowedFilter::exact('order_status'),
                 AllowedFilter::exact('payment_status'),
-                AllowedFilter::exact('order_date'),
-                AllowedFilter::exact('discount_percentage'),
-                AllowedFilter::exact('tax_percentage'),
-                AllowedFilter::exact('clearing_payable_percentage'),
+                AllowedFilter::exact('sale_orders.order_date'),
+                AllowedFilter::exact('sale_orders.discount_percentage'),
+                AllowedFilter::exact('sale_orders.tax_percentage'),
+                AllowedFilter::exact('sale_orders.clearing_payable_percentage'),
                 AllowedFilter::callback('search', function (Builder $query, $value) {
                     $query->where(function ($query) use ($value) {
-                        $query->where('payment_method', 'LIKE', "%{$value}%")
-                              ->orWhere('order_status', 'LIKE', "%{$value}%")
-                              ->orWhere('payment_status', 'LIKE', "%{$value}%")
-                              ->orWhere('order_date', 'LIKE', "%{$value}%");
+                        $query->where('sale_orders.payment_method', 'LIKE', "%{$value}%")
+                              ->orWhere('sale_orders.order_status', 'LIKE', "%{$value}%")
+                              ->orWhere('sale_orders.payment_status', 'LIKE', "%{$value}%")
+                              ->orWhere('sale_orders.order_date', 'LIKE', "%{$value}%");
                     });
                 }),
                 AllowedFilter::callback('date_range', function (Builder $query, $value) {
@@ -46,7 +48,7 @@ class SaleOrderAPIController extends Controller
                     }
                 }),  
             ])
-            ->allowedSorts('created_at', 'updated_at', 'order_date', 'sub_total_in_usd', 'grand_total_with_tax_in_usd')
+            ->allowedSorts('created_at', 'updated_at', 'customer_name' ,'order_date' ,'sub_total_in_usd', 'grand_total_with_tax_in_usd')
             ->defaultSort('-created_at');
     }
     
@@ -130,16 +132,32 @@ class SaleOrderAPIController extends Controller
             $grandTotalUSD = $subTotalUSD - $discountValueUSD + $taxValueUSD;
             $grandTotalRiel = $subTotalRiel - $discountValueRiel + $taxValueRiel;
 
-            $indebtedUSD = $grandTotalUSD * ($validated['clearing_payable_percentage'] / 100);
-            $indebtedRiel = $grandTotalRiel * ($validated['clearing_payable_percentage'] / 100);
+            // $indebtedUSD = $grandTotalUSD * ($validated['clearing_payable_percentage'] / 100);
+            // $indebtedRiel = $grandTotalRiel * ($validated['clearing_payable_percentage'] / 100);
 
-            $payment_status = 'PAID';
-            if ($request->clearing_payable_percentage == 0) {
+            // $payment_status = 'PAID';
+            // if ($request->clearing_payable_percentage == 0) {
+            //     $payment_status = 'UNPAID';
+            // } elseif ($request->clearing_payable_percentage < 100) {
+            //     $payment_status = 'INDEBTED';
+            // } elseif ($request->clearing_payable_percentage > 100) {
+            //     $payment_status = 'OVERPAID';
+            // }
+
+            $clearingPayablePercentage = $validated['clearing_payable_percentage'];
+            $indebtedUSD = 0;
+            $indebtedRiel = 0;
+
+            if ($clearingPayablePercentage == 0) {
                 $payment_status = 'UNPAID';
-            } elseif ($request->clearing_payable_percentage < 100) {
+                $indebtedUSD = $grandTotalUSD;
+                $indebtedRiel = $grandTotalRiel;
+            } elseif ($clearingPayablePercentage < 100) {
                 $payment_status = 'INDEBTED';
-            } elseif ($request->clearing_payable_percentage > 100) {
-                $payment_status = 'OVERPAID';
+                $indebtedUSD = $grandTotalUSD * ((100 - $clearingPayablePercentage) / 100);
+                $indebtedRiel = $grandTotalRiel * ((100 - $clearingPayablePercentage) / 100);
+            } else {
+                $payment_status = 'PAID';
             }
 
             // Step 3: Create the sale order
@@ -243,8 +261,26 @@ class SaleOrderAPIController extends Controller
             $grandTotalUSD = $subTotalUSD - $discountValueUSD + $taxValueUSD;
             $grandTotalRiel = $subTotalRiel - $discountValueRiel + $taxValueRiel;
 
-            $indebtedUSD = $grandTotalUSD * ($validated['clearing_payable_percentage'] / 100);
-            $indebtedRiel = $grandTotalRiel * ($validated['clearing_payable_percentage'] / 100);
+            // $indebtedUSD = $grandTotalUSD * ($validated['clearing_payable_percentage'] / 100);
+            // $indebtedRiel = $grandTotalRiel * ($validated['clearing_payable_percentage'] / 100);
+            // Step 3: Calculate indebted values
+            $clearingPayablePercentage = $validated['clearing_payable_percentage'];
+            $indebtedUSD = 0;
+            $indebtedRiel = 0;
+
+            if ($clearingPayablePercentage == 0) {
+                $payment_status = 'UNPAID';
+                $indebtedUSD = $grandTotalUSD;
+                $indebtedRiel = $grandTotalRiel;
+            } elseif ($clearingPayablePercentage < 100) {
+                $payment_status = 'INDEBTED';
+                $indebtedUSD = $grandTotalUSD * ((100 - $clearingPayablePercentage) / 100);
+                $indebtedRiel = $grandTotalRiel * ((100 - $clearingPayablePercentage) / 100);
+            } else {
+                $payment_status = 'PAID';
+            }
+
+
 
             $payment_status = 'PAID';
             if ($request->clearing_payable_percentage == 0) {
