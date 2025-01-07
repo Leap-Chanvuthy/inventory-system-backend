@@ -383,6 +383,10 @@ class SaleOrderAPIController extends Controller
                 $product->save();
 
                 ProductSaleOrder::where('sale_order_id', $sale_order->id)
+                ->where('product_id', $product->id)
+                ->update(['quantity_sold' => 0]);
+
+                ProductSaleOrder::where('sale_order_id', $sale_order->id)
                     ->where('product_id', $product->id)
                     ->delete();
             }
