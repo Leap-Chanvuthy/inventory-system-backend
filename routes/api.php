@@ -163,5 +163,6 @@ Route::post('customers/import' , [CustomerAPIController::class , 'import']);
 
 // Sale Order
 Route::get('/sale-orders' , [SaleOrderAPIController::class , 'index'] );
+Route::get('/sale-order/{id}' , [SaleOrderAPIController::class , 'show'] );
 Route::post('/sale-order' , [SaleOrderAPIController::class , 'store']);
 Route::patch('/sale-order/{id}' , [SaleOrderAPIController::class , 'update']);

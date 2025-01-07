@@ -83,6 +83,15 @@ class SaleOrderAPIController extends Controller
         }
     }
 
+    public function show ($id) {
+        try {
+            $saleOrder = SaleOrder::with('customer' , 'products') ->findOrFail($id);
+            return response() -> json($saleOrder);
+        }catch (Exception $e){
+            return response() -> json(['error' => $e -> getMessage()],400);
+        }
+    }
+
 
 
     public function store(Request $request)
@@ -99,7 +108,7 @@ class SaleOrderAPIController extends Controller
 
                 // Check if remaining quantity is sufficient
                 if ($product->remaining_quantity < $productInput['quantity_sold']) {
-                    throw new \Exception("Quantity of product ID {$product->id} is not enough.");
+                    throw new \Exception("Quantity of product ID {$product->id}, product code: ({$product -> product_code}) is not enough.");
                 }
 
                 // Add product's price to sub-total
