@@ -51,6 +51,41 @@ class SaleOrderAPIController extends Controller
             ->allowedSorts('created_at', 'updated_at', 'customer_name' ,'order_date' ,'sub_total_in_usd', 'grand_total_with_tax_in_usd')
             ->defaultSort('-created_at');
     }
+
+    private function allBuilderWithTrashed(): QueryBuilder
+    {
+        return QueryBuilder::for(SaleOrder::class)
+            -> leftJoin ('customers' , 'sale_orders.customer_id', '=' , 'customers.id')
+            ->select('sale_orders.*', 'customers.fullname as customer_name')
+            ->onlyTrashed()
+            ->allowedFilters([
+                AllowedFilter::exact('id'),
+                AllowedFilter::exact('payment_method'),
+                AllowedFilter::exact('order_status'),
+                AllowedFilter::exact('payment_status'),
+                AllowedFilter::exact('sale_orders.order_date'),
+                AllowedFilter::exact('sale_orders.discount_percentage'),
+                AllowedFilter::exact('sale_orders.tax_percentage'),
+                AllowedFilter::exact('sale_orders.clearing_payable_percentage'),
+                AllowedFilter::callback('search', function (Builder $query, $value) {
+                    $query->where(function ($query) use ($value) {
+                        $query->where('sale_orders.payment_method', 'LIKE', "%{$value}%")
+                              ->orWhere('sale_orders.order_status', 'LIKE', "%{$value}%")
+                              ->orWhere('sale_orders.payment_status', 'LIKE', "%{$value}%")
+                              ->orWhere('sale_orders.order_date', 'LIKE', "%{$value}%");
+                    });
+                }),
+                AllowedFilter::callback('date_range', function (Builder $query, $value) {
+                    if (isset($value['start_date']) && isset($value['end_date'])) {
+                        $startDate = Carbon::parse($value['start_date'])->startOfDay();
+                        $endDate = Carbon::parse($value['end_date'])->endOfDay();
+                        $query->whereBetween('created_at', [$startDate, $endDate]);
+                    }
+                }),  
+            ])
+            ->allowedSorts('created_at', 'updated_at', 'customer_name' ,'order_date' ,'sub_total_in_usd', 'grand_total_with_tax_in_usd')
+            ->defaultSort('-created_at');
+    }
     
 
     private function validateAndExtractData(Request $request, $id = null): array
@@ -82,6 +117,16 @@ class SaleOrderAPIController extends Controller
             return response() -> json($saleOrder);
         }catch (Exception $e){
             return response() -> json(['error' => $e -> getMessage()],400);
+        }
+    }
+
+    public function trashed()
+    {
+        try {
+            $deletedSaleOrders = $this -> allBuilderWithTrashed() -> with( 'customer' , 'products') -> paginate(10);
+            return response()->json($deletedSaleOrders, 200);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
         }
     }
 
@@ -131,18 +176,6 @@ class SaleOrderAPIController extends Controller
 
             $grandTotalUSD = $subTotalUSD - $discountValueUSD + $taxValueUSD;
             $grandTotalRiel = $subTotalRiel - $discountValueRiel + $taxValueRiel;
-
-            // $indebtedUSD = $grandTotalUSD * ($validated['clearing_payable_percentage'] / 100);
-            // $indebtedRiel = $grandTotalRiel * ($validated['clearing_payable_percentage'] / 100);
-
-            // $payment_status = 'PAID';
-            // if ($request->clearing_payable_percentage == 0) {
-            //     $payment_status = 'UNPAID';
-            // } elseif ($request->clearing_payable_percentage < 100) {
-            //     $payment_status = 'INDEBTED';
-            // } elseif ($request->clearing_payable_percentage > 100) {
-            //     $payment_status = 'OVERPAID';
-            // }
 
             $clearingPayablePercentage = $validated['clearing_payable_percentage'];
             $indebtedUSD = 0;
@@ -261,9 +294,6 @@ class SaleOrderAPIController extends Controller
             $grandTotalUSD = $subTotalUSD - $discountValueUSD + $taxValueUSD;
             $grandTotalRiel = $subTotalRiel - $discountValueRiel + $taxValueRiel;
 
-            // $indebtedUSD = $grandTotalUSD * ($validated['clearing_payable_percentage'] / 100);
-            // $indebtedRiel = $grandTotalRiel * ($validated['clearing_payable_percentage'] / 100);
-            // Step 3: Calculate indebted values
             $clearingPayablePercentage = $validated['clearing_payable_percentage'];
             $indebtedUSD = 0;
             $indebtedRiel = 0;
@@ -327,4 +357,46 @@ class SaleOrderAPIController extends Controller
             ], 400);
         }
     }
+
+
+    public function recover($id)
+    {
+        try {
+            $sale_order = SaleOrder::onlyTrashed()->findOrFail($id);
+            $sale_order->restore();
+            ProductSaleOrder::withTrashed()
+                ->where('sale_order_id', $sale_order->id)
+                ->restore();
+
+            return response()->json(['message' => 'Sale order recovered successfully'], 200);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
+
+    public function delete ($id){
+        try {  
+            $sale_order = SaleOrder::findOrFail($id);
+            foreach ($sale_order->products as $product) {
+                $product->remaining_quantity += $product->pivot->quantity_sold;
+                $product->save();
+
+                ProductSaleOrder::where('sale_order_id', $sale_order->id)
+                    ->where('product_id', $product->id)
+                    ->delete();
+            }
+
+            $sale_order->delete();
+
+            return response()->json(['message' => 'Sale order deleted successfully'], 200);
+
+        }catch (Exception $e){
+                return response() -> json(['error' => $e -> getMessage()],400);
+        }
+    }
+
+
+
+
 }

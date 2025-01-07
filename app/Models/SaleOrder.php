@@ -6,11 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Product;
 use App\Models\Customer;
-
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SaleOrder extends Model
 {
     use HasFactory;
+    use SoftDeletes;
     // protected $fillable = [
     //     'payment_method',
     //     'order_date',
