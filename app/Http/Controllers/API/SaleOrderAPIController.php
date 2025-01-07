@@ -134,7 +134,7 @@ class SaleOrderAPIController extends Controller
 
     public function show ($id) {
         try {
-            $saleOrder = SaleOrder::with('customer' , 'products') ->findOrFail($id);
+            $saleOrder = SaleOrder::with('customer.category' , 'products') ->findOrFail($id);
             return response() -> json($saleOrder);
         }catch (Exception $e){
             return response() -> json(['error' => $e -> getMessage()],400);
