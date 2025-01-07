@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Exports\SaleOrderExport;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
@@ -14,6 +15,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SaleOrderAPIController extends Controller
 {
@@ -401,6 +403,18 @@ class SaleOrderAPIController extends Controller
     }
 
 
+    public function export(Request $request)
+    {
+        try {
+            $filters = $request->all();
+
+            return Excel::download(new SaleOrderExport($request), 'sale_orders.xlsx');
+        }  catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            return response()->json(['errors' => $e->failures()], 422); 
+        }  catch (\Exception $e) {
+            return response()->json(['error' => 'Import failed: ' . $e->getMessage()], 500);
+        }
+    }
 
 
 }
