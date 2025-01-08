@@ -10,6 +10,7 @@ use App\Models\ProductRawMaterial;
 use App\Models\Product;
 use App\Models\RawMaterialCategory;
 use App\Models\RawMaterialImage;
+use App\Models\RawMaterialScrap;
 
 class RawMaterial extends Model
 {
@@ -63,4 +64,9 @@ class RawMaterial extends Model
     {
         return $this->belongsTo(RawMaterialCategory::class, 'raw_material_category_id');
     }    
+
+    public function raw_material_scraps()
+    {
+        return $this->hasMany(RawMaterialScrap::class);
+    }
 }

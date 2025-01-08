@@ -9,6 +9,7 @@ use App\Models\ProductRawMaterial;
 use App\Models\SaleOrder;
 use App\Models\ProductCategory;
 use App\Models\ProductImage;
+use App\Models\ProductScrap;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
@@ -59,6 +60,11 @@ class Product extends Model
     public function category()
     {
         return $this->belongsTo(ProductCategory::class, 'product_category_id');
-    }    
+    }  
+    
+    public function product_scraps()
+    {
+        return $this->hasMany(ProductScrap::class);
+    }
 
 }

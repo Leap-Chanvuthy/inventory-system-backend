@@ -7,10 +7,12 @@ use App\Http\Controllers\API\CustomerAPIController;
 use App\Http\Controllers\API\CustomerCategoryAPIController;
 use App\Http\Controllers\API\ProductAPIController;
 use App\Http\Controllers\API\ProductCategoryAPIController;
+use App\Http\Controllers\API\ProductScrapAPIController;
 use App\Http\Controllers\API\ProfileSettingAPIController;
 use App\Http\Controllers\API\PurchaseInvoiceAPIController;
 use App\Http\Controllers\API\RawMaterialAPIController;
 use App\Http\Controllers\API\RawMaterialCetegoryAPIController;
+use App\Http\Controllers\API\RawMaterialScrapAPIController;
 use App\Http\Controllers\API\SaleOrderAPIController;
 use App\Http\Controllers\API\SupplierAPIController;
 use App\Http\Controllers\API\UserAPIController;
@@ -105,6 +107,16 @@ Route::patch('raw-material-category/update/{id}', [RawMaterialCetegoryAPIControl
 Route::delete('raw-material-category/delete/{id}', [RawMaterialCetegoryAPIController::class , 'delete']);
 
 
+// Raw Material Scrap
+Route::get('/raw-material-scraps', [RawMaterialScrapAPIController::class, 'index']); 
+Route::get('/raw-material-scraps/trashed', [RawMaterialScrapAPIController::class, 'trashed']); 
+Route::get('/raw-material-scrap/{id}', [RawMaterialScrapAPIController::class, 'show']); 
+Route::post('/raw-material-scrap', [RawMaterialScrapAPIController::class, 'store']); 
+Route::patch('/raw-material-scrap/{id}', [RawMaterialScrapAPIController::class, 'update']);
+Route::delete('/raw-material-scrap/{id}', [RawMaterialScrapAPIController::class, 'destroy']);
+Route::patch('/raw-material-scrap/recover/{id}', [RawMaterialScrapAPIController::class, 'recover']);
+
+
 // Product Category
 Route::get('product-categories', [ProductCategoryAPIController::class , 'index']);
 Route::get('product-category/{id}', [ProductCategoryAPIController::class , 'show']);
@@ -136,6 +148,15 @@ Route::patch('/product/{id}' , [ProductAPIController::class , 'update']);
 Route::delete('/product/{id}' , [ProductAPIController::class , 'destroy']);
 Route::patch('/product/recover/{id}' , [ProductAPIController::class , 'recover']);
 Route::get('/products/export', [ProductAPIController::class, 'export']);
+
+// Product Scrap
+Route::get('/product-scraps', [ProductScrapAPIController::class, 'index']); 
+Route::get('/product-scraps/trashed', [ProductScrapAPIController::class, 'trashed']); 
+Route::get('/product-scrap/{id}', [ProductScrapAPIController::class, 'show']); 
+Route::post('/product-scrap', [ProductScrapAPIController::class, 'store']); 
+Route::patch('/product-scrap/{id}', [ProductScrapAPIController::class, 'update']);
+Route::delete('/product-scrap/{id}', [ProductScrapAPIController::class, 'destroy']);
+Route::patch('/product-scrap/recover/{id}', [ProductScrapAPIController::class, 'recover']);
 
 
 
