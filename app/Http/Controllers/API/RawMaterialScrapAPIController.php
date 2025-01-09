@@ -69,7 +69,7 @@ class RawMaterialScrapAPIController extends Controller
                     });
                 })
             ])
-            ->allowedSorts('created_at', 'updated_at' , 'quantity')
+            ->allowedSorts('created_at', 'updated_at', 'quantity')
             ->defaultSort('-created_at');
     }
 
@@ -77,20 +77,20 @@ class RawMaterialScrapAPIController extends Controller
     public function index()
     {
         try {
-            $stockScraps = $this -> allBuilder() -> with('raw_material.category')->paginate(10);
+            $stockScraps = $this->allBuilder()->with('raw_material.category')->paginate(10);
             return response()->json($stockScraps);
-        }catch (Exception $e){
-            return response() -> json(['error' => $e -> getMessage()],400);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
         }
     }
 
     public function trashed()
     {
         try {
-            $stockScraps = $this -> allBuilderWithTrashed() -> with('raw_material')->paginate(10);
+            $stockScraps = $this->allBuilderWithTrashed()->with('raw_material')->paginate(10);
             return response()->json($stockScraps);
-        }catch (Exception $e){
-            return response() -> json(['error' => $e -> getMessage()],400);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
         }
     }
 
@@ -105,7 +105,7 @@ class RawMaterialScrapAPIController extends Controller
 
             $rawMaterial = RawMaterial::findOrFail($validated['raw_material_id']);
 
-            if ($validated['quantity'] > $rawMaterial  -> remaining_quantity) {
+            if ($validated['quantity'] > $rawMaterial->remaining_quantity) {
                 throw new \Exception("Quantity of raw material ID {$rawMaterial->id} is not enough.");
             }
 
@@ -114,62 +114,97 @@ class RawMaterialScrapAPIController extends Controller
                 $product->remaining_quantity -= $validated['quantity'];
                 $product->save();
             }
-    
-            $stockScrap = RawMaterialScrap::create($validated);
-    
-            return response()->json(['message' => 'Stock scrap created successfully!' , $stockScrap],201);
 
-        }catch(ValidationException $e){
-            return response() -> json (['errors' => $e -> errors()],400);
-        }catch (Exception $e){
-            return response() -> json(['error' => $e -> getMessage()],400);
+            $stockScrap = RawMaterialScrap::create($validated);
+
+            return response()->json(['message' => 'Stock scrap created successfully!', $stockScrap], 201);
+        } catch (ValidationException $e) {
+            return response()->json(['errors' => $e->errors()], 400);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
         }
     }
 
     public function show($id)
     {
         try {
-            $stockScrap = RawMaterialScrap::with(['raw_material.category' , 'raw_material.supplier'])->findOrFail($id);
+            $stockScrap = RawMaterialScrap::with(['raw_material.category', 'raw_material.supplier'])->findOrFail($id);
             return response()->json($stockScrap);
-        }catch (Exception $e){
-            return response() -> json(['error' => $e -> getMessage()],400);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
         }
     }
+
+
+    // public function update(Request $request, $id)
+    // {
+    //     try {
+    //         $validated = $request->validate([
+    //             'raw_material_id' => 'required|exists:products,id',
+    //             'quantity' => 'required|integer',
+    //             'reason' => 'required|string',
+    //         ]);
+
+    //         $stockScrap = RawMaterialScrap::findOrFail($id);
+
+    //         if ($validated['raw_material_id']) {
+    //             $rawMaterial = RawMaterial::findOrFail($validated['raw_material_id']);
+
+    //             $rawMaterial->remaining_quantity += $stockScrap->quantity;
+
+    //             if ($validated['quantity'] > $rawMaterial->remaining_quantity) {
+    //                 throw new \Exception("Quantity of raw material ID {$rawMaterial->id} is not enough.");
+    //             }
+
+    //             $rawMaterial->remaining_quantity -= $validated['quantity'];
+
+    //             $rawMaterial->save();
+    //         }
+
+    //         $stockScrap->update($validated);
+
+    //         return response()->json(['message' => 'Stock scrap deleted successfully!' , $stockScrap],200);
+
+    //     }catch(ValidationException $e){
+    //         return response() -> json (['errors' => $e -> errors()],400);
+    //     }catch (Exception $e){
+    //         return response() -> json(['error' => $e -> getMessage()],400);
+    //     }
+    // }
 
 
     public function update(Request $request, $id)
     {
         try {
             $validated = $request->validate([
-                'raw_material_id' => 'required|exists:products,id',
+                'raw_material_id' => 'required|exists:raw_materials,id',
                 'quantity' => 'required|integer',
                 'reason' => 'required|string',
             ]);
-    
+
             $stockScrap = RawMaterialScrap::findOrFail($id);
-            
-            if ($validated['raw_material_id']) {
-                $rawMaterial = RawMaterial::findOrFail($validated['raw_material_id']);
-    
-                $rawMaterial->remaining_quantity += $stockScrap->quantity;
-    
-                if ($validated['quantity'] > $rawMaterial->remaining_quantity) {
-                    throw new \Exception("Quantity of raw material ID {$rawMaterial->id} is not enough.");
-                }
-    
-                $rawMaterial->remaining_quantity -= $validated['quantity'];
-    
-                $rawMaterial->save();
+
+            $oldRawMaterial = RawMaterial::findOrFail($stockScrap->raw_material_id);
+
+            $oldRawMaterial->remaining_quantity += $stockScrap->quantity;
+            $oldRawMaterial->save();
+
+            $newRawMaterial = RawMaterial::findOrFail($validated['raw_material_id']);
+
+            if ($validated['quantity'] > $newRawMaterial->remaining_quantity) {
+                throw new \Exception("Quantity of raw material ID {$newRawMaterial->id} is not enough.");
             }
 
-            $stockScrap->update($validated);
-    
-            return response()->json(['message' => 'Stock scrap deleted successfully!' , $stockScrap],200);
+            $newRawMaterial->remaining_quantity -= $validated['quantity'];
+            $newRawMaterial->save();
 
-        }catch(ValidationException $e){
-            return response() -> json (['errors' => $e -> errors()],400);
-        }catch (Exception $e){
-            return response() -> json(['error' => $e -> getMessage()],400);
+            $stockScrap->update($validated);
+
+            return response()->json(['message' => 'Stock scrap updated successfully!', 'stockScrap' => $stockScrap], 200);
+        } catch (ValidationException $e) {
+            return response()->json(['errors' => $e->errors()], 400);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
         }
     }
 
@@ -193,19 +228,19 @@ class RawMaterialScrapAPIController extends Controller
 
             if ($stockScrap->raw_material_id) {
                 $rawMaterial = RawMaterial::findOrFail($stockScrap->raw_material_id);
-    
+
                 $rawMaterial->remaining_quantity += $stockScrap->quantity;
-    
+
                 $rawMaterial->save();
             }
-            $stockScrap -> quantity = 0;
+            $stockScrap->quantity = 0;
             $stockScrap->save();
 
             $stockScrap->delete();
-    
-            return response()->json(['message' => 'Stock scrap deleted successfully!'],200);
-        }catch (Exception $e){
-            return response() -> json(['error' => $e -> getMessage()],400);
+
+            return response()->json(['message' => 'Stock scrap deleted successfully!'], 200);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
         }
     }
 }
