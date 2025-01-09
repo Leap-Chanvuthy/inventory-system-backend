@@ -15,21 +15,42 @@ use Illuminate\Database\Eloquent\Builder;
 class RawMaterialScrapAPIController extends Controller
 {
 
+    // private function allBuilder(): QueryBuilder
+    // {
+    //     return QueryBuilder::for(RawMaterialScrap::class)
+    //         ->allowedFilters([
+    //             AllowedFilter::exact('id'),
+    //             AllowedFilter::exact('quantity'),
+    //             AllowedFilter::exact('raw_material_id'),
+    //             AllowedFilter::callback('search', function (Builder $query, $value) {
+    //                 $query->where(function ($query) use ($value) {
+    //                     $query->where('quantity', 'LIKE', "%{$value}%")
+    //                         ->orWhere('reason', 'LIKE', "%{$value}%");
+    //                 });
+    //             })
+    //         ])
+    //         ->allowedSorts('created_at', 'updated_at' , 'quantity')
+    //         ->defaultSort('-created_at');
+    // }
+
     private function allBuilder(): QueryBuilder
     {
         return QueryBuilder::for(RawMaterialScrap::class)
+            ->join('raw_materials', 'raw_material_scraps.raw_material_id', '=', 'raw_materials.id')
+            ->select('raw_material_scraps.*', 'raw_materials.name as raw_material_name')
             ->allowedFilters([
                 AllowedFilter::exact('id'),
                 AllowedFilter::exact('quantity'),
                 AllowedFilter::exact('raw_material_id'),
                 AllowedFilter::callback('search', function (Builder $query, $value) {
                     $query->where(function ($query) use ($value) {
-                        $query->where('quantity', 'LIKE', "%{$value}%")
-                            ->orWhere('reason', 'LIKE', "%{$value}%");
+                        $query->where('raw_material_scraps.quantity', 'LIKE', "%{$value}%")
+                            ->orWhere('raw_material_scraps.reason', 'LIKE', "%{$value}%")
+                            ->orWhere('raw_materials.name', 'LIKE', "%{$value}%");
                     });
                 })
             ])
-            ->allowedSorts('created_at', 'updated_at' , 'quantity')
+            ->allowedSorts('created_at', 'updated_at', 'quantity')
             ->defaultSort('-created_at');
     }
 
@@ -56,7 +77,7 @@ class RawMaterialScrapAPIController extends Controller
     public function index()
     {
         try {
-            $stockScraps = $this -> allBuilder() -> with('raw_material')->paginate(10);
+            $stockScraps = $this -> allBuilder() -> with('raw_material.category')->paginate(10);
             return response()->json($stockScraps);
         }catch (Exception $e){
             return response() -> json(['error' => $e -> getMessage()],400);
@@ -82,6 +103,12 @@ class RawMaterialScrapAPIController extends Controller
                 'reason' => 'required|string',
             ]);
 
+            $rawMaterial = RawMaterial::findOrFail($validated['raw_material_id']);
+
+            if ($validated['quantity'] > $rawMaterial  -> remaining_quantity) {
+                throw new \Exception("Quantity of raw material ID {$rawMaterial->id} is not enough.");
+            }
+
             if ($validated['raw_material_id']) {
                 $product = RawMaterial::findOrFail($validated['raw_material_id']);
                 $product->remaining_quantity -= $validated['quantity'];
@@ -102,7 +129,7 @@ class RawMaterialScrapAPIController extends Controller
     public function show($id)
     {
         try {
-            $stockScrap = RawMaterialScrap::with(['raw_material'])->findOrFail($id);
+            $stockScrap = RawMaterialScrap::with(['raw_material.category' , 'raw_material.supplier'])->findOrFail($id);
             return response()->json($stockScrap);
         }catch (Exception $e){
             return response() -> json(['error' => $e -> getMessage()],400);
@@ -124,10 +151,12 @@ class RawMaterialScrapAPIController extends Controller
             if ($validated['raw_material_id']) {
                 $rawMaterial = RawMaterial::findOrFail($validated['raw_material_id']);
     
-                // Add back the old quantity
                 $rawMaterial->remaining_quantity += $stockScrap->quantity;
     
-                // Subtract the new quantity
+                if ($validated['quantity'] > $rawMaterial->remaining_quantity) {
+                    throw new \Exception("Quantity of raw material ID {$rawMaterial->id} is not enough.");
+                }
+    
                 $rawMaterial->remaining_quantity -= $validated['quantity'];
     
                 $rawMaterial->save();
