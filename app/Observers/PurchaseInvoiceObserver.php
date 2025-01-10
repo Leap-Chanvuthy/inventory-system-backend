@@ -3,15 +3,44 @@
 namespace App\Observers;
 
 use App\Models\PurchaseInvoice;
+use App\Services\TelegramNotificationService;
 
 class PurchaseInvoiceObserver
 {
+    protected $telegram;
+
+    public function __construct(TelegramNotificationService $telegram)
+    {
+        $this->telegram = $telegram;
+    }
+
     /**
      * Handle the PurchaseInvoice "created" event.
      */
     public function created(PurchaseInvoice $purchaseInvoice): void
     {
-        //
+        // Construct the message
+        $message = "🔔 *New Purchase Invoice Created* 🔔\n";
+        $message .= "----------------------------------\n";
+        $message .= "*Invoice ID:* {$purchaseInvoice->id}\n";
+        $message .= "*Supplier:* {$purchaseInvoice->supplier->name} - {$purchaseInvoice->supplier->supplier_code}\n";
+        $message .= "*Grand Total with Tax (USD):* {$purchaseInvoice->grand_total_with_tax_in_usd}\n";
+        $message .= "*Grand Total with Tax (Riel):* {$purchaseInvoice->grand_total_with_tax_in_riel}\n";
+        $message .= "*Payable​ Rate:* {$purchaseInvoice->clearing_payable_percentage}%\n";
+        $message .= "*Status:* {$purchaseInvoice->status}\n";
+
+        $message .= "\n🔔 *វិក្កយបត្រទិញថ្មីត្រូវបានបង្កើត* 🔔\n";
+        $message .= "----------------------------------\n";
+        $message .= "*លេខវិក្កយបត្រ:* {$purchaseInvoice->id}\n";
+        $message .= "*អ្នកផ្គត់ផ្គង់:* {$purchaseInvoice->supplier->name} - {$purchaseInvoice->supplier->supplier_code}\n";
+        $message .= "*តម្លៃសរុប និងអាករ (USD):* {$purchaseInvoice->grand_total_with_tax_in_usd}\n";
+        $message .= "*តម្លៃសរុប និងអាករ (រៀល):* {$purchaseInvoice->grand_total_with_tax_in_riel}\n";
+        $message .= "*ភាគរយការទូទាត់:* {$purchaseInvoice->clearing_payable_percentage}%\n";
+        $message .= "*ស្ថានភាពនៃការទូរទាត់:* {$purchaseInvoice->status}\n";
+        $message .= "----------------------------------";
+
+        // Send the message via Telegram
+        $this->telegram->sendMessage($message);
     }
 
     /**
@@ -21,28 +50,45 @@ class PurchaseInvoiceObserver
     {
         // Calculate the clearing payable percentage based on clearing_payable and grand_total
         $clearingPayablePercentage = $purchaseInvoice->clearing_payable_percentage;
-        
-        // Calculate the indebted values based on the clearing payable and grand total
-        $indebtedRiel = $purchaseInvoice->grand_total_with_tax_in_riel - ($clearingPayablePercentage / 100) * $purchaseInvoice->grand_total_with_tax_in_riel;
-        $indebtedUsd = $purchaseInvoice->grand_total_with_tax_in_usd - ($clearingPayablePercentage / 100) * $purchaseInvoice->grand_total_with_tax_in_usd;
-    
+
+        // Determine the status based on the clearing payable percentage
         if ($clearingPayablePercentage == 0) {
-            // UNPAID if clearing payable percentage is 0
             $purchaseInvoice->status = 'UNPAID';
         } elseif ($clearingPayablePercentage > 0 && $clearingPayablePercentage < 100) {
-            // INDEBTED if there is an outstanding amount with partial payment
             $purchaseInvoice->status = 'INDEBTED';
         } elseif ($clearingPayablePercentage == 100) {
-            // PAID if clearing payable matches the grand total exactly
             $purchaseInvoice->status = 'PAID';
         } elseif ($clearingPayablePercentage > 100) {
-            // OVERPAID if clearing payable is more than the grand total
             $purchaseInvoice->status = 'OVERPAID';
         }
-    
-        // Save the changes quietly to avoid triggering recursive events
+
+        // Save the updated status quietly
         $purchaseInvoice->saveQuietly();
+
+        // Construct the message
+        $message = "🔔 *Purchase Invoice Update* 🔔\n";
+        $message .= "----------------------------------\n";
+        $message .= "*Invoice ID:* {$purchaseInvoice->id}\n";
+        $message .= "*Supplier:* {$purchaseInvoice->supplier->name} - {$purchaseInvoice->supplier->supplier_code}\n";
+        $message .= "*Grand Total with Tax (USD):* {$purchaseInvoice->grand_total_with_tax_in_usd}\n";
+        $message .= "*Grand Total with Tax (Riel):* {$purchaseInvoice->grand_total_with_tax_in_riel}\n";
+        $message .= "*Payable Percentage:* {$clearingPayablePercentage}%\n";
+        $message .= "*Status:* {$purchaseInvoice->status}\n";
+
+        $message .= "\n🔔 *ការផ្លាស់ប្តូរតម្លៃវិក្កយបត្រ* 🔔\n";
+        $message .= "----------------------------------\n";
+        $message .= "*លេខវិក្កយបត្រ:* {$purchaseInvoice->id}\n";
+        $message .= "*អ្នកផ្គត់ផ្គង់:* {$purchaseInvoice->supplier->name} - {$purchaseInvoice->supplier->supplier_code}\n";
+        $message .= "*តម្លៃសរុប និងអាករ (USD):* {$purchaseInvoice->grand_total_with_tax_in_usd}\n";
+        $message .= "*តម្លៃសរុប និងអាករ (រៀល):* {$purchaseInvoice->grand_total_with_tax_in_riel}\n";
+        $message .= "*ភាគរយការទូទាត់:* {$clearingPayablePercentage}%\n";
+        $message .= "*ស្ថានភាពនៃការទូទាត់:* {$purchaseInvoice->status}\n";
+        $message .= "----------------------------------";
+
+        // Send the message via Telegram
+        $this->telegram->sendMessage($message);
     }
+
     
     
 
