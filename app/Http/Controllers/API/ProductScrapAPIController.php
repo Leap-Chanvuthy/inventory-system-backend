@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Exports\ProductExport;
+use App\Exports\ProductScrapExport;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductScrap;
@@ -11,6 +13,7 @@ use Illuminate\Validation\ValidationException;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProductScrapAPIController extends Controller
 {
@@ -195,4 +198,20 @@ class ProductScrapAPIController extends Controller
             return response() -> json(['error' => $e -> getMessage()],400);
         }
     }
+
+
+    public function export(Request $request)
+    {
+        try {
+            $filters = $request->all();
+            return Excel::download(new ProductScrapExport($request), 'product_scrap.xlsx');
+        }  catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            return response()->json(['errors' => $e->failures()], 422); 
+        }  catch (\Exception $e) {
+            return response()->json(['error' => 'Export failed: ' . $e->getMessage()], 500);
+        }
+    }
+
+
+
 }

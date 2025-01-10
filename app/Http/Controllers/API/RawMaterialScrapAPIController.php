@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Exports\RawMaterialScrapExport;
 use App\Http\Controllers\Controller;
 use App\Models\RawMaterial;
 use App\Models\RawMaterialScrap;
@@ -11,28 +12,10 @@ use Illuminate\Validation\ValidationException;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Facades\Excel;
 
 class RawMaterialScrapAPIController extends Controller
 {
-
-    // private function allBuilder(): QueryBuilder
-    // {
-    //     return QueryBuilder::for(RawMaterialScrap::class)
-    //         ->allowedFilters([
-    //             AllowedFilter::exact('id'),
-    //             AllowedFilter::exact('quantity'),
-    //             AllowedFilter::exact('raw_material_id'),
-    //             AllowedFilter::callback('search', function (Builder $query, $value) {
-    //                 $query->where(function ($query) use ($value) {
-    //                     $query->where('quantity', 'LIKE', "%{$value}%")
-    //                         ->orWhere('reason', 'LIKE', "%{$value}%");
-    //                 });
-    //             })
-    //         ])
-    //         ->allowedSorts('created_at', 'updated_at' , 'quantity')
-    //         ->defaultSort('-created_at');
-    // }
-
     private function allBuilder(): QueryBuilder
     {
         return QueryBuilder::for(RawMaterialScrap::class)
@@ -136,43 +119,6 @@ class RawMaterialScrapAPIController extends Controller
     }
 
 
-    // public function update(Request $request, $id)
-    // {
-    //     try {
-    //         $validated = $request->validate([
-    //             'raw_material_id' => 'required|exists:products,id',
-    //             'quantity' => 'required|integer',
-    //             'reason' => 'required|string',
-    //         ]);
-
-    //         $stockScrap = RawMaterialScrap::findOrFail($id);
-
-    //         if ($validated['raw_material_id']) {
-    //             $rawMaterial = RawMaterial::findOrFail($validated['raw_material_id']);
-
-    //             $rawMaterial->remaining_quantity += $stockScrap->quantity;
-
-    //             if ($validated['quantity'] > $rawMaterial->remaining_quantity) {
-    //                 throw new \Exception("Quantity of raw material ID {$rawMaterial->id} is not enough.");
-    //             }
-
-    //             $rawMaterial->remaining_quantity -= $validated['quantity'];
-
-    //             $rawMaterial->save();
-    //         }
-
-    //         $stockScrap->update($validated);
-
-    //         return response()->json(['message' => 'Stock scrap deleted successfully!' , $stockScrap],200);
-
-    //     }catch(ValidationException $e){
-    //         return response() -> json (['errors' => $e -> errors()],400);
-    //     }catch (Exception $e){
-    //         return response() -> json(['error' => $e -> getMessage()],400);
-    //     }
-    // }
-
-
     public function update(Request $request, $id)
     {
         try {
@@ -243,4 +189,20 @@ class RawMaterialScrapAPIController extends Controller
             return response()->json(['error' => $e->getMessage()], 400);
         }
     }
+
+
+    public function export(Request $request)
+    {
+        try {
+            $filters = $request->all();
+            return Excel::download(new RawMaterialScrapExport($request), 'raw_materials_scrap.xlsx');
+        }  catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            return response()->json(['errors' => $e->failures()], 422); 
+        }  catch (\Exception $e) {
+            return response()->json(['error' => 'Export failed: ' . $e->getMessage()], 500);
+        }
+    }
+
+
+
 }

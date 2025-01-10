@@ -115,6 +115,7 @@ Route::post('/raw-material-scrap', [RawMaterialScrapAPIController::class, 'store
 Route::patch('/raw-material-scrap/{id}', [RawMaterialScrapAPIController::class, 'update']);
 Route::delete('/raw-material-scrap/{id}', [RawMaterialScrapAPIController::class, 'destroy']);
 Route::patch('/raw-material-scrap/recover/{id}', [RawMaterialScrapAPIController::class, 'recover']);
+Route::get('/raw-material-scraps/export', [RawMaterialScrapAPIController::class, 'export']);
 
 
 // Product Category
@@ -157,6 +158,7 @@ Route::post('/product-scrap', [ProductScrapAPIController::class, 'store']);
 Route::patch('/product-scrap/{id}', [ProductScrapAPIController::class, 'update']);
 Route::delete('/product-scrap/{id}', [ProductScrapAPIController::class, 'destroy']);
 Route::patch('/product-scrap/recover/{id}', [ProductScrapAPIController::class, 'recover']);
+Route::get('/product-scraps/export', [ProductScrapAPIController::class, 'export']);
 
 
 
