@@ -112,6 +112,17 @@ class SaleOrderAPIController extends Controller
     }
 
 
+    public function generateInvoiceNumber(): string
+    {
+        $lastInvoice = SaleOrder::withTrashed()
+            ->selectRaw('MAX(CAST(SUBSTRING(sale_invoice_number, 5) AS UNSIGNED)) AS max_code')
+            ->first();
+
+        $lastCode = $lastInvoice->max_code ?? 0;
+
+        $newNumber = str_pad($lastCode + 1, 6, '0', STR_PAD_LEFT);
+        return 'INV-' . $newNumber;
+    }
 
     public function index () {
         try {
@@ -198,6 +209,7 @@ class SaleOrderAPIController extends Controller
             // Step 3: Create the sale order
             $saleOrder = SaleOrder::create([
                 'payment_method' => $validated['payment_method'],
+                'sale_invoice_number' => $this -> generateInvoiceNumber(),
                 'order_date' => $validated['order_date'],
                 'payment_status' => $payment_status,
                 'order_status' => $validated['order_status'],

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table -> string('payment_method' , 50);
             $table -> date('order_date');
+            $table -> string('sale_invoice_number');
             $table -> string('order_status');
             $table -> string('payment_status');
             $table-> double('discount_percentage')->default(0);

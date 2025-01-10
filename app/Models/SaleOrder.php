@@ -39,6 +39,7 @@ class SaleOrder extends Model
         'payment_method',
         'order_date',
         'payment_status',
+        'sale_invoice_number',
         'order_status',
         'discount_percentage',
         'discount_value_in_usd',

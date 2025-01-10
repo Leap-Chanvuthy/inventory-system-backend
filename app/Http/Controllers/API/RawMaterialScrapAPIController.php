@@ -6,7 +6,6 @@ use App\Exports\RawMaterialScrapExport;
 use App\Http\Controllers\Controller;
 use App\Models\RawMaterial;
 use App\Models\RawMaterialScrap;
-use App\Services\TelegramNotificationService;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -17,13 +16,6 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class RawMaterialScrapAPIController extends Controller
 {
-
-    protected $telegram;
-
-    public function __construct(TelegramNotificationService $telegram)
-    {
-        $this->telegram = $telegram;
-    }
 
     private function allBuilder(): QueryBuilder
     {
@@ -154,16 +146,6 @@ class RawMaterialScrapAPIController extends Controller
             $newRawMaterial->save();
 
             $stockScrap->update($validated);
-
-
-            $message = "Raw material scrap updated:\n";
-            $message .= "ID: {$stockScrap->id}\n";
-            $message .= "Quantity Scrapped: {$validated['quantity']}\n";
-            $message .= "Reason: {$validated['reason']}\n";
-            $message .= "Old Raw Material Code: {$oldRawMaterial->material_code}\n";
-            $message .= "New Raw Material Code: {$newRawMaterial-> material_code}";
-
-            $this->telegram->sendMessage($message);
 
             return response()->json(['message' => 'Stock scrap updated successfully!', 'stockScrap' => $stockScrap], 200);
         } catch (ValidationException $e) {
