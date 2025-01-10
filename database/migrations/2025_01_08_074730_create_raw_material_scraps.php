@@ -19,7 +19,6 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('raw_material_id')->references('id')->on('raw_materials') -> onUpdate('cascade');
-            $table -> softDeletes();
         });
     }
 

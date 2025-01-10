@@ -118,20 +118,39 @@ class ProductScrapAPIController extends Controller
                 'reason' => 'required|string',
             ]);
     
-            $stockScrap = ProductScrap::findOrFail($id);
+            // $stockScrap = ProductScrap::findOrFail($id);
 
-            if ($validated['product_id']) {
-                $product = Product::findOrFail($validated['product_id']);
+            // if ($validated['product_id']) {
+            //     $product = Product::findOrFail($validated['product_id']);
 
-                $product->remaining_quantity += $stockScrap -> quantity;
+            //     $product->remaining_quantity += $stockScrap -> quantity;
 
-                $product->remaining_quantity -= $validated['quantity'];
-                $product->save();
-            }
+            //     $product->remaining_quantity -= $validated['quantity'];
+            //     $product->save();
+            // }
             
+            // $stockScrap->update($validated);
+    
+            // return response()->json(['message' => 'Stock scrap deleted successfully!' , $stockScrap],200);
+
+            $stockScrap = ProductScrap::findOrFail($id);
+            $oldProduct = Product::findOrFail($stockScrap->product_id);
+    
+            $oldProduct->remaining_quantity += $stockScrap->quantity;
+            $oldProduct->save();
+    
+            $newProduct = Product::findOrFail($validated['product_id']);
+    
+            if ($validated['quantity'] > $newProduct->remaining_quantity) {
+                throw new \Exception("Quantity of product ID {$newProduct->id} is not enough.");
+            }
+    
+            $newProduct->remaining_quantity -= $validated['quantity'];
+            $newProduct->save();
+    
             $stockScrap->update($validated);
     
-            return response()->json(['message' => 'Stock scrap deleted successfully!' , $stockScrap],200);
+            return response()->json(['message' => 'Stock scrap updated successfully!', 'stockScrap' => $stockScrap], 200);
 
         }catch(ValidationException $e){
             return response() -> json (['errors' => $e -> errors()],400);
