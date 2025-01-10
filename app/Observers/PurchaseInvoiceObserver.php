@@ -29,7 +29,7 @@ class PurchaseInvoiceObserver
         $message .= "*Grand Total with Tax (Riel):* {$purchaseInvoice->grand_total_with_tax_in_riel}\n";
         $message .= "*Payable​ Rate:* {$purchaseInvoice->clearing_payable_percentage}%\n";
         $message .= "*Discount:* {$purchaseInvoice -> discount_percentage} (%) |  {$purchaseInvoice -> discount_value_in_riel} $ / {$purchaseInvoice -> discount_value_in_riel} ៛ %\n";
-        $message .= "*Tax:* {$purchaseInvoice -> tax_percentage} (%) |  {$purchaseInvoice -> tax_value_in_riel} $ / {$purchaseInvoice -> tax_value_in_riel} ៛ %\n";
+        $message .= "*Tax:* {$purchaseInvoice -> tax_percentage} (%) |  {$purchaseInvoice -> tax_value_in_usd} $ / {$purchaseInvoice -> tax_value_in_riel} ៛ %\n";
         $message .= "*Indebted Money:* {$purchaseInvoice -> indebted_in_usd} $ / {$purchaseInvoice -> indebted_in_riel} ៛ %\n";
         $message .= "*Status:* {$purchaseInvoice->status}\n";
 
@@ -42,7 +42,7 @@ class PurchaseInvoiceObserver
         $message .= "*តម្លៃសរុប និងអាករ (រៀល):* {$purchaseInvoice->grand_total_with_tax_in_riel}\n";
         $message .= "*ភាគរយការទូទាត់:* {$purchaseInvoice->clearing_payable_percentage}%\n";
         $message .= "*ការបញ្ចុះតម្លៃ:* {$purchaseInvoice -> discount_percentage} |  {$purchaseInvoice -> discount_value_in_riel} $ / {$purchaseInvoice -> discount_value_in_riel} ៛ %\n";
-        $message .= "*ពន្ធអាករ:* {$purchaseInvoice -> tax_percentage} |  {$purchaseInvoice -> tax_value_in_riel} $ / {$purchaseInvoice -> tax_value_in_riel} ៛ %\n";
+        $message .= "*ពន្ធអាករ:* {$purchaseInvoice -> tax_percentage} |  {$purchaseInvoice -> tax_value_in_usd} $ / {$purchaseInvoice -> tax_value_in_riel} ៛ %\n";
         $message .= "*លុយជំពាក់:* {$purchaseInvoice -> indebted_in_usd} $ / {$purchaseInvoice -> indebted_in_riel} ៛ %\n";
         $message .= "*ស្ថានភាពនៃការទូរទាត់:* {$purchaseInvoice->status}\n";
         $message .= "----------------------------------";
@@ -83,7 +83,7 @@ class PurchaseInvoiceObserver
         $message .= "*Grand Total with Tax (Riel):* {$purchaseInvoice->grand_total_with_tax_in_riel}\n";
         $message .= "*Payable Percentage:* {$clearingPayablePercentage}%\n";
         $message .= "*Discount:* {$purchaseInvoice -> discount_percentage} (%) |  {$purchaseInvoice -> discount_value_in_riel} $ / {$purchaseInvoice -> discount_value_in_riel} ៛ %\n";
-        $message .= "*Tax:* {$purchaseInvoice -> tax_percentage} (%) |  {$purchaseInvoice -> tax_value_in_riel} $ / {$purchaseInvoice -> tax_value_in_riel} ៛ %\n";
+        $message .= "*Tax:* {$purchaseInvoice -> tax_percentage} (%) |  {$purchaseInvoice -> tax_value_in_usd} $ / {$purchaseInvoice -> tax_value_in_riel} ៛ %\n";
         $message .= "*Indebted Money:* {$purchaseInvoice -> indebted_in_usd} $ / {$purchaseInvoice -> indebted_in_riel} ៛ %\n";
         $message .= "*Status:* {$purchaseInvoice->status}\n";
 
@@ -96,7 +96,7 @@ class PurchaseInvoiceObserver
         $message .= "*តម្លៃសរុប និងអាករ (រៀល):* {$purchaseInvoice->grand_total_with_tax_in_riel}\n";
         $message .= "*ភាគរយការទូទាត់:* {$clearingPayablePercentage}%\n";
         $message .= "*ការបញ្ចុះតម្លៃ:* {$purchaseInvoice -> discount_percentage} |  {$purchaseInvoice -> discount_value_in_riel} $ / {$purchaseInvoice -> discount_value_in_riel} ៛ %\n";
-        $message .= "*ពន្ធអាករ:* {$purchaseInvoice -> tax_percentage} |  {$purchaseInvoice -> tax_value_in_riel} $ / {$purchaseInvoice -> tax_value_in_riel} ៛ %\n";
+        $message .= "*ពន្ធអាករ:* {$purchaseInvoice -> tax_percentage} |  {$purchaseInvoice -> tax_value_in_usd} $ / {$purchaseInvoice -> tax_value_in_riel} ៛ %\n";
         $message .= "*លុយជំពាក់:* {$purchaseInvoice -> indebted_in_usd} $ / {$purchaseInvoice -> indebted_in_riel} ៛ %\n";
         $message .= "*ស្ថានភាពនៃការទូទាត់:* {$purchaseInvoice->status}\n";
         $message .= "----------------------------------";
