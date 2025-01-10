@@ -25,7 +25,7 @@ class ProductObserver
         $message .= "*Product ID:* {$product->id}\n";
         $message .= "*Product Code:* {$product->product_code}\n";
         $message .= "*Product Name:* {$product->product_name}\n";
-        $message .= "*Initial Quantity:* {$product->initial_quantity}\n";
+        $message .= "*Initial Quantity:* {$product->quantity}\n";
         $message .= "*Remaining Quantity:* {$product->remaining_quantity}\n";
         $message .= "*Status:* {$product->status}\n";
 
@@ -34,7 +34,7 @@ class ProductObserver
         $message .= "*លេខសម្គាល់ផលិតផល:* {$product->id}\n";
         $message .= "*លេខកូដផលិតផល:* {$product->product_code}\n";
         $message .= "*ឈ្មោះផលិតផល:* {$product->product_name}\n";
-        $message .= "*បរិមាណដើម:* {$product->initial_quantity}\n";
+        $message .= "*បរិមាណដើម:* {$product->quantity}\n";
         $message .= "*បរិមាណដែលនៅសល់:* {$product->remaining_quantity}\n";
         $message .= "*ស្ថានភាព:* {$product->status}\n";
         $message .= "----------------------------------";
@@ -53,6 +53,7 @@ class ProductObserver
         $message .= "*Product ID:* {$product->id}\n";
         $message .= "*Product Code:* {$product->product_code}\n";
         $message .= "*Product Name:* {$product->product_name}\n";
+        $message .= "*Initial Quantity:* {$product->quantity}\n";
         $message .= "*Remaining Quantity:* {$product->remaining_quantity}\n";
 
         $message .= "\n🔔 *ការផ្លាស់ប្តូរស្តុកផលិតផល* 🔔\n";
@@ -60,6 +61,7 @@ class ProductObserver
         $message .= "*លេខសម្គាល់ផលិតផល:* {$product->id}\n";
         $message .= "*លេខកូដផលិតផល:* {$product->product_code}\n";
         $message .= "*ឈ្មោះផលិតផល:* {$product->product_name}\n";
+        $message .= "*បរិមាណដើម:* {$product->quantity}\n";
         $message .= "*បរិមាណដែលនៅសល់:* {$product->remaining_quantity}\n";
 
         if ($product->remaining_quantity == 0) {
