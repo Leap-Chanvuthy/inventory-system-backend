@@ -25,7 +25,7 @@ class SaleOrderExport implements FromQuery, WithHeadings, WithMapping
 
     public function query()
     {
-        return QueryBuilder::for(SaleOrder::with(['customer', 'products']))
+        return QueryBuilder::for(SaleOrder::with(['customer', 'products' , 'vender']))
             ->allowedFilters([
                 AllowedFilter::exact('id'),
                 AllowedFilter::exact('payment_method'),
@@ -65,6 +65,8 @@ class SaleOrderExport implements FromQuery, WithHeadings, WithMapping
                 $saleOrder->order_date,
                 $saleOrder->payment_status,
                 $saleOrder->order_status,
+                $saleOrder->vender->name,
+                $saleOrder->vender->email,
                 $saleOrder->customer->id,
                 $saleOrder->customer->fullname,
                 $saleOrder->customer->phone_number ?? 'N/A',
@@ -102,6 +104,8 @@ class SaleOrderExport implements FromQuery, WithHeadings, WithMapping
             'Order Date',
             'Payment Status',
             'Order Status',
+            'Veder Name',
+            'Vender Email',
             'Customer ID',
             'Customer Name',
             'Customer Phone',

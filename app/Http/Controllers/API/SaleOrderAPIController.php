@@ -14,6 +14,7 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -126,7 +127,7 @@ class SaleOrderAPIController extends Controller
 
     public function index () {
         try {
-            $saleOrder = $this -> allBuilder() -> with( 'customer' , 'products') -> paginate(10);
+            $saleOrder = $this -> allBuilder() -> with( 'customer' , 'products' , 'vender') -> paginate(10);
             return response() -> json($saleOrder);
         }catch (Exception $e){
             return response() -> json(['error' => $e -> getMessage()],400);
@@ -145,7 +146,7 @@ class SaleOrderAPIController extends Controller
 
     public function show ($id) {
         try {
-            $saleOrder = SaleOrder::with('customer.category' , 'products') ->findOrFail($id);
+            $saleOrder = SaleOrder::with('customer.category' , 'products' , 'vender') ->findOrFail($id);
             return response() -> json($saleOrder);
         }catch (Exception $e){
             return response() -> json(['error' => $e -> getMessage()],400);
@@ -158,6 +159,7 @@ class SaleOrderAPIController extends Controller
     {
         try {
             $validated = $this->validateAndExtractData($request);
+            $vender_id = Auth::user() -> id;
 
             // Step 1: Calculate total values from the product array
             $subTotalUSD = 0;
@@ -229,6 +231,7 @@ class SaleOrderAPIController extends Controller
                 'indebted_in_usd' => $indebtedUSD,
                 'indebted_in_riel' => $indebtedRiel,
                 'customer_id' => $validated['customer_id'],
+                'vender_id' => $vender_id,
             ]);
 
             // Step 4: Create ProductSaleOrder records for each product
@@ -261,6 +264,7 @@ class SaleOrderAPIController extends Controller
         try {
             // Step 1: Validate the incoming request
             $validated = $this->validateAndExtractData($request);
+            $vender_id = Auth::user() -> id;
 
             // Step 2: Find the existing sale order
             $saleOrder = SaleOrder::findOrFail($id);
@@ -357,6 +361,7 @@ class SaleOrderAPIController extends Controller
                 'indebted_in_usd' => $indebtedUSD,
                 'indebted_in_riel' => $indebtedRiel,
                 'customer_id' => $validated['customer_id'],
+                'vender_id' => $vender_id,
             ]);
 
             return response()->json([

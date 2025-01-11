@@ -58,7 +58,7 @@ class ProductScrapAPIController extends Controller
     public function index()
     {
         try {
-            $stockScraps = $this -> allBuilder() -> with('product')->paginate(10);
+            $stockScraps = $this -> allBuilder() -> with('product.category')->paginate(10);
             return response()->json($stockScraps);
         }catch (Exception $e){
             return response() -> json(['error' => $e -> getMessage()],400);
@@ -105,7 +105,7 @@ class ProductScrapAPIController extends Controller
     public function show($id)
     {
         try {
-            $stockScrap = ProductScrap::with(['product'])->findOrFail($id);
+            $stockScrap = ProductScrap::with(['product.category'])->findOrFail($id);
             return response()->json($stockScrap);
         }catch (Exception $e){
             return response() -> json(['error' => $e -> getMessage()],400);

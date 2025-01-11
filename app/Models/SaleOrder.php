@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Product;
+use App\Models\User;
 use App\Models\Customer;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -57,6 +58,7 @@ class SaleOrder extends Model
         'indebted_in_usd',
         'indebted_in_riel',
         'customer_id',
+        'vender_id',
     ];
     
 
@@ -70,6 +72,10 @@ class SaleOrder extends Model
 
     public function customer (){
         return $this -> belongsTo(Customer::class);
+    }
+
+    public function vender (){
+        return $this -> belongsTo(User::class);
     }
 
 }

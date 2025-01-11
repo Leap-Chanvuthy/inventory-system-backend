@@ -29,8 +29,8 @@ class SaleOrderObserver
         $message .= "*Total Amount with Tax (USD):* {$saleOrder -> grand_total_with_tax_in_usd} $ \n";
         $message .= "*Total Amount with Tax (Riel):* {$saleOrder -> grand_total_with_tax_in_riel} ៛ \n";
         $message .= "*Payable Percentage:* {$saleOrder -> clearing_payable_percentage} (%) \n";
-        $message .= "*Discount:* {$saleOrder -> discount_percentage} (%) |  {$saleOrder -> discount_value_in_riel} $ / {$saleOrder -> discount_value_in_riel} ៛\n";
-        $message .= "*Tax:* {$saleOrder -> tax_percentage} (%) |  {$saleOrder -> tax_value_in_riel} $ / {$saleOrder -> tax_value_in_riel} ៛\n";
+        $message .= "*Discount:* {$saleOrder -> discount_percentage} (%) |  {$saleOrder -> discount_value_in_usd} $ / {$saleOrder -> discount_value_in_riel} ៛\n";
+        $message .= "*Tax:* {$saleOrder -> tax_percentage} (%) |  {$saleOrder -> tax_value_in_usd} $ / {$saleOrder -> tax_value_in_riel} ៛\n";
         $message .= "*Payment Status:* {$saleOrder -> payment_status}\n";
         $message .= "*Order Status:* {$saleOrder -> order_status}\n";
         $message .= "*Payment Method:* {$saleOrder -> payment_method}\n";
@@ -45,8 +45,8 @@ class SaleOrderObserver
         $message .= "*តម្លៃសរុប និងអាករ (USD):* {$saleOrder -> grand_total_with_tax_in_usd} $ \n";
         $message .= "*តម្លៃសរុប និងអាករ (រៀល):* {$saleOrder -> grand_total_with_tax_in_riel} ៛ \n";
         $message .= "*ភាគរយការទូទាត់:* {$saleOrder -> clearing_payable_percentage}%\n";
-        $message .= "*ការបញ្ចុះតម្លៃ:* {$saleOrder -> discount_percentage} (%) | {$saleOrder -> discount_value_in_riel} $ / {$saleOrder -> discount_value_in_riel} ៛\n";
-        $message .= "*ពន្ធអាករ:* {$saleOrder -> tax_percentage} (%) | {$saleOrder -> tax_value_in_riel} $ / {$saleOrder -> tax_value_in_riel} ៛\n";
+        $message .= "*ការបញ្ចុះតម្លៃ:* {$saleOrder -> discount_percentage} (%) | {$saleOrder -> discount_value_in_usd} $ / {$saleOrder -> discount_value_in_riel} ៛\n";
+        $message .= "*ពន្ធអាករ:* {$saleOrder -> tax_percentage} (%) | {$saleOrder -> tax_value_in_usd} $ / {$saleOrder -> tax_value_in_riel} ៛\n";
         $message .= "*ស្ថានភាពនៃការទូទាត់:* {$saleOrder -> payment_status}\n";
         $message .= "*ស្ថានភាពនៃការបញ្ជារទិញ:* {$saleOrder -> order_status}\n";
         $message .= "*វិធីសាស្រ្តនៃការទូទាត់:* {$saleOrder -> payment_method}\n";
@@ -71,8 +71,8 @@ class SaleOrderObserver
         $message .= "*Total Amount with Tax (USD):* {$saleOrder -> grand_total_with_tax_in_usd} $ \n";
         $message .= "*Total Amount with Tax (Riel):* {$saleOrder -> grand_total_with_tax_in_riel} ៛ \n";
         $message .= "*Payable Percentage:* {$saleOrder -> clearing_payable_percentage} (%) \n";
-        $message .= "*Discount:* {$saleOrder -> discount_percentage} (%) |  {$saleOrder -> discount_value_in_riel} $ / {$saleOrder -> discount_value_in_riel} ៛\n";
-        $message .= "*Tax:* {$saleOrder -> tax_percentage} (%) |  {$saleOrder -> tax_value_in_riel} $ / {$saleOrder -> tax_value_in_riel} ៛\n";
+        $message .= "*Discount:* {$saleOrder -> discount_percentage} (%) |  {$saleOrder -> discount_value_in_usd} $ / {$saleOrder -> discount_value_in_riel} ៛\n";
+        $message .= "*Tax:* {$saleOrder -> tax_percentage} (%) |  {$saleOrder -> tax_value_in_usd} $ / {$saleOrder -> tax_value_in_riel} ៛\n";
         $message .= "*Payment Status:* {$saleOrder -> payment_status}\n";
         $message .= "*Order Status:* {$saleOrder -> order_status}\n";
         $message .= "*Payment Method:* {$saleOrder -> payment_method}\n";
@@ -87,8 +87,8 @@ class SaleOrderObserver
         $message .= "*តម្លៃសរុប និងអាករ (USD):* {$saleOrder -> grand_total_with_tax_in_usd} $ \n";
         $message .= "*តម្លៃសរុប និងអាករ (រៀល):* {$saleOrder -> grand_total_with_tax_in_riel} ៛ \n";
         $message .= "*ភាគរយការទូទាត់:* {$saleOrder -> clearing_payable_percentage}%\n";
-        $message .= "*ការបញ្ចុះតម្លៃ:* {$saleOrder -> discount_percentage} (%) | {$saleOrder -> discount_value_in_riel} $ / {$saleOrder -> discount_value_in_riel} ៛\n";
-        $message .= "*ពន្ធអាករ:* {$saleOrder -> tax_percentage} (%) | {$saleOrder -> tax_value_in_riel} $ / {$saleOrder -> tax_value_in_riel} ៛\n";
+        $message .= "*ការបញ្ចុះតម្លៃ:* {$saleOrder -> discount_percentage} (%) | {$saleOrder -> discount_value_in_usd} $ / {$saleOrder -> discount_value_in_riel} ៛\n";
+        $message .= "*ពន្ធអាករ:* {$saleOrder -> tax_percentage} (%) | {$saleOrder -> tax_value_in_usd} $ / {$saleOrder -> tax_value_in_riel} ៛\n";
         $message .= "*ស្ថានភាពនៃការទូទាត់:* {$saleOrder -> payment_status}\n";
         $message .= "*ស្ថានភាពនៃការបញ្ជារទិញ:* {$saleOrder -> order_status}\n";
         $message .= "*វិធីសាស្រ្តនៃការទូទាត់:* {$saleOrder -> payment_method}\n";

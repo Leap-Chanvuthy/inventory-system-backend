@@ -34,12 +34,20 @@ return new class extends Migration
             $table -> double('indebted_in_riel') -> default(0);
             $table-> double('indebted_in_usd');
             $table->unsignedBigInteger('customer_id');
+            $table->unsignedBigInteger('vender_id');
 
             $table -> foreign('customer_id')
             ->references('id')
             ->on('customers')
             ->onDelete('cascade')
             ->onUpdate('cascade');
+
+            $table -> foreign('vender_id')
+            ->references('id')
+            ->on('users')
+            ->onDelete('cascade')
+            ->onUpdate('cascade');
+
             $table->timestamps();
             $table -> softDeletes();
         });
