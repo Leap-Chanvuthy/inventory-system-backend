@@ -62,7 +62,7 @@ class SaleOrderObserver
     public function updated(SaleOrder $saleOrder): void
     {
         // Construct the message
-        $message = "🔔 *New Sale Order Created* 🔔\n";
+        $message = "🔔 *New Sale Order Updated* 🔔\n";
         $message .= "----------------------------------\n";
         $message .= "*Sale Order ID:* {$saleOrder->id}\n";
         $message .= "*Sale Invoice:* {$saleOrder->sale_invoice_number}\n";
@@ -78,7 +78,7 @@ class SaleOrderObserver
         $message .= "*Payment Method:* {$saleOrder -> payment_method}\n";
         $message .= "----------------------------------\n";
 
-        $message .= "\n🔔 *ការបង្កើតការបញ្ជាទិញថ្មី* 🔔\n";
+        $message .= "\n🔔 *ការកែប្រែការបញ្ជាទិញថ្មី* 🔔\n";
         $message .= "----------------------------------\n";
         $message .= "*លេខការបញ្ជាទិញ:* {$saleOrder->id}\n";
         $message .= "*លេខកូដវិក័យបត្រ:* {$saleOrder->sale_invoice_number}\n";
