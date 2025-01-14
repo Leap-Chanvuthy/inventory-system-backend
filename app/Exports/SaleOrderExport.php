@@ -61,6 +61,7 @@ class SaleOrderExport implements FromQuery, WithHeadings, WithMapping
         foreach ($saleOrder->products as $product) {
             $data[] = [
                 $saleOrder->id,
+                $saleOrder -> sale_invoice_number,
                 $saleOrder->payment_method,
                 $saleOrder->order_date,
                 $saleOrder->payment_status,
@@ -100,6 +101,7 @@ class SaleOrderExport implements FromQuery, WithHeadings, WithMapping
     {
         return [
             'ID',
+            'Sale Invoice Number',
             'Payment Method',
             'Order Date',
             'Payment Status',
